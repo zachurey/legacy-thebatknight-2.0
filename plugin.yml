@@ -1,0 +1,7 @@
+name: TBN
+version: 2.0
+main: com.zafcoding.zackscott.tbn.TBN
+commands:
+  tbn:
+  spawn:
+  unstuck:
