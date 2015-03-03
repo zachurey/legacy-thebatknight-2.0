@@ -156,7 +156,17 @@ public class TBN extends JavaPlugin {
 
 					if (args[0].equalsIgnoreCase("chest")) {
 						if (p.isOp()) {
-							loc.populateChests(p, false);
+							int i = loc.populateChests(p, false);
+							p.sendMessage(pre + ChatColor.GRAY + "Spawned " + i
+									+ " chests!");
+							return true;
+						}
+					}
+					if (args[0].equalsIgnoreCase("removechest")) {
+						if (p.isOp()) {
+							int i = game.removeChest();
+							p.sendMessage(pre + ChatColor.GRAY + "Removed " + i
+									+ " chests!");
 							return true;
 						}
 					}

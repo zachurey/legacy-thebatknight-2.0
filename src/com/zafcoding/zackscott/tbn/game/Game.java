@@ -34,7 +34,7 @@ public class Game {
 	static Info info = TBN.info;
 	static Locations loc = TBN.loc;
 	final PlayerProfile mostdi1a = null;
-	
+
 	public void start() {
 		info.setState(ServerState.In_Game);
 		setHeroesAndBadGuys(tbn);
@@ -72,10 +72,10 @@ public class Game {
 						0));
 				if (pq.getDiamonds() > mostdia.getDiamonds()) {
 					mostdia = pq;
-					mostdi1a = pq;
 				}
 				total = total + pq.getDiamonds();
 			}
+			info.setWinner(mostdia);
 			info.broadCast(ChatColor.WHITE + "----------" + ChatColor.GOLD
 					+ "TheBatKnight" + ChatColor.WHITE + "----------");
 			info.broadCast(ChatColor.GREEN + "Enjoy " + ChatColor.BLUE
@@ -138,7 +138,7 @@ public class Game {
 								+ "\nThanks for playing! \nRejoin to play another game!\n"
 								+ ChatColor.GREEN + "Winner: "
 								+ ChatColor.DARK_AQUA
-								+ mostdi1a.getPlayer().getDisplayName());
+								+ info.getWinner().getPlayer().getDisplayName());
 					}
 					if (bo == 1) {
 						ppp.kickPlayer(ChatColor.GOLD
@@ -148,24 +148,25 @@ public class Game {
 								+ ChatColor.RESET
 								+ "\nThanks for playing! \nRejoin to play another game!\n"
 								+ ChatColor.GREEN + "Winners: "
-								+ ChatColor.DARK_AQUA
-								+ "Heros!");
+								+ ChatColor.DARK_AQUA + "Heros!");
 					}
 				}
 			}
 		}, 200L);
 	}
 
-	public void removeChest() {
+	public int removeChest() {
 		int chestdone = 0;
 		int totala = info.chests.size();
 		for (Location loc : info.chests) {
 			if (loc.getBlock().getType() == Material.CHEST) {
 				loc.getBlock().setType(Material.AIR);
+				chestdone++;
 				tbn.debugMsg("Removed chest " + chestdone + "/" + totala);
 				info.chests.remove(loc);
 			}
 		}
+		return chestdone;
 	}
 
 	public ItemStack setName(ItemStack is, String name, List<String> lore) {

@@ -43,7 +43,7 @@ public class Info {
 	public static ArrayList<Player> ingame = new ArrayList<Player>();
 	public static ArrayList<Location> fakechests = new ArrayList<Location>();
 	public static ArrayList<Location> chests = new ArrayList<Location>();
-	Player winner = null;
+	PlayerProfile winner = null;
 
 	public boolean isSpect(Player p) {
 		return spects.contains(p);
@@ -60,11 +60,11 @@ public class Info {
 		active = world;
 	}
 
-	public void setWinner(Player win) {
+	public void setWinner(PlayerProfile win) {
 		winner = win;
 	}
 
-	public Player getWinner() {
+	public PlayerProfile getWinner() {
 		return winner;
 	}
 

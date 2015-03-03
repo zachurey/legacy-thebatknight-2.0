@@ -189,7 +189,7 @@ public class GameListiner implements Listener {
 	@EventHandler
 	public void PlayerInteract(PlayerInteractEvent e) {
 		PlayerProfile pe = info.getPP(e.getPlayer());
-		if (pe.isDead()) {
+		if (pe != null && pe.isDead()) {
 			if (pe.getPlayer().getItemInHand() != null
 					&& pe.getPlayer().getItemInHand().getType() == Material.COMPASS) {
 				List ss = new ArrayList<>();

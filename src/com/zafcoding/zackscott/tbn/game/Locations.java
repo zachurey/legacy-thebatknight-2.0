@@ -97,7 +97,7 @@ public class Locations {
 	 * -271.0D); player.teleport(waitingCellLocation); }
 	 */
 
-	public static void populateChests(Player player, boolean superChestMode) {
+	public static int populateChests(Player player, boolean superChestMode) {
 		if (superChestMode) {
 			Bukkit.broadcastMessage(ChatColor.GOLD + "SUPER CHEST GAME!");
 			Bukkit.broadcastMessage(ChatColor.YELLOW
@@ -335,5 +335,6 @@ public class Locations {
 			}
 		}
 		System.out.println("Chests Spawned: " + chestsSpawned);
+		return chestsSpawned;
 	}
 }
