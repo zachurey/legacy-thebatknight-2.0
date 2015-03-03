@@ -28,6 +28,7 @@ public class Info {
 	int lobbytime = 120;
 	int gametime = 600;
 	int playerc = 0;
+	public static int spawnwitch = 1;
 	public static boolean superChest = false;
 	public static boolean didsuperChest = false;
 	public static boolean herofreeze = false;
@@ -52,7 +53,7 @@ public class Info {
 	}
 
 	public World getActiveWorld() {
-		if(active == null){
+		if (active == null) {
 			setActiveWorld(Bukkit.getWorld("SamCity"));
 		}
 		return active;
@@ -147,20 +148,20 @@ public class Info {
 	}
 
 	public static void hidePlayer(Player player) {
-	    for (Player p : Bukkit.getOnlinePlayers())
-	      p.hidePlayer(player);
-	  }
+		for (Player p : Bukkit.getOnlinePlayers())
+			p.hidePlayer(player);
+	}
 
-	  public static void showPlayer(Player player) {
-	    for (Player p : Bukkit.getOnlinePlayers())
-	      p.showPlayer(player);
-	  }
+	public static void showPlayer(Player player) {
+		for (Player p : Bukkit.getOnlinePlayers())
+			p.showPlayer(player);
+	}
 
-	  public static void showPlayers() {
-	    for (Player p : Bukkit.getOnlinePlayers())
-	      showPlayer(p);
-	  }
-	
+	public static void showPlayers() {
+		for (Player p : Bukkit.getOnlinePlayers())
+			showPlayer(p);
+	}
+
 	public void removePlayer(Player p) {
 		if (players.contains(p)) {
 			players.remove(p);
@@ -243,38 +244,36 @@ public class Info {
 		}
 	}
 
-	 public static void removeArmour(Player player) {
-		    ItemStack[] is = { new ItemStack(Material.AIR), 
-		      new ItemStack(Material.AIR), new ItemStack(Material.AIR), 
-		      new ItemStack(Material.AIR) };
-		    player.getInventory().setArmorContents(is);
-		  }
-	 
-	 public static void updateAllInventories()
-	  {
-	    for (Player player : Bukkit.getOnlinePlayers())
-	      player.updateInventory();
-	  }
-	
+	public static void removeArmour(Player player) {
+		ItemStack[] is = { new ItemStack(Material.AIR),
+				new ItemStack(Material.AIR), new ItemStack(Material.AIR),
+				new ItemStack(Material.AIR) };
+		player.getInventory().setArmorContents(is);
+	}
+
+	public static void updateAllInventories() {
+		for (Player player : Bukkit.getOnlinePlayers())
+			player.updateInventory();
+	}
+
 	@Deprecated
-	  public static void bounceBlock(TheBatKnight plugin, Block b)
-	  {
-	    try {
-	      if (b == null)
-	        return;
-	      Material type = b.getType();
-	      byte data = b.getData();
-	      Location l = b.getLocation();
-	      b.setType(Material.AIR);
-	      FallingBlock fb = b.getWorld().spawnFallingBlock(l, type, data);
+	public static void bounceBlock(TheBatKnight plugin, Block b) {
+		try {
+			if (b == null)
+				return;
+			Material type = b.getType();
+			byte data = b.getData();
+			Location l = b.getLocation();
+			b.setType(Material.AIR);
+			FallingBlock fb = b.getWorld().spawnFallingBlock(l, type, data);
 
-	      float x = -0.6F + (float)(Math.random() * 2.2D);
-	      float y = -2.0F + (float)(Math.random() * 5.0D);
-	      float z = -0.3F + (float)(Math.random() * 1.6D);
+			float x = -0.6F + (float) (Math.random() * 2.2D);
+			float y = -2.0F + (float) (Math.random() * 5.0D);
+			float z = -0.3F + (float) (Math.random() * 1.6D);
 
-	      fb.setVelocity(new Vector(x, y, z));
-	    } catch (Exception localException) {
-	    }
-	  }
-	
+			fb.setVelocity(new Vector(x, y, z));
+		} catch (Exception localException) {
+		}
+	}
+
 }

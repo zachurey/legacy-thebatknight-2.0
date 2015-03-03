@@ -70,6 +70,12 @@ public class TBN extends JavaPlugin {
 		// String[] ss = getConfig().getString("Worlds").split(",");
 		// int randy = info.getRandom(1, ss.length);
 		// info.setActiveWorld(Bukkit.getWorld((String) ss[randy - 1]));
+		try {
+			updateMods();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		debug = getConfig().getBoolean("debug");
 		System.out.print("[TBN] The Bat Night v." + version + " enabled!");
 	}

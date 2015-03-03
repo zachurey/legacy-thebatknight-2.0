@@ -482,9 +482,8 @@ public class Game {
 			info.joker.getInventory().addItem(
 					new ItemStack[] { setName(new ItemStack(Material.CHEST, 5),
 							ChatColor.RED + "TNT-In-A-Box", new ArrayList()) });
-			info.batman.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
-					.getName(), -1));
-			// TODO: Bad guy spawn
+			int spawn = (int) (Math.random() * 20 + 1);
+			info.joker.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(), spawn));
 		}
 
 		/*
@@ -538,9 +537,13 @@ public class Game {
 				 * badGuy.getInventory().addItem(new ItemStack[] { i }); } End
 				 * of comment
 				 */
-
 				index++;
 				badGuy.updateInventory();
+				if(info.spawnwitch>=20){
+					info.spawnwitch = 1;
+				}
+				badGuy.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(), info.spawnwitch));
+				info.spawnwitch++;
 			}
 	}
 
