@@ -89,6 +89,10 @@ public class LobbyListiners implements Listener {
 				+ tbn.getMaxPlayer() + ")");
 		// e.getPlayer().teleport(tbn.getPlayerSpawn(0), TeleportCause.PLUGIN);
 		e.getPlayer().teleport(info.getActiveWorld().getSpawnLocation());
+		if (tbn.mods.containsKey(e.getPlayer().getDisplayName())) {
+			setListName(e.getPlayer(), e.getPlayer().getDisplayName(),
+					ChatColor.DARK_AQUA);
+		}
 	}
 
 	@EventHandler
@@ -252,24 +256,11 @@ public class LobbyListiners implements Listener {
 						+ ChatColor.WHITE + e.getMessage());
 			}
 		}
-		if (e.getPlayer().getDisplayName().equalsIgnoreCase("legostarwarszach")) {
-			e.setFormat(ChatColor.WHITE
-					+ "["
-					+ ChatColor.AQUA
-					+ "Dev"
-					+ ChatColor.WHITE
-					+ "]<"
-					+ e.getPlayer().getDisplayName()
-					+ "> "
-					+ ChatColor.translateAlternateColorCodes('&',
-							e.getMessage()));
-			return;
-		}
 		if (e.getPlayer().getDisplayName().equalsIgnoreCase("zackscott")) {
 			e.setFormat(ChatColor.WHITE
 					+ "["
-					+ ChatColor.BOLD
 					+ ChatColor.AQUA
+					+ ChatColor.BOLD
 					+ "BlameMe"
 					+ ChatColor.RESET
 					+ ChatColor.WHITE
@@ -280,11 +271,54 @@ public class LobbyListiners implements Listener {
 							e.getMessage()));
 			return;
 		}
-		if (e.getPlayer().hasPermission("tt.admin")) {
+		if (tbn.mods.containsKey(e.getPlayer().getDisplayName())) {
+			if (tbn.mods.get(e.getPlayer().getDisplayName()).contains("Dev")) {
+				e.setFormat(ChatColor.WHITE
+						+ "["
+						+ ChatColor.AQUA
+						+ ""
+						+ tbn.mods.get(e.getPlayer().getDisplayName())
+						+ ChatColor.WHITE
+						+ "]<"
+						+ e.getPlayer().getDisplayName()
+						+ "> "
+						+ ChatColor.translateAlternateColorCodes('&',
+								e.getMessage()));
+				return;
+			}
+			if (tbn.mods.get(e.getPlayer().getDisplayName()).equalsIgnoreCase(
+					"admin")) {
+				e.setFormat(ChatColor.WHITE
+						+ "["
+						+ ChatColor.DARK_AQUA
+						+ "Admin"
+						+ ChatColor.WHITE
+						+ "]<"
+						+ e.getPlayer().getDisplayName()
+						+ "> "
+						+ ChatColor.translateAlternateColorCodes('&',
+								e.getMessage()));
+				return;
+			}
+			if (tbn.mods.get(e.getPlayer().getDisplayName()).equalsIgnoreCase(
+					"mod")) {
+				e.setFormat(ChatColor.WHITE
+						+ "["
+						+ ChatColor.DARK_AQUA
+						+ "Mod"
+						+ ChatColor.WHITE
+						+ "]<"
+						+ e.getPlayer().getDisplayName()
+						+ "> "
+						+ ChatColor.translateAlternateColorCodes('&',
+								e.getMessage()));
+				return;
+			}
 			e.setFormat(ChatColor.WHITE
 					+ "["
-					+ ChatColor.RED
-					+ "Admin"
+					+ ChatColor.DARK_AQUA
+					+ ""
+					+ tbn.mods.get(e.getPlayer().getDisplayName())
 					+ ChatColor.WHITE
 					+ "]<"
 					+ e.getPlayer().getDisplayName()
@@ -293,32 +327,13 @@ public class LobbyListiners implements Listener {
 							e.getMessage()));
 			return;
 		}
-		if (e.getPlayer().hasPermission("tt.mod")) {
-			e.setFormat(ChatColor.WHITE
-					+ "["
-					+ ChatColor.GOLD
-					+ "Mod"
-					+ ChatColor.WHITE
-					+ "]<"
-					+ e.getPlayer().getDisplayName()
-					+ "> "
-					+ ChatColor.translateAlternateColorCodes('&',
-							e.getMessage()));
-			return;
-		}
-		if (e.getPlayer().hasPermission("tt.pro")) {
-			e.setFormat(ChatColor.WHITE
-					+ "["
-					+ ChatColor.GREEN
-					+ "PRO"
-					+ ChatColor.WHITE
-					+ "]<"
-					+ e.getPlayer().getDisplayName()
-					+ "> "
-					+ ChatColor.translateAlternateColorCodes('&',
-							e.getMessage()));
-			return;
-		}
+		/*
+		 * if (tbn.vips.contains(e.getPlayer().getDisplayName())) {
+		 * e.setFormat(ChatColor.WHITE + "[" + ChatColor.GREEN + "VIP" +
+		 * ChatColor.WHITE + "]<" + e.getPlayer().getDisplayName() + "> " +
+		 * ChatColor.translateAlternateColorCodes('&', e.getMessage())); return;
+		 * }
+		 */
 		e.setFormat(ChatColor.GRAY + "<" + e.getPlayer().getDisplayName()
 				+ "> " + e.getMessage());
 	}
@@ -342,6 +357,17 @@ public class LobbyListiners implements Listener {
 				|| e.getBlock().getType() == Material.SNOW_BLOCK) {
 			e.setCancelled(true);
 		}
+	}
+
+	@SuppressWarnings("static-access")
+	public void setListName(Player player, String name, ChatColor C) {
+		/*
+		 * String s = name; String ss = ""; if (name.toCharArray().length >= 14)
+		 * { s = C + s; for (int i = 0; i <= 13; i++) s = C + s +
+		 * name.toCharArray()[i]; }
+		 */
+		tbn.debugMsg("The listName has been updated!");
+		player.setPlayerListName(C + name);
 	}
 
 }

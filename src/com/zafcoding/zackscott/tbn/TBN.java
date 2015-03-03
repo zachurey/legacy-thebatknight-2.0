@@ -1,7 +1,15 @@
 package com.zafcoding.zackscott.tbn;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -42,6 +50,7 @@ public class TBN extends JavaPlugin {
 	public static Inventory inv;
 	public boolean debugMode = true;
 	ArrayList<Player> unstuckers = new ArrayList<Player>();
+	public static HashMap<String, String> mods = new HashMap<String, String>();
 
 	@Override
 	public void onEnable() {
@@ -690,4 +699,31 @@ public class TBN extends JavaPlugin {
 		reloadConfig();
 	}
 
+	public void updateMods() throws IOException {
+		if (!new File(tbn.getDataFolder(), "mods.txt").exists())
+			new File(tbn.getDataFolder(), "mods.txt").createNewFile();
+		URL website = new URL("http://www.zafcoding.com/pieman/mods.txt");
+		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+
+		FileOutputStream fos = new FileOutputStream(new File(
+				tbn.getDataFolder(), "mods.txt"));
+		fos.getChannel().transferFrom(rbc, 0L, 16777216L);
+
+		BufferedReader br = new BufferedReader(new FileReader(new File(
+				tbn.getDataFolder(), "mods.txt")));
+		try {
+			String line = br.readLine();
+			while (line != null) {
+				if (line != null) {
+					tbn.mods.put(line.split("~")[0].trim(),
+							line.split("~")[1].trim());
+					System.out.println("MOD:" + line.trim());
+				}
+				line = br.readLine();
+			}
+		} finally {
+			br.close();
+		}
+	}
+	
 }
