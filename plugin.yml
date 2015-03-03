@@ -5,3 +5,4 @@ commands:
   tbn:
   spawn:
   unstuck:
+  setspawn:

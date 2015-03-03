@@ -13,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFadeEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -305,6 +307,22 @@ public class LobbyListiners implements Listener {
 	@EventHandler
 	public void WeatherChange(WeatherChangeEvent e) {
 		e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onBlockForm(BlockFormEvent e) {
+		if (e.getBlock().getType() == Material.ICE) {
+			e.setCancelled(true);
+		}
+	}
+
+	@EventHandler
+	public void onBlockFade(BlockFadeEvent e) {
+		if (e.getBlock().getType() == Material.ICE
+				|| e.getBlock().getType() == Material.SNOW
+				|| e.getBlock().getType() == Material.SNOW_BLOCK) {
+			e.setCancelled(true);
+		}
 	}
 
 }

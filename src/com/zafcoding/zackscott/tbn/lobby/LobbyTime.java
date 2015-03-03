@@ -1,5 +1,8 @@
 package com.zafcoding.zackscott.tbn.lobby;
 
+import java.io.File;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -15,8 +18,23 @@ public class LobbyTime {
 	Info info = tbn.info;
 	Game game = null;
 
+	@SuppressWarnings("static-access")
 	public void LobbyHeartBeat() {
 		tbn.debugMsg("LobbyHeartBeat called!");
+		if(info.getActiveWorld() == null){
+			String worldName = "SamCity";
+			info.setActiveWorld(Bukkit.getWorld("SamCity"));
+			System.out.println("[DEBUG] The world has been set to "
+					+ Bukkit.getWorld("SamCity"));
+			File playerFilesDir = new File(worldName + "/players");
+			if (playerFilesDir.isDirectory()) {
+				String[] playerDats = playerFilesDir.list();
+				for (int i = 0; i < playerDats.length; i++) {
+					File datFile = new File(playerFilesDir, playerDats[i]);
+					datFile.delete();
+				}
+			}
+		}
 		if (game == null) {
 			game = tbn.getG();
 		}

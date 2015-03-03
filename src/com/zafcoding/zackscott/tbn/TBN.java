@@ -61,18 +61,6 @@ public class TBN extends JavaPlugin {
 		// String[] ss = getConfig().getString("Worlds").split(",");
 		// int randy = info.getRandom(1, ss.length);
 		// info.setActiveWorld(Bukkit.getWorld((String) ss[randy - 1]));
-		String worldName = "SamCity";
-		info.active = Bukkit.getWorld("SamCity");
-		System.out.println("[DEBUG] The world has been set to "
-				+ Bukkit.getWorld("world"));
-		File playerFilesDir = new File(worldName + "/players");
-		if (playerFilesDir.isDirectory()) {
-			String[] playerDats = playerFilesDir.list();
-			for (int i = 0; i < playerDats.length; i++) {
-				File datFile = new File(playerFilesDir, playerDats[i]);
-				datFile.delete();
-			}
-		}
 		debug = getConfig().getBoolean("debug");
 		System.out.print("[TBN] The Bat Night v." + version + " enabled!");
 	}
@@ -88,9 +76,9 @@ public class TBN extends JavaPlugin {
 			String[] list = { "world", "DarkTemple" };
 			this.getConfig().set("Config.exsits", true);
 			this.getConfig().set("Chests.amount", 3);
-			this.getConfig().set("Chests.1", "-1194,18,-550");
-			this.getConfig().set("Chests.2", "-1186,18,-549");
-			this.getConfig().set("Chests.3", "-1188,18,-553");
+			this.getConfig().set("Chests.SamCity.1", "-1194,18,-550");
+			this.getConfig().set("Chests.SamCity.2", "-1186,18,-549");
+			this.getConfig().set("Chests.SamCity.3", "-1188,18,-553");
 			this.getConfig().set("MinPlayers", 8);
 			this.getConfig().set("MaxPlayers", 25);
 			this.getConfig().set("debug", true);
@@ -131,7 +119,7 @@ public class TBN extends JavaPlugin {
 			}
 			if (label.equalsIgnoreCase("spawn")
 					&& !(info.getState() == ServerState.In_Game)) {
-				p.teleport(getPlayerSpawn(info.getActiveWorld().getName(), 0));
+				p.teleport(info.getActiveWorld().getSpawnLocation());
 				p.sendMessage(ChatColor.GREEN + "Teleported to spawn!");
 				return true;
 			}
@@ -164,27 +152,6 @@ public class TBN extends JavaPlugin {
 								+ ChatColor.GREEN + " enabled" + ChatColor.GOLD
 								+ "!");
 						return true;
-					}
-					if (args[0].equalsIgnoreCase("addchest")) {
-						if (p.isOp()) {
-							int amount = getConfig().getInt("Chests.amount");
-							getConfig().set(
-									"Chests." + (amount + 1),
-									p.getLocation().getBlockX() + ","
-											+ p.getLocation().getBlockY() + ","
-											+ p.getLocation().getBlockZ());
-							p.sendMessage(pre + "Added a new chest to "
-									+ p.getLocation().getBlockX() + ","
-									+ p.getLocation().getBlockY() + ","
-									+ p.getLocation().getBlockZ()
-									+ " (Your current location)");
-							getConfig().set("Chests.amount", amount + 1);
-							saveAll();
-							return true;
-						} else {
-							p.sendMessage("Nope.");
-							return true;
-						}
 					}
 
 					if (args[0].equalsIgnoreCase("chest")) {
@@ -538,6 +505,28 @@ public class TBN extends JavaPlugin {
 							return true;
 						}
 					}
+					if (args[0].equalsIgnoreCase("addchest")) {
+						if (p.isOp()) {
+							int amount = getConfig().getInt("Chests.amount");
+							getConfig().set(
+									"Chests." + args[1] + "." + (amount + 1),
+									p.getLocation().getBlockX() + ","
+											+ p.getLocation().getBlockY() + ","
+											+ p.getLocation().getBlockZ());
+							p.sendMessage(pre + " (" + args[1]
+									+ ") Added a new chest to "
+									+ p.getLocation().getBlockX() + ","
+									+ p.getLocation().getBlockY() + ","
+									+ p.getLocation().getBlockZ()
+									+ " (Your current location)");
+							getConfig().set("Chests.amount", amount + 1);
+							saveAll();
+							return true;
+						} else {
+							p.sendMessage("Nope.");
+							return true;
+						}
+					}
 
 				} else {
 					if (args.length == 1) {
@@ -551,7 +540,7 @@ public class TBN extends JavaPlugin {
 				}
 			}
 		}
-		if (label.equalsIgnoreCase("setplayerspaw")) {
+		if (label.equalsIgnoreCase("setspawn")) {
 			if (sender instanceof Player) {
 				Player pp = (Player) sender;
 				// TODO: Change to tradional method of mod finding

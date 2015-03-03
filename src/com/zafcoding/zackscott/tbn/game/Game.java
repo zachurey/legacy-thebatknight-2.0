@@ -33,7 +33,8 @@ public class Game {
 	static TBN tbn = TBN.tbn;
 	static Info info = TBN.info;
 	static Locations loc = TBN.loc;
-
+	final PlayerProfile mostdi1a = null;
+	
 	public void start() {
 		info.setState(ServerState.In_Game);
 		setHeroesAndBadGuys(tbn);
@@ -59,10 +60,11 @@ public class Game {
 	}
 
 	// TODO: KicK all players
-	public void endGame(int bo) {
+	@SuppressWarnings("deprecation")
+	public void endGame(final int bo) {
+		PlayerProfile mostdia = null;
 		if (bo == 1) {
 			info.setState(ServerState.Post_Game);
-			PlayerProfile mostdia = null;
 			int total = 0;
 			for (Player pa : info.getPlayers()) {
 				PlayerProfile pq = info.getPP(pa);
@@ -70,6 +72,7 @@ public class Game {
 						0));
 				if (pq.getDiamonds() > mostdia.getDiamonds()) {
 					mostdia = pq;
+					mostdi1a = pq;
 				}
 				total = total + pq.getDiamonds();
 			}
@@ -118,6 +121,51 @@ public class Game {
 					+ ChatColor.DARK_AQUA + totalkill + "" + ChatColor.AQUA
 					+ " players!");
 		}
+		removeChest();
+		info.broadCast(ChatColor.RED + "" + ChatColor.BOLD
+				+ "Server reseting in 10 seconds!");
+		Bukkit.getScheduler().scheduleAsyncDelayedTask(tbn, new Runnable() {
+
+			@Override
+			public void run() {
+				for (Player ppp : info.getPlayers()) {
+					if (bo == 1) {
+						ppp.kickPlayer(ChatColor.GOLD
+								+ ""
+								+ ChatColor.BOLD
+								+ "TheBatKnight"
+								+ ChatColor.RESET
+								+ "\nThanks for playing! \nRejoin to play another game!\n"
+								+ ChatColor.GREEN + "Winner: "
+								+ ChatColor.DARK_AQUA
+								+ mostdi1a.getPlayer().getDisplayName());
+					}
+					if (bo == 1) {
+						ppp.kickPlayer(ChatColor.GOLD
+								+ ""
+								+ ChatColor.BOLD
+								+ "TheBatKnight"
+								+ ChatColor.RESET
+								+ "\nThanks for playing! \nRejoin to play another game!\n"
+								+ ChatColor.GREEN + "Winners: "
+								+ ChatColor.DARK_AQUA
+								+ "Heros!");
+					}
+				}
+			}
+		}, 200L);
+	}
+
+	public void removeChest() {
+		int chestdone = 0;
+		int totala = info.chests.size();
+		for (Location loc : info.chests) {
+			if (loc.getBlock().getType() == Material.CHEST) {
+				loc.getBlock().setType(Material.AIR);
+				tbn.debugMsg("Removed chest " + chestdone + "/" + totala);
+				info.chests.remove(loc);
+			}
+		}
 	}
 
 	public ItemStack setName(ItemStack is, String name, List<String> lore) {
@@ -157,7 +205,8 @@ public class Game {
 		return total;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked", "static-access", "unused", "deprecation" })
+	@SuppressWarnings({ "rawtypes", "unchecked", "static-access", "unused",
+			"deprecation" })
 	private void setHeroesAndBadGuys(TBN tbn2) {
 		Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray();
 		Random rand = new Random();
