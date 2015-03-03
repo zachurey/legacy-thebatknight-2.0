@@ -103,7 +103,8 @@ public class Locations {
 			info.broadCast(ChatColor.YELLOW + "All Chests Have Been Spawned!");
 		}
 		int maxchest = tbn.getConfig().getInt("Chests.amount");
-		int min = (int) tbn.getConfig().getInt("Chests.amount")/3;
+		int min = (int) tbn.getConfig().getInt("Chests.amount") / 3;
+		tbn.debugMsg("The max chest is " + min);
 		int chestsSpawned = 0;
 
 		for (int i = 1; i <= tbn.getConfig().getInt("Chests.amount"); i++) {
@@ -133,8 +134,8 @@ public class Locations {
 							if (chestLoc != null) {
 								int randomChests = Map.mapId == 2 ? 750
 										: Map.mapId == 0 ? 350 : 500;
-								if (((new Random().nextInt(1000) < randomChests)
-										&& chestsSpawned < maxchest) || superChestMode) {
+								if ((new Random().nextInt(1000) < randomChests && chestsSpawned < maxchest)
+										|| superChestMode) {
 									if (chestLoc.getBlock().getType() != Material.CHEST) {
 										chestLoc.getBlock().setType(
 												Material.CHEST);
@@ -152,7 +153,20 @@ public class Locations {
 																	.getInventory() != null)) {
 														Random rand = new Random();
 														int random = rand
-																.nextInt(tbn.getConfig().getInt("MaxDiamonds")) + tbn.getConfig().getInt("MinDiamonds");
+																.nextInt(tbn
+																		.getConfig()
+																		.getInt("MaxDiamonds"));
+														while (random < tbn
+																.getConfig()
+																.getInt("MinDiamonds")) {
+															random = rand
+																	.nextInt(tbn
+																			.getConfig()
+																			.getInt("MaxDiamonds"));
+														}
+														tbn.debugMsg("Adding "
+																+ random
+																+ " diamonds!");
 														List diamondLore = new ArrayList();
 														diamondLore
 																.add(ChatColor.DARK_AQUA
@@ -173,7 +187,7 @@ public class Locations {
 																						diamondLore) });
 														int arrowRand = rand
 																.nextBoolean() ? rand
-																.nextInt(20) + 6
+																.nextInt(10) + 6
 																: 12;
 														ItemStack ironSword = rand
 																.nextInt(1000) < 25 ? new ItemStack(
@@ -221,15 +235,18 @@ public class Locations {
 																	Material.BOW)) {
 																if ((Math
 																		.random() * 30 + 1) >= 20) {
-																	ItemStack it = new ItemStack(
-																			Material.BOW,
-																			1);
-																	tbn.debugMsg("Adding it! ("
-																			+ it.getAmount()
-																			+ ")");
-																	chest.getInventory()
-																			.addItem(
-																					it);
+																	if ((Math
+																			.random() * 2 + 1) >= 2) {
+																		ItemStack it = new ItemStack(
+																				Material.BOW,
+																				1);
+																		tbn.debugMsg("Adding it! ("
+																				+ it.getAmount()
+																				+ ")");
+																		chest.getInventory()
+																				.addItem(
+																						it);
+																	}
 																}
 															}
 														}
