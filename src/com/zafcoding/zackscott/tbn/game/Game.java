@@ -30,9 +30,9 @@ import com.zafcoding.zackscott.tbn.TBN;
 
 public class Game {
 
-	TBN tbn = TBN.tbn;
-	Info info = TBN.info;
-	Locations loc = TBN.loc;
+	static TBN tbn = TBN.tbn;
+	static Info info = TBN.info;
+	static Locations loc = TBN.loc;
 
 	public void start() {
 		info.setState(ServerState.In_Game);
@@ -157,8 +157,9 @@ public class Game {
 		return total;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked", "static-access", "unused", "deprecation" })
 	private void setHeroesAndBadGuys(TBN tbn2) {
-		Player[] players = Bukkit.getOnlinePlayers();
+		Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray();
 		Random rand = new Random();
 		int batmanIndex = rand.nextInt(players.length);
 		int robinIndex = rand.nextInt(players.length);
@@ -184,7 +185,7 @@ public class Game {
 			info.joker = players[jockerIndex];
 			info.getPP(info.joker).setType(PlayType.Joker);
 		}
-		info.badGuys = new Player[Bukkit.getOnlinePlayers().length];
+		info.badGuys = new Player[Bukkit.getOnlinePlayers().size()];
 
 		/*
 		 * if ((catwoman == null) && (vipsOnline > 1)) { int catwomanRand =
@@ -446,6 +447,7 @@ public class Game {
 			}
 	}
 
+	@SuppressWarnings({ "unused", "static-access" })
 	private void sendHowToPlayInfo(Player robin, Player batman,
 			Player[] badGuys, Player joker) {
 		String badGuyList = ChatColor.GRAY + "Bad Guys: " + ChatColor.DARK_GRAY;
@@ -624,6 +626,7 @@ public class Game {
 	public void startCompassEngine() {
 		tbn.getServer().getScheduler()
 				.scheduleSyncRepeatingTask(tbn, new Runnable() {
+					@SuppressWarnings({ "static-access", "rawtypes" })
 					public void run() {
 						if (info.getState() == ServerState.In_Game)
 							try {
@@ -681,6 +684,7 @@ public class Game {
 				}, 0L, 20L);
 	}
 
+	@SuppressWarnings("static-access")
 	public void setListName(Player player, String name, ChatColor C) {
 		/*
 		 * String s = name; String ss = ""; if (name.toCharArray().length >= 14)
