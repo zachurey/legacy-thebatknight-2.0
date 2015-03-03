@@ -44,7 +44,8 @@ public class GameTime {
 			}
 		}
 		if (nt < 1) {
-			game.endGame(1);
+			tbn.debugMsg((game != null) + " is the thingy!");
+			game.endGame(0);
 		}
 		broadCastShort(info.getGameTime());
 		if (info.getGameTime() <= 0) {

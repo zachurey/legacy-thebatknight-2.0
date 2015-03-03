@@ -48,7 +48,7 @@ public class Game {
 			pl.setCanPickupItems(true);
 			pl.sendMessage(ChatColor.AQUA + "The game has started!");
 			if (info.batman != null) {
-				pl.sendMessage(ChatColor.BLACK + "Your BatNight is "
+				pl.sendMessage(ChatColor.GRAY + "Your BatNight is "
 						+ info.batman.getDisplayName());
 			}
 			if (info.robin != null) {
@@ -64,17 +64,18 @@ public class Game {
 	}
 
 	@SuppressWarnings("deprecation")
-	public void endGame(final int bo) {
+	public static void endGame(final int bo) {
+		info.setState(ServerState.Post_Game);
 		PlayerProfile mostdia = null;
 		if (bo == 1) {
-			info.setState(ServerState.Post_Game);
 			int total = 0;
 			for (Player pa : info.getPlayers()) {
 				PlayerProfile pq = info.getPP(pa);
 				pa.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(),
 						0));
+				pa.getInventory().clear();
 				pa.setGameMode(GameMode.ADVENTURE);
-				if (pq.getDiamonds() > mostdia.getDiamonds()) {
+				if (mostdia == null || pq.getDiamonds() > mostdia.getDiamonds()) {
 					mostdia = pq;
 				}
 				total = total + pq.getDiamonds();
@@ -102,13 +103,18 @@ public class Game {
 				PlayerProfile pp = info.getPP(pa);
 				pa.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(),
 						0));
+				pa.getInventory().clear();
 				pa.setGameMode(GameMode.ADVENTURE);
 				if (pp.getType() == PlayType.BatNight
-						|| pp.getType() == PlayType.BirdBoy)
-					if (pp.getKills() > mostkill.getKills()) {
+						|| pp.getType() == PlayType.BirdBoy) {
+					if (mostkill == null || pp.getKills() > mostkill.getKills()) {
 						mostkill = pp;
 					}
-				totalkill = totalkill + pp.getKills();
+					totalkill = totalkill + pp.getKills();
+				}
+				if (mostkill == null) {
+					mostkill = info.getPP(pa);
+				}
 			}
 			info.setState(ServerState.Post_Game);
 			info.broadCast(ChatColor.WHITE + "----------" + ChatColor.GOLD
@@ -126,7 +132,7 @@ public class Game {
 					+ ChatColor.DARK_AQUA + totalkill + "" + ChatColor.AQUA
 					+ " players!");
 		}
-		removeChest();
+		tbn.debugMsg("Removed chests: " + removeChest());
 		info.broadCast(ChatColor.RED + "" + ChatColor.BOLD
 				+ "Server reseting in 10 seconds!");
 		Bukkit.getScheduler().scheduleAsyncDelayedTask(tbn, new Runnable() {
@@ -143,9 +149,10 @@ public class Game {
 								+ "\nThanks for playing! \nRejoin to play another game!\n"
 								+ ChatColor.GREEN + "Winner: "
 								+ ChatColor.DARK_AQUA
-								+ info.getWinner().getPlayer().getDisplayName());
+								+ info.getWinner().getPlayer().getDisplayName()
+								+ " (" + info.getWinner().getDiamonds() + ")");
 					}
-					if (bo == 1) {
+					if (bo == 0) {
 						ppp.kickPlayer(ChatColor.GOLD
 								+ ""
 								+ ChatColor.BOLD
@@ -155,12 +162,19 @@ public class Game {
 								+ ChatColor.GREEN + "Winners: "
 								+ ChatColor.DARK_AQUA + "Heros!");
 					}
+					try {
+						Bukkit.getServer().dispatchCommand(
+								Bukkit.getConsoleSender(), "reload");
+					} catch (Exception e) {
+						tbn.debugMsg("Err_ " + e.getMessage());
+						Bukkit.getServer().reload();
+					}
 				}
 			}
 		}, 200L);
 	}
 
-	public int removeChest() {
+	public static int removeChest() {
 		int chestdone = 0;
 		int totala = info.chests.size();
 		for (Object loca : info.chests.toArray()) {
@@ -177,7 +191,7 @@ public class Game {
 	}
 
 	@SuppressWarnings("static-access")
-	public void clearEnts() {
+	public static void clearEnts() {
 		int done = 0;
 		for (Entity ent : info.getActiveWorld().getEntities()) {
 			if (ent.getType() == EntityType.DROPPED_ITEM) {
@@ -226,35 +240,48 @@ public class Game {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked", "static-access", "unused",
-			"deprecation" })
+			"deprecation", "null" })
 	private void setHeroesAndBadGuys(TBN tbn2) {
-		Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray();
+		Player[] players = null;
+		players = new Player[info.getPlayers().size()];
+		int io = 0;
+		for (Player pl : info.getPlayers()) {
+			players[io] = pl;
+			io++;
+		}
 		Random rand = new Random();
 		int batmanIndex = rand.nextInt(players.length);
 		int robinIndex = rand.nextInt(players.length);
 		int jockerIndex = rand.nextInt(players.length);
+
 		while (batmanIndex == robinIndex)
 			robinIndex = rand.nextInt(players.length);
-		while (batmanIndex == jockerIndex)
-			jockerIndex = rand.nextInt(players.length);
+		/*
+		 * while (batmanIndex == jockerIndex) jockerIndex =
+		 * rand.nextInt(players.length);
+		 */
 		while (robinIndex == jockerIndex)
 			jockerIndex = rand.nextInt(players.length);
+
 		tbn.debugMsg("Setting batman...");
 		if (info.batman == null) {
 			info.batman = players[batmanIndex];
 			info.getPP(info.batman).setType(PlayType.BatNight);
 		}
 		tbn.debugMsg("Setting robin...");
+
 		if (info.robin == null) {
-			info.robin = players[robinIndex];
+			//info.robin = players[robinIndex];
+			info.robin = info.batman;
 			info.getPP(info.robin).setType(PlayType.BirdBoy);
 		}
+
 		tbn.debugMsg("Setting joker...");
 		if (info.joker == null) {
 			info.joker = players[jockerIndex];
 			info.getPP(info.joker).setType(PlayType.Joker);
 		}
-		info.badGuys = new Player[Bukkit.getOnlinePlayers().size()];
+		info.badGuys = new Player[info.getPlayers().size()];
 
 		/*
 		 * if ((catwoman == null) && (vipsOnline > 1)) { int catwomanRand =
@@ -395,6 +422,7 @@ public class Game {
 		info.batman.getInventory().setBoots(
 				setArmourColour(Material.LEATHER_LEGGINGS, 0, 0, 0));
 		setListName(info.batman, info.batman.getDisplayName(), ChatColor.GRAY);
+		info.batman.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(), -1));
 		info.robin.getInventory()
 				.addItem(
 						new ItemStack[] {
@@ -415,7 +443,7 @@ public class Game {
 		info.robin.getInventory().setBoots(
 				setArmourColour(Material.LEATHER_LEGGINGS, 64, 193, 55));
 		setListName(info.robin, info.robin.getDisplayName(), ChatColor.GREEN);
-
+		info.batman.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(), -2));
 		if (info.joker != null) {
 			info.joker.getInventory().setHelmet(
 					setArmourColour(Material.LEATHER_HELMET, 191, 0, 255));
@@ -457,6 +485,8 @@ public class Game {
 			info.joker.getInventory().addItem(
 					new ItemStack[] { setName(new ItemStack(Material.CHEST, 5),
 							ChatColor.RED + "TNT-In-A-Box", new ArrayList()) });
+			info.batman.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(), -1));
+			//TODO: Bad guy spawn
 		}
 
 		/*
@@ -593,7 +623,7 @@ public class Game {
 			}
 		}
 
-		for (Player player : Bukkit.getOnlinePlayers()) {
+		for (Player player : info.getPlayers()) {
 			sendMessage(player, "");
 			sendMessage(player, ChatColor.YELLOW + "Stuck? Use /unstuck!");
 		}

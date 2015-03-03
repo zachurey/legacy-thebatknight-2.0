@@ -19,7 +19,7 @@ public class Thread implements Runnable {
 	@Override
 	public void run() {
 		if (info.getState() == ServerState.In_Game) {
-			gt.GameHeartBeat();
+		    gt.GameHeartBeat();
 		}
 		if (info.getState() == ServerState.Pre_Game) {
 			lt.LobbyHeartBeat();
