@@ -102,6 +102,8 @@ public class Locations {
 			info.broadCast(ChatColor.GOLD + "SUPER CHEST GAME!");
 			info.broadCast(ChatColor.YELLOW + "All Chests Have Been Spawned!");
 		}
+		int maxchest = tbn.getConfig().getInt("Chests.amount");
+		int min = (int) tbn.getConfig().getInt("Chests.amount")/3;
 		int chestsSpawned = 0;
 
 		for (int i = 1; i <= tbn.getConfig().getInt("Chests.amount"); i++) {
@@ -131,8 +133,8 @@ public class Locations {
 							if (chestLoc != null) {
 								int randomChests = Map.mapId == 2 ? 750
 										: Map.mapId == 0 ? 350 : 500;
-								if ((new Random().nextInt(1000) < randomChests)
-										|| (superChestMode)) {
+								if (((new Random().nextInt(1000) < randomChests)
+										&& chestsSpawned < maxchest) || superChestMode) {
 									if (chestLoc.getBlock().getType() != Material.CHEST) {
 										chestLoc.getBlock().setType(
 												Material.CHEST);
