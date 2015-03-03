@@ -2,6 +2,7 @@ package com.zafcoding.zackscott.tbn.game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -56,8 +57,12 @@ public class Game {
 						+ info.robin.getDisplayName());
 			}
 			if (info.joker != null) {
-				pl.sendMessage(ChatColor.DARK_PURPLE + "Your jester is "
+				pl.sendMessage(ChatColor.DARK_PURPLE + "Your Jester is "
 						+ info.joker.getDisplayName());
+			}
+			if (info.puffin != null) {
+				pl.sendMessage(ChatColor.LIGHT_PURPLE + "Your Puffin is "
+						+ info.puffin.getDisplayName());
 			}
 		}
 		dosomeDiamondLvl();
@@ -133,6 +138,7 @@ public class Game {
 					+ " players!");
 		}
 		tbn.debugMsg("Removed chests: " + removeChest());
+		tbn.debugMsg("Changed blocks: " + removeChest());
 		info.broadCast(ChatColor.RED + "" + ChatColor.BOLD
 				+ "Server reseting in 10 seconds!");
 		Bukkit.getScheduler().scheduleAsyncDelayedTask(tbn, new Runnable() {
@@ -188,6 +194,21 @@ public class Game {
 		}
 		clearEnts();
 		return chestdone;
+	}
+
+	public static int removeBlock() {
+		int blockchange = 0;
+		int totala = info.broke.size();
+		HashMap<Location, Material> newbroke = new HashMap<Location, Material>(info.broke);
+		for (Object loca : newbroke.keySet()) {
+			Location loc = (Location) loca;
+			Material mat = info.broke.get(loca);
+			loc.getBlock().setType(mat);
+			info.broke.remove(loc);
+			newbroke.remove(loc);
+		}
+		clearEnts();
+		return blockchange;
 	}
 
 	@SuppressWarnings("static-access")
@@ -253,11 +274,15 @@ public class Game {
 		int batmanIndex = rand.nextInt(players.length);
 		int robinIndex = rand.nextInt(players.length);
 		int jockerIndex = rand.nextInt(players.length);
+		int puffinIndex = rand.nextInt(players.length);
 
 		while (batmanIndex == robinIndex)
 			robinIndex = rand.nextInt(players.length);
-		while (batmanIndex == jockerIndex || robinIndex == jockerIndex)
+		while ((batmanIndex == jockerIndex || robinIndex == jockerIndex))
 			jockerIndex = rand.nextInt(players.length);
+		while ((batmanIndex == puffinIndex || robinIndex == puffinIndex)
+				|| jockerIndex == puffinIndex)
+			puffinIndex = rand.nextInt(players.length);
 
 		tbn.debugMsg("Setting batman...");
 		if (info.batman == null) {
@@ -273,6 +298,11 @@ public class Game {
 
 		tbn.debugMsg("Setting joker...");
 		if (info.joker == null) {
+			info.joker = players[jockerIndex];
+			info.getPP(info.joker).setType(PlayType.Joker);
+		}
+		tbn.debugMsg("Setting puffin...");
+		if (info.puffin == null) {
 			info.joker = players[jockerIndex];
 			info.getPP(info.joker).setType(PlayType.Joker);
 		}
@@ -483,7 +513,19 @@ public class Game {
 					new ItemStack[] { setName(new ItemStack(Material.CHEST, 5),
 							ChatColor.RED + "TNT-In-A-Box", new ArrayList()) });
 			int spawn = (int) (Math.random() * 20 + 1);
-			info.joker.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(), spawn));
+			info.joker.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+					.getName(), spawn));
+		}
+		if (info.puffin != null) {
+			List<String> ll = new ArrayList<String>();
+			info.puffin.getInventory().addItem(
+					new ItemStack[] {
+							setName(Material.IRON_HOE, ChatColor.DARK_PURPLE
+									+ "Umbrella", ll),
+							setName(Material.EGG, ChatColor.YELLOW
+									+ "Minion Spawner", ll),
+							setName(Material.RAW_CHICKEN, ChatColor.GRAY
+									+ "The Puffinator", ll) });
 		}
 
 		/*
@@ -539,12 +581,24 @@ public class Game {
 				 */
 				index++;
 				badGuy.updateInventory();
-				if(info.spawnwitch>=20){
+				if (info.spawnwitch >= 20) {
 					info.spawnwitch = 1;
 				}
-				badGuy.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(), info.spawnwitch));
+				badGuy.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+						.getName(), info.spawnwitch));
 				info.spawnwitch++;
 			}
+	}
+
+	private ItemStack setName(Material ma, String name, List<String> lore) {
+		ItemStack is = new ItemStack(ma);
+		ItemMeta m = is.getItemMeta();
+		if (name != null)
+			m.setDisplayName(name);
+		if (lore != null)
+			m.setLore(lore);
+		is.setItemMeta(m);
+		return is;
 	}
 
 	@SuppressWarnings({ "unused", "static-access" })

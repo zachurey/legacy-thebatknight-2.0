@@ -1,6 +1,7 @@
 package com.zafcoding.zackscott.tbn;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -37,6 +38,7 @@ public class Info {
 	public static Player batman = null;
 	public static Player robin = null;
 	public static Player joker = null;
+	public static Player puffin = null;
 	public static Player[] badGuys = null;
 	World active = null;
 	public boolean pvp = false;
@@ -46,6 +48,7 @@ public class Info {
 	public static ArrayList<Player> ingame = new ArrayList<Player>();
 	public static ArrayList<Location> fakechests = new ArrayList<Location>();
 	public static ArrayList<Location> chests = new ArrayList<Location>();
+	public static HashMap<Location, Material> broke = new HashMap<Location, Material>();
 	PlayerProfile winner = null;
 
 	public boolean isSpect(Player p) {

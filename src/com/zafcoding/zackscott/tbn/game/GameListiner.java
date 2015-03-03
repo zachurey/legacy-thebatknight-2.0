@@ -1,20 +1,24 @@
 package com.zafcoding.zackscott.tbn.game;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -75,11 +79,6 @@ public class GameListiner implements Listener {
 								tbn.debugMsg(event.getBlock().getLocation()
 										.toString()
 										+ "");
-								if (info.joker == null) {
-									event.getPlayer().sendMessage(
-											ChatColor.RED
-													+ "Trap Chest Placed...");
-								}
 								info.joker.sendMessage(ChatColor.RED
 										+ "Trap Chest Placed...");
 								event.getBlockPlaced().setType(Material.CHEST);
@@ -215,7 +214,9 @@ public class GameListiner implements Listener {
 				pe.getPlayer().sendMessage(ChatColor.RED + "Just don't");
 			}
 			if (e.getClickedBlock() != null
-					&& e.getClickedBlock().getType() == Material.CHEST) {
+					&& e.getClickedBlock().getType() == Material.CHEST
+					&& !info.fakechests.contains(e.getClickedBlock()
+							.getLocation())) {
 				Chest ch = (Chest) e.getClickedBlock().getState();
 				ItemStack[] ss = ch.getInventory().getContents();
 				for (ItemStack ii : ss) {
@@ -255,6 +256,16 @@ public class GameListiner implements Listener {
 					e.setCancelled(true);
 				}
 			}
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+	public void handleExplosion(EntityExplodeEvent event) {
+		Iterator<Block> iter = event.blockList().iterator();
+		while (iter.hasNext()) {
+			Block b = iter.next();
+			iter.remove();
+			info.broke.put(b.getLocation(), b.getType());
 		}
 	}
 }

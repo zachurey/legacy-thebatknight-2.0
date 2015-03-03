@@ -197,6 +197,13 @@ public class TBN extends JavaPlugin {
 							game.endGame(0);
 							return true;
 						}
+					}if (args[0].equalsIgnoreCase("blockchange")) {
+						if (p.isOp()) {
+							int i = game.removeBlock();
+							p.sendMessage(pre + ChatColor.GRAY + "Changed " + i
+									+ " blocks!");
+							return true;
+						}
 					}
 					if (args[0].equalsIgnoreCase("removechest")) {
 						if (p.isOp()) {

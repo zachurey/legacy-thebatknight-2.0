@@ -195,6 +195,7 @@ public class LobbyListiners implements Listener {
 				|| e.getBlock().getType() == Material.STAINED_GLASS_PANE || e
 				.getBlock().getType() == Material.STAINED_GLASS)
 				&& info.getState() == ServerState.In_Game) {
+			info.broke.put(e.getBlock().getLocation(), e.getBlock().getType());
 			return;
 		}
 		e.setCancelled(true);
