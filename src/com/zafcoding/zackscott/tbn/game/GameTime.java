@@ -20,12 +20,12 @@ public class GameTime {
 
 	public void GameHeartBeat() {
 		// TODO: test this
-		/*if (info.getPlayerCount() <= 0) {
+		if (info.getPlayerCount() <= 0) {
 			if (info.getState() == ServerState.In_Game) {
 				tbn.getServer().reload();
 			}
-		}*/
-		/*int yt = 0;
+		}
+		int yt = 0;
 		for (Player op : info.ingame) {
 			if ((info.getPP(op).getType() == PlayType.Villan || info.getPP(op)
 					.getType() == PlayType.Joker) && !info.getPP(op).isDead()) {
@@ -45,7 +45,7 @@ public class GameTime {
 		}
 		if (nt < 1) {
 			game.endGame(1);
-		}*/
+		}
 		broadCastShort(info.getGameTime());
 		if (info.getGameTime() <= 0) {
 			game.endGame(1);

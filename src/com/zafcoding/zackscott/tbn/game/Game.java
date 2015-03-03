@@ -39,9 +39,11 @@ public class Game {
 
 	public void start() {
 		info.setState(ServerState.In_Game);
+		info.setGameTime(tbn.getConfig().getInt("MatchLengh") * 60);
 		setHeroesAndBadGuys(tbn);
-		loc.populateChests(false);
+		loc.populateChests(info.superChest);
 		sendHowToPlayInfo(info.robin, info.batman, info.badGuys, info.joker);
+		info.herofreeze = true;
 		for (Player pl : info.getPlayers()) {
 			pl.setCanPickupItems(true);
 			pl.sendMessage(ChatColor.AQUA + "The game has started!");
@@ -61,7 +63,6 @@ public class Game {
 		dosomeDiamondLvl();
 	}
 
-	// TODO: KicK all players
 	@SuppressWarnings("deprecation")
 	public void endGame(final int bo) {
 		PlayerProfile mostdia = null;

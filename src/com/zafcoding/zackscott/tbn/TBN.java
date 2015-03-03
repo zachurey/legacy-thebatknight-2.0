@@ -75,12 +75,16 @@ public class TBN extends JavaPlugin {
 		if (this.getConfig().get("Config.exsits") == null) {
 			String[] list = { "world", "DarkTemple" };
 			this.getConfig().set("Config.exsits", true);
+			this.getConfig().set("MinPlayers", 8);
+			this.getConfig().set("MaxPlayers", 25);
+			this.getConfig().set("MinDiamonds", 10);
+			this.getConfig().set("MaxDiamonds", 100);
+			this.getConfig().set("MatchLengh", 10);
+			this.getConfig().set("GracePeriod", 10);
 			this.getConfig().set("Chests.amount", 3);
 			this.getConfig().set("Chests.SamCity.1", "-1194,18,-550");
 			this.getConfig().set("Chests.SamCity.2", "-1186,18,-549");
 			this.getConfig().set("Chests.SamCity.3", "-1188,18,-553");
-			this.getConfig().set("MinPlayers", 8);
-			this.getConfig().set("MaxPlayers", 25);
 			this.getConfig().set("debug", true);
 			this.getConfig().options().copyDefaults(true);
 			this.saveConfig();

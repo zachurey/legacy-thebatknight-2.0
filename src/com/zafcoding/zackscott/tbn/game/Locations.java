@@ -150,7 +150,7 @@ public class Locations {
 																	.getInventory() != null)) {
 														Random rand = new Random();
 														int random = rand
-																.nextInt(20) + 1;
+																.nextInt(tbn.getConfig().getInt("MaxDiamonds")) + tbn.getConfig().getInt("MinDiamonds");
 														List diamondLore = new ArrayList();
 														diamondLore
 																.add(ChatColor.DARK_AQUA
@@ -202,27 +202,33 @@ public class Locations {
 															if (contains(
 																	chest.getInventory(),
 																	Material.ARROW)) {
-																ItemStack op = new ItemStack(
-																		Material.ARROW,
-																		arrowRand);
-																chest.getInventory()
-																		.addItem(
-																				op);
+																if ((Math
+																		.random() * 2 + 1) == 1) {
+																	ItemStack op = new ItemStack(
+																			Material.ARROW,
+																			arrowRand);
+																	chest.getInventory()
+																			.addItem(
+																					op);
+																}
 															}
 														}
 														if (rand.nextInt(100) <= 10) {
 															if (contains(
 																	chest.getInventory(),
 																	Material.BOW)) {
-																ItemStack it = new ItemStack(
-																		Material.BOW,
-																		1);
-																tbn.debugMsg("Adding it! ("
-																		+ it.getAmount()
-																		+ ")");
-																chest.getInventory()
-																		.addItem(
-																				it);
+																if ((Math
+																		.random() * 30 + 1) >= 20) {
+																	ItemStack it = new ItemStack(
+																			Material.BOW,
+																			1);
+																	tbn.debugMsg("Adding it! ("
+																			+ it.getAmount()
+																			+ ")");
+																	chest.getInventory()
+																			.addItem(
+																					it);
+																}
 															}
 														}
 
@@ -415,7 +421,6 @@ public class Locations {
 					return false;
 				}
 			} else {
-				tbn.debugMsg("It's null boy!");
 			}
 		}
 		tbn.debugMsg(is + " is a thingy!");

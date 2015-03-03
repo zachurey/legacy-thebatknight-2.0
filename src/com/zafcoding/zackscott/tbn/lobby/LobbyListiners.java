@@ -149,9 +149,21 @@ public class LobbyListiners implements Listener {
 			if (((HumanEntity) en).getGameMode() == GameMode.CREATIVE) {
 				return;
 			}
-			if (!(info.getState() == ServerState.In_Game || info.getState() == ServerState.Post_Game)
-					|| info.pvp == false) {
+			if (!(info.getState() == ServerState.In_Game) || info.pvp == false) {
 				e.setCancelled(true);
+			}
+			if (e.getDamager() instanceof Player) {
+				PlayerProfile pp = info.getPP((Player) e.getDamager());
+				PlayerProfile eq = info.getPP((Player) en);
+				if (pp.getType() == PlayType.BatNight
+						&& pp.getType() == PlayType.BirdBoy
+						|| pp.getType() == PlayType.BirdBoy
+						&& pp.getType() == PlayType.BatNight) {
+					e.setCancelled(true);
+					pp.getPlayer().sendMessage(
+							ChatColor.RED + "Why would you want to damage "
+									+ pp.getType() + "??");
+				}
 			}
 		}
 	}
@@ -308,7 +320,7 @@ public class LobbyListiners implements Listener {
 	public void WeatherChange(WeatherChangeEvent e) {
 		e.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void onBlockForm(BlockFormEvent e) {
 		if (e.getBlock().getType() == Material.ICE) {

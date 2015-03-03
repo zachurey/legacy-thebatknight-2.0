@@ -30,6 +30,7 @@ public class Info {
 	int playerc = 0;
 	public static boolean superChest = false;
 	public static boolean didsuperChest = false;
+	public static boolean herofreeze = false;
 	public static int mapId;
 	public static String mapName;
 	public static Player batman = null;

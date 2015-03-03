@@ -38,8 +38,7 @@ public class Thread implements Runnable {
 		for (Player pp : info.players) {
 			pp.setFoodLevel(20);
 			pp.setSaturation(20f);
-			if (info.getState() == ServerState.In_Game || tbn.debugMode
-					|| pp.getGameMode() == GameMode.CREATIVE) {
+			if (info.getState() == ServerState.In_Game || tbn.debugMode) {
 				if (info.isSpect(pp)) {
 					pp.setAllowFlight(true);
 					pp.setFlying(true);
@@ -50,8 +49,10 @@ public class Thread implements Runnable {
 					pp.setFlying(true);
 					return;
 				}
-				pp.setAllowFlight(false);
-				pp.setFlying(false);
+				if (!(pp.getGameMode() == GameMode.CREATIVE)) {
+					pp.setAllowFlight(false);
+					pp.setFlying(false);
+				}
 			} else {
 				if (!(pp.getGameMode() == GameMode.CREATIVE)
 						&& info.getPP(pp).getType() == PlayType.Villan) {
