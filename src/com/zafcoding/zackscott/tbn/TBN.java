@@ -79,6 +79,8 @@ public class TBN extends JavaPlugin {
 			this.getConfig().set("MaxPlayers", 25);
 			this.getConfig().set("MinDiamonds", 10);
 			this.getConfig().set("MaxDiamonds", 100);
+			this.getConfig().set("MinDeath", 5);
+			this.getConfig().set("MaxDeath", 40);
 			this.getConfig().set("MatchLengh", 10);
 			this.getConfig().set("GracePeriod", 10);
 			this.getConfig().set("Chests.amount", 3);
@@ -165,13 +167,16 @@ public class TBN extends JavaPlugin {
 									+ " chests!");
 							return true;
 						}
-					}if (args[0].equalsIgnoreCase("force")) {
+					}
+					if (args[0].equalsIgnoreCase("force")) {
 						if (p.isOp()) {
-							p.sendMessage(ChatColor.GRAY + "Starting the game...");
+							p.sendMessage(ChatColor.GRAY
+									+ "Starting the game...");
 							game.start();
 							return true;
 						}
-					}if (args[0].equalsIgnoreCase("finish")) {
+					}
+					if (args[0].equalsIgnoreCase("finish")) {
 						if (p.isOp()) {
 							p.sendMessage(ChatColor.GRAY + "Ending the game...");
 							game.endGame(0);

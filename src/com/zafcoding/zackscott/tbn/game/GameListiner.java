@@ -8,9 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,8 +21,6 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -175,6 +171,18 @@ public class GameListiner implements Listener {
 		}
 		if (info.ingame.contains(e.getEntity())) {
 			info.outplayer(e.getEntity());
+			int amount = (int) (Math.random()
+					* tbn.getConfig().getInt("MinDeath") + tbn.getConfig()
+					.getInt("MaxDeath"));
+			List diamondLore = new ArrayList();
+			diamondLore.add(ChatColor.DARK_AQUA + "Collect The Most "
+					+ ChatColor.AQUA + "Diamonds " + ChatColor.DARK_AQUA
+					+ "To Win!");
+			ItemStack ads = game.setName(
+					new ItemStack(Material.DIAMOND, amount), ChatColor.AQUA
+							+ "Diamond", diamondLore);
+			e.getEntity().getWorld()
+					.dropItemNaturally(e.getEntity().getLocation(), ads);
 			e.setDeathMessage(ChatColor.RED + ""
 					+ e.getEntity().getDisplayName() + " has died! "
 					+ ChatColor.GOLD + "" + info.ingame.size() + ChatColor.RED
