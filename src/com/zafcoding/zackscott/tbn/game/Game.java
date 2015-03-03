@@ -256,11 +256,7 @@ public class Game {
 
 		while (batmanIndex == robinIndex)
 			robinIndex = rand.nextInt(players.length);
-		/*
-		 * while (batmanIndex == jockerIndex) jockerIndex =
-		 * rand.nextInt(players.length);
-		 */
-		while (robinIndex == jockerIndex)
+		while (batmanIndex == jockerIndex || robinIndex == jockerIndex)
 			jockerIndex = rand.nextInt(players.length);
 
 		tbn.debugMsg("Setting batman...");
@@ -271,8 +267,7 @@ public class Game {
 		tbn.debugMsg("Setting robin...");
 
 		if (info.robin == null) {
-			//info.robin = players[robinIndex];
-			info.robin = info.batman;
+			info.robin = players[robinIndex];
 			info.getPP(info.robin).setType(PlayType.BirdBoy);
 		}
 
@@ -422,7 +417,8 @@ public class Game {
 		info.batman.getInventory().setBoots(
 				setArmourColour(Material.LEATHER_LEGGINGS, 0, 0, 0));
 		setListName(info.batman, info.batman.getDisplayName(), ChatColor.GRAY);
-		info.batman.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(), -1));
+		info.batman.teleport(tbn.getPlayerSpawn(
+				info.getActiveWorld().getName(), -1));
 		info.robin.getInventory()
 				.addItem(
 						new ItemStack[] {
@@ -443,7 +439,8 @@ public class Game {
 		info.robin.getInventory().setBoots(
 				setArmourColour(Material.LEATHER_LEGGINGS, 64, 193, 55));
 		setListName(info.robin, info.robin.getDisplayName(), ChatColor.GREEN);
-		info.batman.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(), -2));
+		info.batman.teleport(tbn.getPlayerSpawn(
+				info.getActiveWorld().getName(), -2));
 		if (info.joker != null) {
 			info.joker.getInventory().setHelmet(
 					setArmourColour(Material.LEATHER_HELMET, 191, 0, 255));
@@ -485,8 +482,9 @@ public class Game {
 			info.joker.getInventory().addItem(
 					new ItemStack[] { setName(new ItemStack(Material.CHEST, 5),
 							ChatColor.RED + "TNT-In-A-Box", new ArrayList()) });
-			info.batman.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(), -1));
-			//TODO: Bad guy spawn
+			info.batman.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+					.getName(), -1));
+			// TODO: Bad guy spawn
 		}
 
 		/*

@@ -103,8 +103,15 @@ public class LobbyListiners implements Listener {
 	@EventHandler
 	public void PickupItem(PlayerPickupItemEvent e) {
 		Player p = e.getPlayer();
+		PlayerProfile pp = info.getPP(p);
 		if (p.getGameMode() == GameMode.CREATIVE) {
 			return;
+		}
+		if (info.getState() == ServerState.In_Game) {
+			if (pp.getType() == PlayType.BatNight
+					|| pp.getType() == PlayType.BirdBoy) {
+				e.setCancelled(true);
+			}
 		}
 		if (info.getState() == ServerState.Pre_Game
 				|| info.getState() == ServerState.Post_Game) {
