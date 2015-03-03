@@ -165,6 +165,18 @@ public class TBN extends JavaPlugin {
 									+ " chests!");
 							return true;
 						}
+					}if (args[0].equalsIgnoreCase("force")) {
+						if (p.isOp()) {
+							p.sendMessage(ChatColor.GRAY + "Starting the game...");
+							game.start();
+							return true;
+						}
+					}if (args[0].equalsIgnoreCase("finish")) {
+						if (p.isOp()) {
+							p.sendMessage(ChatColor.GRAY + "Ending the game...");
+							game.endGame(0);
+							return true;
+						}
 					}
 					if (args[0].equalsIgnoreCase("removechest")) {
 						if (p.isOp()) {
