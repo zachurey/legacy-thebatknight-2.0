@@ -216,6 +216,7 @@ public class GameListiner implements Listener {
 								.getWorld()
 								.dropItemNaturally(
 										e.getClickedBlock().getLocation(), ii);
+						ch.getInventory().remove(ii);
 					}
 				}
 				e.getClickedBlock().setType(Material.AIR);

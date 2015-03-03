@@ -29,6 +29,7 @@ public class Info {
 	int gametime = 600;
 	int playerc = 0;
 	public static boolean superChest = false;
+	public static boolean didsuperChest = false;
 	public static int mapId;
 	public static String mapName;
 	public static Player batman = null;

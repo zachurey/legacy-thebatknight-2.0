@@ -156,7 +156,7 @@ public class TBN extends JavaPlugin {
 
 					if (args[0].equalsIgnoreCase("chest")) {
 						if (p.isOp()) {
-							int i = loc.populateChests(p, false);
+							int i = loc.populateChests(false);
 							p.sendMessage(pre + ChatColor.GRAY + "Spawned " + i
 									+ " chests!");
 							return true;

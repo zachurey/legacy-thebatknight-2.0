@@ -8,10 +8,12 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
@@ -38,8 +40,8 @@ public class Game {
 	public void start() {
 		info.setState(ServerState.In_Game);
 		setHeroesAndBadGuys(tbn);
-		// loc.populateChests(Bukkit.getOnlinePlayers()[0], false);
-		// sendHowToPlayInfo(info.robin, info.batman, info.badGuys, info.joker);
+		loc.populateChests(false);
+		sendHowToPlayInfo(info.robin, info.batman, info.badGuys, info.joker);
 		for (Player pl : info.getPlayers()) {
 			pl.setCanPickupItems(true);
 			pl.sendMessage(ChatColor.AQUA + "The game has started!");
@@ -70,6 +72,7 @@ public class Game {
 				PlayerProfile pq = info.getPP(pa);
 				pa.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(),
 						0));
+				pa.setGameMode(GameMode.ADVENTURE);
 				if (pq.getDiamonds() > mostdia.getDiamonds()) {
 					mostdia = pq;
 				}
@@ -98,6 +101,7 @@ public class Game {
 				PlayerProfile pp = info.getPP(pa);
 				pa.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(),
 						0));
+				pa.setGameMode(GameMode.ADVENTURE);
 				if (pp.getType() == PlayType.BatNight
 						|| pp.getType() == PlayType.BirdBoy)
 					if (pp.getKills() > mostkill.getKills()) {
@@ -158,7 +162,8 @@ public class Game {
 	public int removeChest() {
 		int chestdone = 0;
 		int totala = info.chests.size();
-		for (Location loc : info.chests) {
+		for (Object loca : info.chests.toArray()) {
+			Location loc = (Location) loca;
 			if (loc.getBlock().getType() == Material.CHEST) {
 				loc.getBlock().setType(Material.AIR);
 				chestdone++;
@@ -166,7 +171,20 @@ public class Game {
 				info.chests.remove(loc);
 			}
 		}
+		clearEnts();
 		return chestdone;
+	}
+
+	@SuppressWarnings("static-access")
+	public void clearEnts() {
+		int done = 0;
+		for (Entity ent : info.getActiveWorld().getEntities()) {
+			if (ent.getType() == EntityType.DROPPED_ITEM) {
+				done++;
+				ent.remove();
+			}
+		}
+		tbn.debugMsg("Removed " + done + " entites!");
 	}
 
 	public ItemStack setName(ItemStack is, String name, List<String> lore) {
