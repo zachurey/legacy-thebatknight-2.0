@@ -359,13 +359,14 @@ public class GameListiner implements Listener {
         for (int i = 0; i < e.blockList().size();i++){
             Block b = e.blockList().get(i);
             Location bLoc = b.getLocation();
-            info.broke.put(b.getLocation(), b.getType());
             x = bLoc.getX() - eLoc.getX();
             y = bLoc.getY() - eLoc.getY() + 0.5;
             z = bLoc.getZ() - eLoc.getZ();
             FallingBlock fb = w.spawnFallingBlock(bLoc, b.getType(), (byte)b.getData());
             fb.setDropItem(false);
             fb.setVelocity(new Vector(x,y,z));
+            info.broke.put(bLoc, b.getType());
+            info.block.add(b);
         }
 	}
 

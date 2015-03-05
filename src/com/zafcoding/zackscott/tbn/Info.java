@@ -50,6 +50,7 @@ public class Info {
 	public static ArrayList<Player> ingame = new ArrayList<Player>();
 	public static ArrayList<Location> fakechests = new ArrayList<Location>();
 	public static ArrayList<Location> chests = new ArrayList<Location>();
+	public static ArrayList<Block> block = new ArrayList<Block>();
 	public static HashMap<Location, Material> broke = new HashMap<Location, Material>();
 	PlayerProfile winner = null;
 

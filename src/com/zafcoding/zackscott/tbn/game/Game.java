@@ -12,6 +12,7 @@ import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -26,8 +27,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import com.zafcoding.zackscott.tbn.Info;
-import com.zafcoding.zackscott.tbn.PlayerProfile;
 import com.zafcoding.zackscott.tbn.Info.ServerState;
+import com.zafcoding.zackscott.tbn.PlayerProfile;
 import com.zafcoding.zackscott.tbn.PlayerProfile.PlayType;
 import com.zafcoding.zackscott.tbn.TBN;
 
@@ -205,12 +206,20 @@ public class Game {
 		int totala = info.broke.size();
 		HashMap<Location, Material> newbroke = new HashMap<Location, Material>(
 				info.broke);
+		ArrayList<Block> sd = new ArrayList<Block>(info.block);
+		for(Block blo : sd){
+			blo.setType(Material.AIR);
+			sd.remove(blo);
+			info.block.remove(blo);
+		}
 		for (Object loca : newbroke.keySet()) {
 			Location loc = (Location) loca;
 			Material mat = info.broke.get(loca);
 			loc.getBlock().setType(mat);
 			info.broke.remove(loc);
 			blockchange++;
+		}for(Block blo : sd){
+			blo.setType(Material.AIR);
 		}
 		clearEnts();
 		return blockchange;
