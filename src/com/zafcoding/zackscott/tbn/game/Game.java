@@ -286,13 +286,13 @@ public class Game {
 			robinIndex = rand.nextInt(players.length);
 		while ((batmanIndex == jockerIndex || robinIndex == jockerIndex))
 			jockerIndex = rand.nextInt(players.length);
+		while ((batmanIndex == catIndex || robinIndex == catIndex)
+				|| jockerIndex == catIndex || puffinIndex == catIndex)
+			catIndex = rand.nextInt(players.length);
 		if (tbn.debugMode) {
 			while ((batmanIndex == puffinIndex || robinIndex == puffinIndex)
 					|| jockerIndex == puffinIndex)
 				puffinIndex = rand.nextInt(players.length);
-			while ((batmanIndex == catIndex || robinIndex == catIndex)
-					|| jockerIndex == catIndex || puffinIndex == catIndex)
-				catIndex = rand.nextInt(players.length);
 		}
 
 		tbn.debugMsg("Setting batman...");
@@ -538,17 +538,29 @@ public class Game {
 			setListName(info.joker, info.joker.getDisplayName(),
 					ChatColor.DARK_PURPLE);
 			info.joker.setDisplayName(ChatColor.DARK_PURPLE + "[Jester]");
+			if (info.spawnwitch >= 20) {
+				info.spawnwitch = 1;
+			}
+			info.joker.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+					.getName(), info.spawnwitch));
+			info.spawnwitch++;
 		}
 		if (info.puffin != null) {
 			List<String> ll = new ArrayList<String>();
 			info.puffin.getInventory().addItem(
 					new ItemStack[] {
-							setName(Material.IRON_HOE, ChatColor.DARK_PURPLE
+							setName(Material.STONE_HOE, ChatColor.DARK_PURPLE
 									+ "Umbrella", ll),
 							setName(Material.EGG, ChatColor.YELLOW
 									+ "Minion Spawner", ll),
 							setName(Material.RAW_CHICKEN, ChatColor.GRAY
 									+ "The Puffinator", ll) });
+			if (info.spawnwitch >= 20) {
+				info.spawnwitch = 1;
+			}
+			info.puffin.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+					.getName(), info.spawnwitch));
+			info.spawnwitch++;
 		}
 		if (info.catwomen != null) {
 			info.catwomen.getInventory().addItem(
@@ -577,6 +589,12 @@ public class Game {
 					PotionEffectType.SPEED, -1, 2));
 			setListName(info.catwomen, info.catwomen.getDisplayName(),
 					ChatColor.LIGHT_PURPLE);
+			if (info.spawnwitch >= 20) {
+				info.spawnwitch = 1;
+			}
+			info.catwomen.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+					.getName(), info.spawnwitch));
+			info.spawnwitch++;
 		}
 
 		/*

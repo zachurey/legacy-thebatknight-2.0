@@ -43,7 +43,8 @@ public class Thread implements Runnable {
 		for (Player pp : info.players) {
 			pp.setFoodLevel(20);
 			pp.setSaturation(20f);
-			if (info.getPP(pp).getDis()) {
+			if (info.getPP(pp).getDis()
+					&& info.getPP(pp).getType() == PlayType.KittyKat) {
 				if (pp.getItemInHand() == null) {
 					DisguiseAPI.undisguiseToAll(pp);
 					pp.sendMessage(ChatColor.RED + "" + ChatColor.BOLD
@@ -56,6 +57,33 @@ public class Thread implements Runnable {
 					pp.sendMessage(ChatColor.RED + "" + ChatColor.BOLD
 							+ "You have been undisguised!");
 					info.getPP(pp).setDis(false);
+				}
+			}
+			if (info.getPP(pp).getType() == PlayType.Puffin) {
+				if (pp.getItemInHand() != null
+						&& pp.getItemInHand().getType() == Material.EGG) {
+					if (info.getPP(pp).getRap() == false) {
+						DisguiseAPI.disguiseToAll(pp, new MobDisguise(
+								DisguiseType.CHICKEN));
+						pp.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD
+								+ "You are now disguised as a chicken!");
+						info.getPP(pp).setRap(true);
+					}
+				}
+			}if (info.getPP(pp).getRap()
+					&& info.getPP(pp).getType() == PlayType.Puffin) {
+				if (pp.getItemInHand() == null) {
+					DisguiseAPI.undisguiseToAll(pp);
+					pp.sendMessage(ChatColor.RED + "" + ChatColor.BOLD
+							+ "You have been undisguised!");
+					info.getPP(pp).setRap(false);
+				}
+				if (pp.getItemInHand() != null
+						&& !(pp.getItemInHand().getType() == Material.EGG)) {
+					DisguiseAPI.undisguiseToAll(pp);
+					pp.sendMessage(ChatColor.RED + "" + ChatColor.BOLD
+							+ "You have been undisguised!");
+					info.getPP(pp).setRap(false);
 				}
 			}
 			if (info.getPP(pp).getType() == PlayType.KittyKat) {

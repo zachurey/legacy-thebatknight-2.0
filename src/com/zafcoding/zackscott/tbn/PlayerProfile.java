@@ -23,6 +23,7 @@ public class PlayerProfile {
 	boolean dead = false;
 	public boolean did = false;
 	private boolean de = false;
+	private boolean ra = false;
 	PlayType ty;
 	public ArrayList<Location> loc = new ArrayList<Location>();
 
@@ -57,8 +58,15 @@ public class PlayerProfile {
 	}
 
 	public void setDis(boolean bool) {
-		tbn.debugMsg("Set bool to " + bool);
 		de = bool;
+	}
+
+	public boolean getRap() {
+		return ra;
+	}
+
+	public void setRap(boolean bool) {
+		ra = bool;
 	}
 
 	public void removeLocation(Location l) {

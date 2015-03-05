@@ -41,6 +41,7 @@ public class Info {
 	public static Player puffin = null;
 	public static Player catwomen = null;
 	public static Player[] badGuys = null;
+	public static int h = 0;
 	World active = null;
 	public boolean pvp = true;
 	ServerState state = ServerState.Pre_Game;

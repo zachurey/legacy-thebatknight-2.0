@@ -253,6 +253,15 @@ public class TBN extends JavaPlugin {
 									+ ChatColor.GOLD + "!");
 							return true;
 						}
+					}if (args[0].equalsIgnoreCase("puffin")) {
+						if (p.isOp()) {
+							info.puffin = p;
+							ppp.setType(PlayType.Puffin);
+							p.sendMessage(pre + " You are the now the "
+									+ ChatColor.AQUA + "Puffin"
+									+ ChatColor.GOLD + "!");
+							return true;
+						}
 					}
 					if (args[0].equalsIgnoreCase("birdboy")) {
 						if (p.isOp()) {
@@ -626,6 +635,16 @@ public class TBN extends JavaPlugin {
 									game.setListName(info.catwomen,
 											info.catwomen.getDisplayName(),
 											ChatColor.LIGHT_PURPLE);
+								}if(info.puffin != null && info.puffin == p){
+									List<String> ll = new ArrayList<String>();
+									info.puffin.getInventory().addItem(
+											new ItemStack[] {
+													game.setName(Material.IRON_HOE, ChatColor.DARK_PURPLE
+															+ "Umbrella", ll),
+															game.setName(Material.EGG, ChatColor.YELLOW
+															+ "Minion Spawner", ll),
+															game.setName(Material.RAW_CHICKEN, ChatColor.GRAY
+															+ "The Puffinator", ll) });
 								}
 							}
 						}
