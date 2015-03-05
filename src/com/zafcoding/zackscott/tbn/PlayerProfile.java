@@ -22,6 +22,7 @@ public class PlayerProfile {
 	boolean spectate = false;
 	boolean dead = false;
 	public boolean did = false;
+	private boolean de = false;
 	PlayType ty;
 	public ArrayList<Location> loc = new ArrayList<Location>();
 
@@ -39,7 +40,8 @@ public class PlayerProfile {
 					"Chest." + i,
 					loca.getBlockX() + "," + loca.getBlockY() + ","
 							+ loca.getBlockZ());
-			p.sendMessage(tbn.pre + " Adding chest " + i + " out of " + loc.size());
+			p.sendMessage(tbn.pre + " Adding chest " + i + " out of "
+					+ loc.size());
 		}
 		tbn.saveAll();
 		p.sendMessage(tbn.pre + "Success!");
@@ -48,6 +50,15 @@ public class PlayerProfile {
 
 	public void clearLocations() {
 		loc.clear();
+	}
+
+	public boolean getDis() {
+		return de;
+	}
+
+	public void setDis(boolean bool) {
+		tbn.debugMsg("Set bool to " + bool);
+		de = bool;
 	}
 
 	public void removeLocation(Location l) {
@@ -118,7 +129,7 @@ public class PlayerProfile {
 	}
 
 	public enum PlayType {
-		Joker, Villan, BatNight, BirdBoy
+		Joker, Villan, BatNight, BirdBoy, KittyKat, Puffin
 	}
 
 }

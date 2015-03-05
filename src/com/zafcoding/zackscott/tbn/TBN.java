@@ -25,10 +25,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
 import com.zafcoding.zackscott.tbn.Info.ServerState;
+import com.zafcoding.zackscott.tbn.PlayerProfile.PlayType;
 import com.zafcoding.zackscott.tbn.game.Game;
 import com.zafcoding.zackscott.tbn.game.GameListiner;
 import com.zafcoding.zackscott.tbn.game.GameTime;
@@ -46,11 +49,13 @@ public class TBN extends JavaPlugin {
 	public static Locations loc;
 	static boolean debug = true;
 	double version = 1.6;
-	public String pre = ChatColor.GOLD + "[TBN]";
+	public String pre = ChatColor.GOLD + "[TBN] ";
 	public static Inventory inv;
 	public boolean debugMode = true;
 	ArrayList<Player> unstuckers = new ArrayList<Player>();
 	public static HashMap<String, String> mods = new HashMap<String, String>();
+
+	// public static Object dcAPI;
 
 	@Override
 	public void onEnable() {
@@ -67,6 +72,19 @@ public class TBN extends JavaPlugin {
 				this);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Thread(), 20,
 				20);
+		System.out.print("Loading DisguiseCraft...");
+		/*
+		 * try { dcAPI = DisguiseCraft.getAPI(); } catch (Exception e) {
+		 * System.out.println("==================================");
+		 * System.out.println("|Made sure you have DisguiseCraft|");
+		 * System.out.println("|  DisguiseCraft on the server!  |");
+		 * System.out.println("=================================="); } if (dcAPI
+		 * == null) { System.out.println("==================================");
+		 * System.out.println("|Made sure you have DisguiseCraft|");
+		 * System.out.println("|  DisguiseCraft on the server!  |");
+		 * System.out.println("=================================="); } else {
+		 * System.out.print("Success!"); }
+		 */
 		// String[] ss = getConfig().getString("Worlds").split(",");
 		// int randy = info.getRandom(1, ss.length);
 		// info.setActiveWorld(Bukkit.getWorld((String) ss[randy - 1]));
@@ -127,12 +145,14 @@ public class TBN extends JavaPlugin {
 			String label, String[] args) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
+			PlayerProfile ppp = info.getPP(p);
 			if (label.equalsIgnoreCase("unstuck")
 					&& info.getState() == ServerState.In_Game) {
 				if (!unstuckers.contains(p)) {
 					Vector v = new Vector(0, 2, 0);
 					p.setVelocity(v);
 					unstuckers.add(p);
+					p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Pop!");
 				} else {
 					p.sendMessage(ChatColor.RED
 							+ "I'm gonna put ya on da list boy!");
@@ -197,7 +217,8 @@ public class TBN extends JavaPlugin {
 							game.endGame(0);
 							return true;
 						}
-					}if (args[0].equalsIgnoreCase("blockchange")) {
+					}
+					if (args[0].equalsIgnoreCase("blockchange")) {
 						if (p.isOp()) {
 							int i = game.removeBlock();
 							p.sendMessage(pre + ChatColor.GRAY + "Changed " + i
@@ -216,8 +237,19 @@ public class TBN extends JavaPlugin {
 					if (args[0].equalsIgnoreCase("batknight")) {
 						if (p.isOp()) {
 							info.batman = p;
+							ppp.setType(PlayType.BatNight);
 							p.sendMessage(pre + " You are the now the "
 									+ ChatColor.GRAY + "BatKnight"
+									+ ChatColor.GOLD + "!");
+							return true;
+						}
+					}
+					if (args[0].equalsIgnoreCase("kittykat")) {
+						if (p.isOp()) {
+							info.catwomen = p;
+							ppp.setType(PlayType.KittyKat);
+							p.sendMessage(pre + " You are the now the "
+									+ ChatColor.LIGHT_PURPLE + "KittyKat"
 									+ ChatColor.GOLD + "!");
 							return true;
 						}
@@ -225,6 +257,7 @@ public class TBN extends JavaPlugin {
 					if (args[0].equalsIgnoreCase("birdboy")) {
 						if (p.isOp()) {
 							info.robin = p;
+							ppp.setType(PlayType.BirdBoy);
 							p.sendMessage(pre + " You are the now "
 									+ ChatColor.GREEN + "BirdBoy"
 									+ ChatColor.GOLD + "!");
@@ -234,6 +267,7 @@ public class TBN extends JavaPlugin {
 					if (args[0].equalsIgnoreCase("joker")) {
 						if (p.isOp()) {
 							info.joker = p;
+							ppp.setType(PlayType.Joker);
 							p.sendMessage(pre + " You are the now "
 									+ ChatColor.LIGHT_PURPLE + "Jester"
 									+ ChatColor.GOLD + "!");
@@ -529,6 +563,70 @@ public class TBN extends JavaPlugin {
 											info.joker.getDisplayName(),
 											ChatColor.LIGHT_PURPLE);
 								}
+								if (info.catwomen != null && info.catwomen == p) {
+									List compassLore = new ArrayList();
+									compassLore
+											.add(ChatColor.DARK_GRAY
+													+ "Use This To Track The Bad Guys!");
+									info.catwomen
+											.getInventory()
+											.addItem(
+													new ItemStack[] {
+															game.setName(
+																	new ItemStack(
+																			Material.STONE_SWORD),
+																	ChatColor.GRAY
+																			+ "Kitty Claws",
+																	null),
+															game.setName(
+																	new ItemStack(
+																			Material.MILK_BUCKET),
+																	ChatColor.GOLD
+																			+ "Catsciser",
+																	null),
+															game.setName(
+																	new ItemStack(
+																			Material.getMaterial(349)),
+																	ChatColor.BLUE
+																			+ "Minion Spawner",
+																	null),
+															game.setName(
+																	new ItemStack(
+																			Material.FISHING_ROD),
+																	ChatColor.RED
+																			+ "Diamond Stealer",
+																	null),
+															game.setName(
+																	Material.COMPASS,
+																	ChatColor.GREEN
+																			+ "Tracker",
+																	compassLore) });
+									info.catwomen.getInventory().setHelmet(
+											game.setArmourColour(
+													Material.LEATHER_HELMET,
+													253, 152, 254));
+									info.catwomen
+											.getInventory()
+											.setChestplate(
+													game.setArmourColour(
+															Material.LEATHER_CHESTPLATE,
+															253, 152, 254));
+									info.catwomen.getInventory().setLeggings(
+											game.setArmourColour(
+													Material.LEATHER_LEGGINGS,
+													253, 152, 254));
+									info.catwomen.getInventory().setBoots(
+											game.setArmourColour(
+													Material.LEATHER_LEGGINGS,
+													253, 152, 254));
+									info.catwomen
+											.addPotionEffect(new PotionEffect(
+													PotionEffectType.SPEED, -1,
+													2));
+									game.setListName(info.catwomen,
+											info.catwomen.getDisplayName(),
+											ChatColor.LIGHT_PURPLE);
+								}
 							}
 						}
 					}
@@ -738,5 +836,5 @@ public class TBN extends JavaPlugin {
 			br.close();
 		}
 	}
-	
+
 }

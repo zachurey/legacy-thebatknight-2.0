@@ -27,8 +27,10 @@ public class GameTime {
 		}
 		int yt = 0;
 		for (Player op : info.ingame) {
-			if ((info.getPP(op).getType() == PlayType.Villan || info.getPP(op)
-					.getType() == PlayType.Joker) && !info.getPP(op).isDead()) {
+			if ((info.getPP(op).getType() == PlayType.Villan
+					|| info.getPP(op).getType() == PlayType.Joker || info
+					.getPP(op).getType() == PlayType.KittyKat)
+					&& !info.getPP(op).isDead()) {
 				yt++;
 			}
 		}
@@ -37,8 +39,9 @@ public class GameTime {
 		}
 		int nt = 0;
 		for (Player op : info.ingame) {
-			if ((info.getPP(op).getType() == PlayType.BatNight || info
-					.getPP(op).getType() == PlayType.BirdBoy)
+			if ((info.getPP(op).getType() == PlayType.BatNight
+					|| info.getPP(op).getType() == PlayType.BirdBoy || info
+					.getPP(op).getType() == PlayType.KittyKat)
 					&& !info.getPP(op).isDead()) {
 				nt++;
 			}

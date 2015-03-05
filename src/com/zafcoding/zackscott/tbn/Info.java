@@ -39,9 +39,10 @@ public class Info {
 	public static Player robin = null;
 	public static Player joker = null;
 	public static Player puffin = null;
+	public static Player catwomen = null;
 	public static Player[] badGuys = null;
 	World active = null;
-	public boolean pvp = false;
+	public boolean pvp = true;
 	ServerState state = ServerState.Pre_Game;
 	ArrayList<PlayerProfile> profiles = new ArrayList<PlayerProfile>();
 	ArrayList<Player> spects = new ArrayList<Player>();

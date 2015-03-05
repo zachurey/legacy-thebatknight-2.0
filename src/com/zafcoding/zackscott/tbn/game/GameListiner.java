@@ -10,8 +10,10 @@ import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -43,11 +45,15 @@ public class GameListiner implements Listener {
 
 	@EventHandler
 	public void PlayerFall(EntityDamageEvent e) {
+		if (!(info.getState() == ServerState.In_Game)) {
+			e.setCancelled(true);
+		}
 		if (e.getCause() == DamageCause.FALL) {
 			if (e.getEntity() instanceof Player) {
 				PlayerProfile pp = info.getPP((Player) e.getEntity());
 				if (pp.getType() == PlayType.BatNight
-						|| pp.getType() == PlayType.BirdBoy) {
+						|| pp.getType() == PlayType.BirdBoy
+						|| pp.getType() == PlayType.KittyKat) {
 					e.setCancelled(true);
 				}
 			}
@@ -196,6 +202,7 @@ public class GameListiner implements Listener {
 	@EventHandler
 	public void PlayerInteract(PlayerInteractEvent e) {
 		PlayerProfile pe = info.getPP(e.getPlayer());
+		tbn.debugMsg("Interact!");
 		if (pe != null && pe.isDead()) {
 			if (pe.getPlayer().getItemInHand() != null
 					&& pe.getPlayer().getItemInHand().getType() == Material.COMPASS) {
@@ -230,6 +237,30 @@ public class GameListiner implements Listener {
 				}
 				e.getClickedBlock().setType(Material.AIR);
 			}
+			tbn.debugMsg("Close!");
+			tbn.debugMsg(e.getItem().getType() + "");
+			if (e.getItem().getType() != null
+					&& e.getItem().getType() == Material.RAW_FISH) {
+				tbn.debugMsg("Fish!");
+				final Entity ee = e
+						.getClickedBlock()
+						.getWorld()
+						.spawnEntity(e.getClickedBlock().getLocation(),
+								EntityType.OCELOT);
+				tbn.debugMsg("Did it!");
+				Bukkit.getServer().getScheduler()
+						.scheduleSyncDelayedTask(tbn, new Runnable() {
+							public void run() {
+								ee.remove();
+							}
+						}, 200L);
+			}
+
+			if ((e.getItem().getType() == Material.MILK_BUCKET)
+					|| (e.getItem().getType() == Material.RAW_FISH)) {
+				e.setCancelled(true);
+				e.setUseItemInHand(Event.Result.DENY);
+			}
 		}
 	}
 
@@ -244,18 +275,6 @@ public class GameListiner implements Listener {
 			e.getWhoClicked().teleport(pp);
 			((Player) e.getWhoClicked()).sendMessage(ChatColor.GREEN
 					+ "You have been teleported to " + pp.getDisplayName());
-		}
-	}
-
-	@EventHandler
-	public void PlayerHit(EntityDamageEvent e) {
-		if (e.getCause() == DamageCause.FALL) {
-			if (e.getEntity() instanceof Player) {
-				if (info.getPP((Player) e.getEntity()).getType() == PlayType.BatNight
-						|| info.getPP((Player) e.getEntity()).getType() == PlayType.BirdBoy) {
-					e.setCancelled(true);
-				}
-			}
 		}
 	}
 

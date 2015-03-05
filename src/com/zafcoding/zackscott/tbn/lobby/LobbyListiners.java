@@ -7,9 +7,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -17,6 +19,8 @@ import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -83,11 +87,21 @@ public class LobbyListiners implements Listener {
 		e.getPlayer().getInventory().setBoots(new ItemStack(Material.AIR));
 		info.addPlayer(e.getPlayer());
 		info.getPP(e.getPlayer()).setType(PlayType.Villan);
-		e.setJoinMessage(ChatColor.GOLD + "" + e.getPlayer().getDisplayName()
-				+ "" + ChatColor.WHITE + " has joined the game!"
-				+ ChatColor.YELLOW + " (" + info.getPlayerCount() + "/"
-				+ tbn.getMaxPlayer() + ")");
-		// e.getPlayer().teleport(tbn.getPlayerSpawn(0), TeleportCause.PLUGIN);
+		if (tbn.mods.containsKey(e.getPlayer().getDisplayName())) {
+			e.setJoinMessage("[" + ChatColor.DARK_AQUA
+					+ tbn.mods.get(e.getPlayer().getDisplayName())
+					+ ChatColor.WHITE + "]" + ChatColor.GOLD + ""
+					+ e.getPlayer().getDisplayName() + "" + ChatColor.WHITE
+					+ " has joined the game!" + ChatColor.YELLOW + " ("
+					+ info.getPlayerCount() + "/" + tbn.getMaxPlayer() + ")");
+		} else {
+			e.setJoinMessage(ChatColor.GOLD + ""
+					+ e.getPlayer().getDisplayName() + "" + ChatColor.WHITE
+					+ " has joined the game!" + ChatColor.YELLOW + " ("
+					+ info.getPlayerCount() + "/" + tbn.getMaxPlayer() + ")");
+			// e.getPlayer().teleport(tbn.getPlayerSpawn(0),
+			// TeleportCause.PLUGIN);
+		}
 		e.getPlayer().teleport(info.getActiveWorld().getSpawnLocation());
 		if (tbn.mods.containsKey(e.getPlayer().getDisplayName())) {
 			setListName(e.getPlayer(), e.getPlayer().getDisplayName(),
@@ -157,23 +171,56 @@ public class LobbyListiners implements Listener {
 	public void BlockerBreak(EntityDamageByEntityEvent e) {
 		Entity en = e.getEntity();
 		if (en instanceof Player) {
+			Player a = (Player) en;
 			if (((HumanEntity) en).getGameMode() == GameMode.CREATIVE) {
 				return;
 			}
 			if (!(info.getState() == ServerState.In_Game) || info.pvp == false) {
 				e.setCancelled(true);
 			}
+			if (e.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+				if (((Player) ((Projectile) e.getDamager()).getShooter() == info.catwomen)
+						&& (!((Projectile) e.getDamager() instanceof Arrow))
+						&& ((e.getEntity() instanceof Player))) {
+					Player player = (Player) e.getEntity();
+					player.getInventory().remove(
+							new ItemStack(Material.DIAMOND, 10));
+					info.catwomen.getInventory().addItem(
+							new ItemStack[] { new ItemStack(Material.DIAMOND,
+									10) });
+					e.setDamage(5.0);
+					info.catwomen.updateInventory();
+					player.updateInventory();
+					e.setCancelled(false);
+					return;
+				}
+			}
 			if (e.getDamager() instanceof Player) {
 				PlayerProfile pp = info.getPP((Player) e.getDamager());
 				PlayerProfile eq = info.getPP((Player) en);
 				if (pp.getType() == PlayType.BatNight
-						&& pp.getType() == PlayType.BirdBoy
-						|| pp.getType() == PlayType.BirdBoy
+						&& eq.getType() == PlayType.BirdBoy
+						|| eq.getType() == PlayType.BirdBoy
 						&& pp.getType() == PlayType.BatNight) {
 					e.setCancelled(true);
 					pp.getPlayer().sendMessage(
 							ChatColor.RED + "Why would you want to damage "
 									+ pp.getType() + "??");
+				}
+				if (pp.getType() == PlayType.KittyKat) {
+					Player player = pp.getPlayer();
+					if (e.getCause() == DamageCause.PROJECTILE) {
+						player.getInventory().removeItem(
+								new ItemStack[] { new ItemStack(
+										Material.DIAMOND) });
+						info.catwomen.getInventory().addItem(
+								new ItemStack[] { new ItemStack(
+										Material.DIAMOND) });
+						info.catwomen.updateInventory();
+						player.updateInventory();
+						e.setCancelled(false);
+						return;
+					}
 				}
 			}
 		}
@@ -192,8 +239,9 @@ public class LobbyListiners implements Listener {
 			return;
 		}
 		if ((e.getBlock().getType() == Material.GLASS
-				|| e.getBlock().getType() == Material.STAINED_GLASS_PANE || e
-				.getBlock().getType() == Material.STAINED_GLASS)
+				|| e.getBlock().getType() == Material.STAINED_GLASS_PANE
+				|| e.getBlock().getType() == Material.STAINED_GLASS || e
+				.getBlock().getType() == Material.THIN_GLASS)
 				&& info.getState() == ServerState.In_Game) {
 			info.broke.put(e.getBlock().getLocation(), e.getBlock().getType());
 			return;

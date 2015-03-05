@@ -61,7 +61,11 @@ public class Game {
 						+ info.joker.getDisplayName());
 			}
 			if (info.puffin != null) {
-				pl.sendMessage(ChatColor.LIGHT_PURPLE + "Your Puffin is "
+				pl.sendMessage(ChatColor.AQUA + "Your Puffin is "
+						+ info.puffin.getDisplayName());
+			}
+			if (info.catwomen != null) {
+				pl.sendMessage(ChatColor.LIGHT_PURPLE + "Your KittyKat is "
 						+ info.puffin.getDisplayName());
 			}
 		}
@@ -199,13 +203,14 @@ public class Game {
 	public static int removeBlock() {
 		int blockchange = 0;
 		int totala = info.broke.size();
-		HashMap<Location, Material> newbroke = new HashMap<Location, Material>(info.broke);
+		HashMap<Location, Material> newbroke = new HashMap<Location, Material>(
+				info.broke);
 		for (Object loca : newbroke.keySet()) {
 			Location loc = (Location) loca;
 			Material mat = info.broke.get(loca);
 			loc.getBlock().setType(mat);
 			info.broke.remove(loc);
-			newbroke.remove(loc);
+			blockchange++;
 		}
 		clearEnts();
 		return blockchange;
@@ -275,14 +280,20 @@ public class Game {
 		int robinIndex = rand.nextInt(players.length);
 		int jockerIndex = rand.nextInt(players.length);
 		int puffinIndex = rand.nextInt(players.length);
+		int catIndex = rand.nextInt(players.length);
 
 		while (batmanIndex == robinIndex)
 			robinIndex = rand.nextInt(players.length);
 		while ((batmanIndex == jockerIndex || robinIndex == jockerIndex))
 			jockerIndex = rand.nextInt(players.length);
-		while ((batmanIndex == puffinIndex || robinIndex == puffinIndex)
-				|| jockerIndex == puffinIndex)
-			puffinIndex = rand.nextInt(players.length);
+		if (tbn.debugMode) {
+			while ((batmanIndex == puffinIndex || robinIndex == puffinIndex)
+					|| jockerIndex == puffinIndex)
+				puffinIndex = rand.nextInt(players.length);
+			while ((batmanIndex == catIndex || robinIndex == catIndex)
+					|| jockerIndex == catIndex || puffinIndex == catIndex)
+				catIndex = rand.nextInt(players.length);
+		}
 
 		tbn.debugMsg("Setting batman...");
 		if (info.batman == null) {
@@ -301,10 +312,17 @@ public class Game {
 			info.joker = players[jockerIndex];
 			info.getPP(info.joker).setType(PlayType.Joker);
 		}
-		tbn.debugMsg("Setting puffin...");
-		if (info.puffin == null) {
-			info.joker = players[jockerIndex];
-			info.getPP(info.joker).setType(PlayType.Joker);
+		if (tbn.debugMode) {
+			tbn.debugMsg("Setting puffin...");
+			if (info.puffin == null) {
+				info.puffin = players[puffinIndex];
+				info.getPP(info.puffin).setType(PlayType.Puffin);
+			}
+			tbn.debugMsg("Setting catlady...");
+			if (info.catwomen == null) {
+				info.catwomen = players[catIndex];
+				info.getPP(info.catwomen).setType(PlayType.KittyKat);
+			}
 		}
 		info.badGuys = new Player[info.getPlayers().size()];
 
@@ -447,6 +465,7 @@ public class Game {
 		info.batman.getInventory().setBoots(
 				setArmourColour(Material.LEATHER_LEGGINGS, 0, 0, 0));
 		setListName(info.batman, info.batman.getDisplayName(), ChatColor.GRAY);
+		info.batman.setDisplayName(ChatColor.GRAY + "[BatKnight]");
 		info.batman.teleport(tbn.getPlayerSpawn(
 				info.getActiveWorld().getName(), -1));
 		info.robin.getInventory()
@@ -469,8 +488,9 @@ public class Game {
 		info.robin.getInventory().setBoots(
 				setArmourColour(Material.LEATHER_LEGGINGS, 64, 193, 55));
 		setListName(info.robin, info.robin.getDisplayName(), ChatColor.GREEN);
-		info.batman.teleport(tbn.getPlayerSpawn(
-				info.getActiveWorld().getName(), -2));
+		info.robin.setDisplayName(ChatColor.GREEN + "[BirdBoy]");
+		info.robin.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(),
+				-2));
 		if (info.joker != null) {
 			info.joker.getInventory().setHelmet(
 					setArmourColour(Material.LEATHER_HELMET, 191, 0, 255));
@@ -515,6 +535,9 @@ public class Game {
 			int spawn = (int) (Math.random() * 20 + 1);
 			info.joker.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
 					.getName(), spawn));
+			setListName(info.joker, info.joker.getDisplayName(),
+					ChatColor.DARK_PURPLE);
+			info.joker.setDisplayName(ChatColor.DARK_PURPLE + "[Jester]");
 		}
 		if (info.puffin != null) {
 			List<String> ll = new ArrayList<String>();
@@ -526,6 +549,34 @@ public class Game {
 									+ "Minion Spawner", ll),
 							setName(Material.RAW_CHICKEN, ChatColor.GRAY
 									+ "The Puffinator", ll) });
+		}
+		if (info.catwomen != null) {
+			info.catwomen.getInventory().addItem(
+					new ItemStack[] {
+							setName(new ItemStack(Material.STONE_SWORD),
+									ChatColor.GRAY + "Kitty Claws", null),
+							setName(new ItemStack(Material.MILK_BUCKET),
+									ChatColor.GOLD + "Catsciser", null),
+							setName(new ItemStack(Material.getMaterial(349)),
+									ChatColor.BLUE + "Minion Spawner", null),
+							setName(new ItemStack(Material.FISHING_ROD),
+									ChatColor.RED + "Diamond Stealer", null),
+							setName(Material.COMPASS, ChatColor.GREEN
+									+ "Tracker", compassLore) });
+			info.catwomen.getInventory().setHelmet(
+					setArmourColour(Material.LEATHER_HELMET, 253, 152, 254));
+			info.catwomen.getInventory()
+					.setChestplate(
+							setArmourColour(Material.LEATHER_CHESTPLATE, 253,
+									152, 254));
+			info.catwomen.getInventory().setLeggings(
+					setArmourColour(Material.LEATHER_LEGGINGS, 253, 152, 254));
+			info.catwomen.getInventory().setBoots(
+					setArmourColour(Material.LEATHER_LEGGINGS, 253, 152, 254));
+			info.catwomen.addPotionEffect(new PotionEffect(
+					PotionEffectType.SPEED, -1, 2));
+			setListName(info.catwomen, info.catwomen.getDisplayName(),
+					ChatColor.LIGHT_PURPLE);
 		}
 
 		/*
@@ -590,7 +641,7 @@ public class Game {
 			}
 	}
 
-	private ItemStack setName(Material ma, String name, List<String> lore) {
+	public ItemStack setName(Material ma, String name, List<String> lore) {
 		ItemStack is = new ItemStack(ma);
 		ItemMeta m = is.getItemMeta();
 		if (name != null)
@@ -810,6 +861,20 @@ public class Game {
 											if ((p != info.batman)) {
 												if (!info.isSpect(p))
 													info.robin.setCompassTarget(p
+															.getLocation());
+											}
+										}
+								}
+								if (info.catwomen != null) {
+									List entities = info.catwomen
+											.getNearbyEntities(500.0D, 500.0D,
+													500.0D);
+									for (Object e : entities)
+										if ((e instanceof Player)) {
+											Player p = (Player) e;
+											if ((p != info.catwomen)) {
+												if (!info.isSpect(p))
+													info.catwomen.setCompassTarget(p
 															.getLocation());
 											}
 										}
