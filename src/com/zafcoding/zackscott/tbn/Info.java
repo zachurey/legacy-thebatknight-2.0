@@ -53,6 +53,7 @@ public class Info {
 	public static ArrayList<Block> block = new ArrayList<Block>();
 	public static HashMap<Location, Material> broke = new HashMap<Location, Material>();
 	PlayerProfile winner = null;
+	public static boolean poo = false;
 
 	public boolean isSpect(Player p) {
 		return spects.contains(p);

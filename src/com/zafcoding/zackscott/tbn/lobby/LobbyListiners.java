@@ -83,6 +83,7 @@ public class LobbyListiners implements Listener {
 		e.getPlayer().getInventory().setChestplate(new ItemStack(Material.AIR));
 		e.getPlayer().getInventory().setLeggings(new ItemStack(Material.AIR));
 		e.getPlayer().getInventory().setBoots(new ItemStack(Material.AIR));
+		e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation());
 		info.addPlayer(e.getPlayer());
 		info.getPP(e.getPlayer()).setType(PlayType.Villan);
 		if (tbn.mods.containsKey(e.getPlayer().getDisplayName())) {

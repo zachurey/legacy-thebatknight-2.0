@@ -25,37 +25,40 @@ public class GameTime {
 				tbn.getServer().reload();
 			}
 		}
-		int yt = 0;
-		for (Player op : info.ingame) {
-			if ((info.getPP(op).getType() == PlayType.Villan
-					|| info.getPP(op).getType() == PlayType.Joker || info
-					.getPP(op).getType() == PlayType.KittyKat)
-					&& !info.getPP(op).isDead()) {
-				yt++;
+		if (info.poo) {
+			int yt = 0;
+			for (Player op : info.ingame) {
+				if ((info.getPP(op).getType() == PlayType.Villan
+						|| info.getPP(op).getType() == PlayType.Joker || info
+						.getPP(op).getType() == PlayType.KittyKat)
+						&& !info.getPP(op).isDead()) {
+					yt++;
+				}
 			}
-		}
-		if (yt < 1) {
-			game.endGame(0);
-		}
-		int nt = 0;
-		for (Player op : info.ingame) {
-			if ((info.getPP(op).getType() == PlayType.BatNight
-					|| info.getPP(op).getType() == PlayType.BirdBoy || info
-					.getPP(op).getType() == PlayType.KittyKat)
-					&& !info.getPP(op).isDead()) {
-				nt++;
+			if (yt <= 0) {
+				tbn.debugMsg("Yt = " + yt);
+				// game.endGame(0);
 			}
+			int nt = 0;
+			for (Player op : info.ingame) {
+				if ((info.getPP(op).getType() == PlayType.BatNight
+						|| info.getPP(op).getType() == PlayType.BirdBoy || info
+						.getPP(op).getType() == PlayType.KittyKat)
+						&& !info.getPP(op).isDead()) {
+					nt++;
+				}
+			}
+			if (nt <= 0) {
+				tbn.debugMsg("Nt = " + yt);
+				game.endGame(0);
+			}
+			broadCastShort(info.getGameTime());
+			if (info.getGameTime() <= 0) {
+				game.endGame(1);
+			}
+			tbn.debugMsg("The current game time is: " + info.getGameTime());
+			info.setGameTime(info.getGameTime() - 1);
 		}
-		if (nt < 1) {
-			tbn.debugMsg((game != null) + " is the thingy!");
-			game.endGame(0);
-		}
-		broadCastShort(info.getGameTime());
-		if (info.getGameTime() <= 0) {
-			game.endGame(1);
-		}
-		tbn.debugMsg("The current game time is: " + info.getGameTime());
-		info.setGameTime(info.getGameTime() - 1);
 	}
 
 	private void broadCastShort(int gameTime) {

@@ -51,26 +51,27 @@ public class Game {
 			pl.sendMessage(ChatColor.AQUA + "The game has started!");
 			if (info.batman != null) {
 				pl.sendMessage(ChatColor.GRAY + "Your BatNight is "
-						+ info.batman.getDisplayName());
+						+ info.batman.getName());
 			}
 			if (info.robin != null) {
 				pl.sendMessage(ChatColor.DARK_GREEN + "Your BirdBoy is "
-						+ info.robin.getDisplayName());
+						+ info.robin.getName());
 			}
 			if (info.joker != null) {
 				pl.sendMessage(ChatColor.DARK_PURPLE + "Your Jester is "
-						+ info.joker.getDisplayName());
+						+ info.joker.getName());
 			}
 			if (info.puffin != null) {
 				pl.sendMessage(ChatColor.AQUA + "Your Puffin is "
-						+ info.puffin.getDisplayName());
+						+ info.puffin.getName());
 			}
 			if (info.catwomen != null) {
 				pl.sendMessage(ChatColor.LIGHT_PURPLE + "Your KittyKat is "
-						+ info.puffin.getDisplayName());
+						+ info.puffin.getName());
 			}
 		}
 		dosomeDiamondLvl();
+		info.poo = true;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -85,7 +86,10 @@ public class Game {
 						0));
 				pa.getInventory().clear();
 				pa.setGameMode(GameMode.ADVENTURE);
-				if (mostdia == null || pq.getDiamonds() > mostdia.getDiamonds()) {
+				if ((mostdia == null || pq.getDiamonds() > mostdia
+						.getDiamonds())
+						&& !pq.isDead()
+						&& !(pq.getType() == PlayType.BatNight || pq.getType() == PlayType.BirdBoy)) {
 					mostdia = pq;
 				}
 				total = total + pq.getDiamonds();
@@ -98,10 +102,9 @@ public class Game {
 					+ " Tell everyone with /gg!");
 			info.broadCast(ChatColor.YELLOW + "The bad guys won!");
 			info.broadCast(ChatColor.YELLOW + "Bad guy winner is "
-					+ ChatColor.DARK_AQUA
-					+ mostdia.getPlayer().getDisplayName() + ChatColor.YELLOW
-					+ " (" + ChatColor.DARK_AQUA + mostdia.getDiamonds()
-					+ ChatColor.YELLOW + ")");
+					+ ChatColor.DARK_AQUA + mostdia.getPlayer().getName()
+					+ ChatColor.YELLOW + " (" + ChatColor.DARK_AQUA
+					+ mostdia.getDiamonds() + ChatColor.YELLOW + ")");
 			info.broadCast(ChatColor.YELLOW
 					+ "The bad guys collected a total of " + ChatColor.AQUA
 					+ total + "" + ChatColor.YELLOW + " diamonds!");
@@ -116,7 +119,8 @@ public class Game {
 				pa.getInventory().clear();
 				pa.setGameMode(GameMode.ADVENTURE);
 				if (pp.getType() == PlayType.BatNight
-						|| pp.getType() == PlayType.BirdBoy) {
+						|| pp.getType() == PlayType.BirdBoy
+						|| pp.getType() == PlayType.KittyKat) {
 					if (mostkill == null || pp.getKills() > mostkill.getKills()) {
 						mostkill = pp;
 					}
@@ -134,10 +138,9 @@ public class Game {
 					+ " Tell everyone with /gg!");
 			info.broadCast(ChatColor.AQUA + "The good guys won!");
 			info.broadCast(ChatColor.AQUA + "The best hero is "
-					+ ChatColor.DARK_AQUA
-					+ mostkill.getPlayer().getDisplayName() + ChatColor.AQUA
-					+ " (" + ChatColor.DARK_AQUA + mostkill.getDiamonds()
-					+ ChatColor.AQUA + ")");
+					+ ChatColor.DARK_AQUA + mostkill.getPlayer().getName()
+					+ ChatColor.AQUA + " (" + ChatColor.DARK_AQUA
+					+ mostkill.getDiamonds() + ChatColor.AQUA + ")");
 			info.broadCast(ChatColor.AQUA + "The heros killed "
 					+ ChatColor.DARK_AQUA + totalkill + "" + ChatColor.AQUA
 					+ " players!");
@@ -160,8 +163,8 @@ public class Game {
 								+ "\nThanks for playing! \nRejoin to play another game!\n"
 								+ ChatColor.GREEN + "Winner: "
 								+ ChatColor.DARK_AQUA
-								+ info.getWinner().getPlayer().getDisplayName()
-								+ " (" + info.getWinner().getDiamonds() + ")");
+								+ info.getWinner().getPlayer().getName() + " ("
+								+ info.getWinner().getDiamonds() + ")");
 					}
 					if (bo == 0) {
 						ppp.kickPlayer(ChatColor.GOLD
@@ -206,20 +209,12 @@ public class Game {
 		int totala = info.broke.size();
 		HashMap<Location, Material> newbroke = new HashMap<Location, Material>(
 				info.broke);
-		ArrayList<Block> sd = new ArrayList<Block>(info.block);
-		for(Block blo : sd){
-			blo.setType(Material.AIR);
-			sd.remove(blo);
-			info.block.remove(blo);
-		}
 		for (Object loca : newbroke.keySet()) {
 			Location loc = (Location) loca;
 			Material mat = info.broke.get(loca);
 			loc.getBlock().setType(mat);
 			info.broke.remove(loc);
 			blockchange++;
-		}for(Block blo : sd){
-			blo.setType(Material.AIR);
 		}
 		clearEnts();
 		return blockchange;
@@ -298,19 +293,17 @@ public class Game {
 		while ((batmanIndex == catIndex || robinIndex == catIndex)
 				|| jockerIndex == catIndex || puffinIndex == catIndex)
 			catIndex = rand.nextInt(players.length);
-		if (tbn.debugMode) {
-			while ((batmanIndex == puffinIndex || robinIndex == puffinIndex)
-					|| jockerIndex == puffinIndex)
-				puffinIndex = rand.nextInt(players.length);
-		}
+		while ((batmanIndex == puffinIndex || robinIndex == puffinIndex)
+				|| jockerIndex == puffinIndex || puffinIndex == catIndex)
+			puffinIndex = rand.nextInt(players.length);
 
 		tbn.debugMsg("Setting batman...");
 		if (info.batman == null) {
 			info.batman = players[batmanIndex];
 			info.getPP(info.batman).setType(PlayType.BatNight);
 		}
-		tbn.debugMsg("Setting robin...");
 
+		tbn.debugMsg("Setting robin...");
 		if (info.robin == null) {
 			info.robin = players[robinIndex];
 			info.getPP(info.robin).setType(PlayType.BirdBoy);
@@ -321,45 +314,18 @@ public class Game {
 			info.joker = players[jockerIndex];
 			info.getPP(info.joker).setType(PlayType.Joker);
 		}
-		if (tbn.debugMode) {
-			tbn.debugMsg("Setting puffin...");
-			if (info.puffin == null) {
-				info.puffin = players[puffinIndex];
-				info.getPP(info.puffin).setType(PlayType.Puffin);
-			}
-			tbn.debugMsg("Setting catlady...");
-			if (info.catwomen == null) {
-				info.catwomen = players[catIndex];
-				info.getPP(info.catwomen).setType(PlayType.KittyKat);
-			}
+		tbn.debugMsg("Setting puffin...");
+		if (info.puffin == null) {
+			info.puffin = players[puffinIndex];
+			info.getPP(info.puffin).setType(PlayType.Puffin);
 		}
-		info.badGuys = new Player[info.getPlayers().size()];
+		tbn.debugMsg("Setting catlady...");
+		if (info.catwomen == null) {
+			info.catwomen = players[catIndex];
+			info.getPP(info.catwomen).setType(PlayType.KittyKat);
+		}
 
-		/*
-		 * if ((catwoman == null) && (vipsOnline > 1)) { int catwomanRand =
-		 * rand.nextInt(vipsOnline);
-		 * 
-		 * int cwIndex = 0;
-		 * 
-		 * for (Player p : Bukkit.getOnlinePlayers()) { if
-		 * (TheBatKnight.vips.contains(p.getName())) { System.out.println("CW: "
-		 * + cwIndex + " " + p.getName() + " " + catwomanRand); if
-		 * ((catwomanRand == cwIndex) && (p != batman) && (p != robin) && (p !=
-		 * catwoman) && (p != joker) && (p != mrFreeze) && (p != penguin)) {
-		 * catwoman = p; break; } cwIndex++; } } }
-		 * 
-		 * if ((penguin == null) && (vipsOnline > 1)) { int penguinRand =
-		 * rand.nextInt(vipsOnline);
-		 * 
-		 * int pIndex = 0;
-		 * 
-		 * for (Player p : Bukkit.getOnlinePlayers()) { if
-		 * (TheBatKnight.vips.contains(p.getName())) { System.out.println("P: "
-		 * + pIndex + " " + p.getName() + " " + penguinRand); if ((pIndex ==
-		 * penguinRand) && (p != batman) && (p != robin) && (p != catwoman) &&
-		 * (p != joker) && (p != mrFreeze) && (p != penguin)) { penguin = p;
-		 * break; } pIndex++; } } }
-		 */
+		info.badGuys = new Player[info.getPlayers().size()];
 
 		tbn.debugMsg("Adding badguys...");
 		for (int i = 0; i < players.length; i++) {
@@ -368,44 +334,7 @@ public class Game {
 							players[i].getName())))
 				info.badGuys[i] = players[i];
 		}
-		/*
-		 * if ((info.joker == null)) { int jokerRand =
-		 * rand.nextInt(info.getPlayerCount()); int index = 0; for (Player p :
-		 * Bukkit.getOnlinePlayers()) { tbn.debugMsg("J: " + index + " " +
-		 * p.getName() + " " + jokerRand); if ((jokerRand == index) && (p !=
-		 * info.batman) && (p != info.robin)) { info.joker = p; break; }
-		 * index++;
-		 * 
-		 * }
-		 * 
-		 * }
-		 */
 
-		/*
-		 * if (mrFreeze == null) { int freezeRand =
-		 * rand.nextInt(Bukkit.getOnlinePlayers().length); int index = 0; for
-		 * (Player p : Bukkit.getOnlinePlayers()) { if
-		 * (TheBatKnight.vips.contains(p.getName())) { if ((freezeRand == index)
-		 * && (p != batman) && (p != robin) && (p != catwoman) && (p != joker)
-		 * && (p != mrFreeze) && (p != penguin)) { mrFreeze = p; break; }
-		 * index++; } } }
-		 */
-
-		if (info.joker != null) {
-			tbn.debugMsg("Joker Is Not Null!");
-		} else {
-			tbn.debugMsg("Joker Is Null!");
-		}
-		/*
-		 * if (catwoman != null) { catwomanName = catwoman.getName();
-		 * tbn.debugMsg("CatWoman Is Not Null!"); catwoman.addPotionEffect(new
-		 * PotionEffect(PotionEffectType.SPEED, 50000, 1)); } else {
-		 * tbn.debugMsg("CatWoman Is Null!"); } if (posionivy != null) { ivyName
-		 * = posionivy.getName(); tbn.debugMsg("Ivy Is Not Null!"); } else {
-		 * tbn.debugMsg("Ivy Is Null!"); } if (mrFreeze != null) { freezeName =
-		 * mrFreeze.getName(); tbn.debugMsg("Freeze Is Not Null!"); } else {
-		 * tbn.debugMsg("Freeze Is Null!"); }
-		 */
 		tbn.debugMsg("Doing some inv stuffr...");
 		info.clearAllInventories();
 		ItemStack strength = new ItemStack(Material.POTION);
@@ -477,29 +406,30 @@ public class Game {
 		info.batman.setDisplayName(ChatColor.GRAY + "[BatKnight]");
 		info.batman.teleport(tbn.getPlayerSpawn(
 				info.getActiveWorld().getName(), -1));
-		info.robin.getInventory()
-				.addItem(
-						new ItemStack[] {
-								setName(new ItemStack(Material.COMPASS),
-										ChatColor.GREEN + "Tracker",
-										compassLore),
-								setName(sword, ChatColor.RED + "BatSword",
-										swordLore),
-								setName(new ItemStack(Material.FEATHER),
-										ChatColor.GRAY + "Feather o' Flight",
-										featherLore), strength });
-		info.robin.getInventory().setHelmet(
-				setArmourColour(Material.LEATHER_HELMET, 64, 193, 55));
-		info.robin.getInventory().setChestplate(
-				setArmourColour(Material.LEATHER_CHESTPLATE, 64, 193, 55));
-		info.robin.getInventory().setLeggings(
-				setArmourColour(Material.LEATHER_LEGGINGS, 64, 193, 55));
-		info.robin.getInventory().setBoots(
-				setArmourColour(Material.LEATHER_LEGGINGS, 64, 193, 55));
-		setListName(info.robin, info.robin.getDisplayName(), ChatColor.GREEN);
-		info.robin.setDisplayName(ChatColor.GREEN + "[BirdBoy]");
-		info.robin.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(),
-				-2));
+		if (info.robin != null) {
+			info.robin.getInventory().addItem(
+					new ItemStack[] {
+							setName(new ItemStack(Material.COMPASS),
+									ChatColor.GREEN + "Tracker", compassLore),
+							setName(sword, ChatColor.RED + "BatSword",
+									swordLore),
+							setName(new ItemStack(Material.FEATHER),
+									ChatColor.GRAY + "Feather o' Flight",
+									featherLore), strength });
+			info.robin.getInventory().setHelmet(
+					setArmourColour(Material.LEATHER_HELMET, 64, 193, 55));
+			info.robin.getInventory().setChestplate(
+					setArmourColour(Material.LEATHER_CHESTPLATE, 64, 193, 55));
+			info.robin.getInventory().setLeggings(
+					setArmourColour(Material.LEATHER_LEGGINGS, 64, 193, 55));
+			info.robin.getInventory().setBoots(
+					setArmourColour(Material.LEATHER_LEGGINGS, 64, 193, 55));
+			setListName(info.robin, info.robin.getDisplayName(),
+					ChatColor.GREEN);
+			info.robin.setDisplayName(ChatColor.GREEN + "[BirdBoy]");
+			info.robin.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+					.getName(), -2));
+		}
 		if (info.joker != null) {
 			info.joker.getInventory().setHelmet(
 					setArmourColour(Material.LEATHER_HELMET, 191, 0, 255));
@@ -606,35 +536,6 @@ public class Game {
 			info.spawnwitch++;
 		}
 
-		/*
-		 * if (catwoman != null) { catwoman.getInventory().addItem(new
-		 * ItemStack[] { setName(new ItemStack(Material.STONE_SWORD),
-		 * ChatColor.GRAY + "Kitty Claws", null), setName(new
-		 * ItemStack(Material.MILK_BUCKET), ChatColor.GOLD + "Catsciser", null),
-		 * setName(new ItemStack(Material.getMaterial(349)), ChatColor.BLUE +
-		 * "Minion Spawner", null), setName(new ItemStack(Material.FISHING_ROD),
-		 * ChatColor.RED + "Diamond Stealer", null), setName(Material.COMPASS,
-		 * ChatColor.GREEN + "Tracker", compassLore) }); } if (mrFreeze != null)
-		 * { ItemStack icePick = setName(Material.IRON_SWORD, ChatColor.AQUA +
-		 * "Ice Pick", Arrays.asList(new String[] { ChatColor.DARK_GRAY +
-		 * "Ice I" })); int snowballs = new Random().nextInt(30) + 1; while
-		 * (snowballs < 8) snowballs = new Random().nextInt(30) + 1;
-		 * mrFreeze.getInventory().addItem(new ItemStack[] { icePick,
-		 * setName(new ItemStack(Material.SNOW_BALL, snowballs),
-		 * ChatColor.DARK_AQUA + "Freezeball", Arrays.asList(new String[] {
-		 * ChatColor.DARK_GRAY + "Stun Your Enemies!" })) }); }
-		 * 
-		 * if (posionivy != null) { posionivy.getInventory().addItem(new
-		 * ItemStack[] { setName(new ItemStack(Material.VINE, 64),
-		 * ChatColor.GREEN + "Vines") }); }
-		 * 
-		 * if (penguin != null) { penguin.getInventory().addItem(new ItemStack[]
-		 * { setName(Material.IRON_HOE, ChatColor.DARK_PURPLE + "Umbrella"),
-		 * setName(Material.EGG, ChatColor.YELLOW + "Minion Spawner"),
-		 * setName(Material.RAW_CHICKEN, ChatColor.GRAY + "The Puffinator") });
-		 * }
-		 */
-
 		info.updateAllInventories();
 
 		int index = 0;
@@ -683,10 +584,11 @@ public class Game {
 	private void sendHowToPlayInfo(Player robin, Player batman,
 			Player[] badGuys, Player joker) {
 		String badGuyList = ChatColor.GRAY + "Bad Guys: " + ChatColor.DARK_GRAY;
-		robin.sendMessage(ChatColor.WHITE + "------" + ChatColor.GOLD
-				+ "TheBatKnight" + ChatColor.WHITE + "------");
-		sendMessage(robin, "You Are " + ChatColor.DARK_RED + "BIRDBOY!");
-
+		if (info.robin != null) {
+			robin.sendMessage(ChatColor.WHITE + "------" + ChatColor.GOLD
+					+ "TheBatKnight" + ChatColor.WHITE + "------");
+			sendMessage(robin, "You Are " + ChatColor.DARK_RED + "BIRDBOY!");
+		}
 		batman.sendMessage(ChatColor.WHITE + "------" + ChatColor.GOLD
 				+ "TheBatKnight" + ChatColor.WHITE + "------");
 		sendMessage(batman, "You Are " + ChatColor.DARK_RED + "BATKNGIHT!");

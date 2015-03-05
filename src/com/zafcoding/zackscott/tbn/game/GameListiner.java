@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -24,6 +25,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -231,7 +233,9 @@ public class GameListiner implements Listener {
 			if (e.getClickedBlock() != null
 					&& e.getClickedBlock().getType() == Material.CHEST
 					&& !info.fakechests.contains(e.getClickedBlock()
-							.getLocation())) {
+							.getLocation())
+					&& info.getPP(e.getPlayer()).getType() == PlayType.BatNight
+					|| info.getPP(e.getPlayer()).getType() == PlayType.BirdBoy) {
 				Chest ch = (Chest) e.getClickedBlock().getState();
 				ItemStack[] ss = ch.getInventory().getContents();
 				for (ItemStack ii : ss) {
@@ -247,15 +251,14 @@ public class GameListiner implements Listener {
 			}
 			if (e.getItem().getType() != null
 					&& e.getItem().getType() == Material.RAW_FISH) {
-				e.getClickedBlock().getLocation()
-						.setY(e.getClickedBlock().getLocation().getY() + 2);
-				final Entity ee = e
-						.getClickedBlock()
-						.getWorld()
-						.spawnEntity(e.getClickedBlock().getLocation(),
-								EntityType.OCELOT);
+				e.setCancelled(true);
+				Location loc = e.getClickedBlock().getLocation();
+				loc.setY(e.getClickedBlock().getLocation().getY() + 2);
+				final Entity ee = e.getClickedBlock().getWorld()
+						.spawnEntity(loc, EntityType.OCELOT);
 				Ocelot oc = (Ocelot) ee;
 				oc.setAdult();
+				oc.setBreed(false);
 				Bukkit.getServer().getScheduler()
 						.scheduleSyncDelayedTask(tbn, new Runnable() {
 							public void run() {
@@ -265,15 +268,13 @@ public class GameListiner implements Listener {
 			}
 			if (e.getItem().getType() != null
 					&& e.getItem().getType() == Material.RAW_CHICKEN) {
-				e.getClickedBlock().getLocation()
-						.setY(e.getClickedBlock().getLocation().getY() + 2);
-				final Entity ee = e
-						.getClickedBlock()
-						.getWorld()
-						.spawnEntity(e.getClickedBlock().getLocation(),
-								EntityType.CHICKEN);
+				Location loc = e.getClickedBlock().getLocation();
+				loc.setY(e.getClickedBlock().getLocation().getY() + 2);
+				final Entity ee = e.getClickedBlock().getWorld()
+						.spawnEntity(loc, EntityType.CHICKEN);
 				Chicken chi = (Chicken) ee;
 				chi.setAdult();
+				chi.setBreed(false);
 				Bukkit.getServer().getScheduler()
 						.scheduleSyncDelayedTask(tbn, new Runnable() {
 							public void run() {
@@ -292,7 +293,7 @@ public class GameListiner implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void a1308a(PlayerInteractEvent event) {
-		if (event.getItem().getType() != null
+		if (event.getItem() != null
 				&& (event.getItem().getType() == Material.IRON_HOE)
 				&& ((event.getAction() == Action.LEFT_CLICK_AIR) || (event
 						.getAction() == Action.LEFT_CLICK_BLOCK))) {
@@ -339,35 +340,34 @@ public class GameListiner implements Listener {
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void handleExplosion(EntityExplodeEvent e) {
-		
-		/*ArrayList<Block> iter = new ArrayList<Block>(event.blockList());
-		tbn.debugMsg("Added to the list!");
-		for (Block bb : iter) {
-			info.broke.put(bb.getLocation(), bb.getType());
-			iter.remove(bb);
-		}*/
+
+		/*
+		 * ArrayList<Block> iter = new ArrayList<Block>(event.blockList());
+		 * tbn.debugMsg("Added to the list!"); for (Block bb : iter) {
+		 * info.broke.put(bb.getLocation(), bb.getType()); iter.remove(bb); }
+		 */
 		double x = 0;
-        double y = 0;
-        double z = 0;
-        Location eLoc;
-        if(e.getEntity() == null){
-            eLoc = e.getLocation();
-        }else{
-            eLoc = e.getEntity().getLocation();
-        }
-        World w = eLoc.getWorld();
-        for (int i = 0; i < e.blockList().size();i++){
-            Block b = e.blockList().get(i);
-            Location bLoc = b.getLocation();
-            x = bLoc.getX() - eLoc.getX();
-            y = bLoc.getY() - eLoc.getY() + 0.5;
-            z = bLoc.getZ() - eLoc.getZ();
-            FallingBlock fb = w.spawnFallingBlock(bLoc, b.getType(), (byte)b.getData());
-            fb.setDropItem(false);
-            fb.setVelocity(new Vector(x,y,z));
-            info.broke.put(bLoc, b.getType());
-            info.block.add(b);
-        }
+		double y = 0;
+		double z = 0;
+		Location eLoc;
+		if (e.getEntity() == null) {
+			eLoc = e.getLocation();
+		} else {
+			eLoc = e.getEntity().getLocation();
+		}
+		World w = eLoc.getWorld();
+		for (int i = 0; i < e.blockList().size(); i++) {
+			Block b = e.blockList().get(i);
+			Location bLoc = b.getLocation();
+			x = bLoc.getX() - eLoc.getX();
+			y = bLoc.getY() - eLoc.getY() + 0.5;
+			z = bLoc.getZ() - eLoc.getZ();
+			// FallingBlock fb = w.spawnFallingBlock(bLoc, b.getType(),
+			// (byte)b.getData());
+			// fb.setDropItem(false);
+			// fb.setVelocity(new Vector(x,y,z));
+			info.broke.put(bLoc, b.getType());
+		}
 	}
 
 	@EventHandler
@@ -403,5 +403,6 @@ public class GameListiner implements Listener {
 			}
 		}
 	}
+	
 
 }
