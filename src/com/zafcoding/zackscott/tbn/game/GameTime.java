@@ -35,10 +35,6 @@ public class GameTime {
 					yt++;
 				}
 			}
-			if (yt <= 0) {
-				tbn.debugMsg("Yt = " + yt);
-				// game.endGame(0);
-			}
 			int nt = 0;
 			for (Player op : info.ingame) {
 				if ((info.getPP(op).getType() == PlayType.BatNight
@@ -48,8 +44,16 @@ public class GameTime {
 					nt++;
 				}
 			}
-			if (nt <= 0) {
-				tbn.debugMsg("Nt = " + yt);
+			if ((nt == 1 && yt == 1) && info.getPlayerCount() == 1) {
+				game.endGame(1);
+			}
+			if(nt < 0 && yt <0){
+				
+			}
+			if (nt < 1) {
+				game.endGame(1);
+			}
+			if (yt < 1) {
 				game.endGame(0);
 			}
 			broadCastShort(info.getGameTime());

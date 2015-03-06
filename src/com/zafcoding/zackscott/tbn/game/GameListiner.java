@@ -35,6 +35,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
@@ -178,6 +179,7 @@ public class GameListiner implements Listener {
 		}
 	}
 
+	@SuppressWarnings("static-access")
 	@EventHandler
 	public void PlayerDie(PlayerDeathEvent e) {
 		if (!(info.getState() == ServerState.In_Game)) {
@@ -187,9 +189,8 @@ public class GameListiner implements Listener {
 		}
 		if (info.ingame.contains(e.getEntity())) {
 			info.outplayer(e.getEntity());
-			int amount = (int) (Math.random()
-					* tbn.getConfig().getInt("MinDeath") + tbn.getConfig()
-					.getInt("MaxDeath"));
+			int amount = game.randInt(tbn.getConfig().getInt("MinDeath"), tbn
+					.getConfig().getInt("MaxDeath"));
 			List diamondLore = new ArrayList();
 			diamondLore.add(ChatColor.DARK_AQUA + "Collect The Most "
 					+ ChatColor.AQUA + "Diamonds " + ChatColor.DARK_AQUA
@@ -210,7 +211,7 @@ public class GameListiner implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler
 	public void PlayerInteract(PlayerInteractEvent e) {
 		PlayerProfile pe = info.getPP(e.getPlayer());
 		if (pe != null && pe.isDead()) {
@@ -234,8 +235,8 @@ public class GameListiner implements Listener {
 					&& e.getClickedBlock().getType() == Material.CHEST
 					&& !info.fakechests.contains(e.getClickedBlock()
 							.getLocation())
-					&& info.getPP(e.getPlayer()).getType() == PlayType.BatNight
-					|| info.getPP(e.getPlayer()).getType() == PlayType.BirdBoy) {
+					&& !(info.getPP(e.getPlayer()).getType() == PlayType.BatNight || info
+							.getPP(e.getPlayer()).getType() == PlayType.BirdBoy)) {
 				Chest ch = (Chest) e.getClickedBlock().getState();
 				ItemStack[] ss = ch.getInventory().getContents();
 				for (ItemStack ii : ss) {
@@ -249,78 +250,96 @@ public class GameListiner implements Listener {
 				}
 				e.getClickedBlock().setType(Material.AIR);
 			}
-			if (e.getItem().getType() != null
-					&& e.getItem().getType() == Material.RAW_FISH) {
-				e.setCancelled(true);
-				Location loc = e.getClickedBlock().getLocation();
-				loc.setY(e.getClickedBlock().getLocation().getY() + 2);
-				final Entity ee = e.getClickedBlock().getWorld()
-						.spawnEntity(loc, EntityType.OCELOT);
-				Ocelot oc = (Ocelot) ee;
-				oc.setAdult();
-				oc.setBreed(false);
-				Bukkit.getServer().getScheduler()
-						.scheduleSyncDelayedTask(tbn, new Runnable() {
-							public void run() {
-								ee.remove();
-							}
-						}, 200L);
+			try {
+				if (e.getItem().getType() != null
+						&& e.getItem().getType() == Material.RAW_FISH) {
+					e.setCancelled(true);
+					Location loc = e.getClickedBlock().getLocation();
+					loc.setY(e.getClickedBlock().getLocation().getY() + 2);
+					final Entity ee = e.getClickedBlock().getWorld()
+							.spawnEntity(loc, EntityType.OCELOT);
+					Ocelot oc = (Ocelot) ee;
+					oc.setAdult();
+					oc.setBreed(false);
+					Bukkit.getServer().getScheduler()
+							.scheduleSyncDelayedTask(tbn, new Runnable() {
+								public void run() {
+									ee.remove();
+								}
+							}, 200L);
+				}
+			} catch (NullPointerException ee) {
+				tbn.debugMsg("Err_ Null at GameListiner.java:252");
 			}
-			if (e.getItem().getType() != null
-					&& e.getItem().getType() == Material.RAW_CHICKEN) {
-				Location loc = e.getClickedBlock().getLocation();
-				loc.setY(e.getClickedBlock().getLocation().getY() + 2);
-				final Entity ee = e.getClickedBlock().getWorld()
-						.spawnEntity(loc, EntityType.CHICKEN);
-				Chicken chi = (Chicken) ee;
-				chi.setAdult();
-				chi.setBreed(false);
-				Bukkit.getServer().getScheduler()
-						.scheduleSyncDelayedTask(tbn, new Runnable() {
-							public void run() {
-								ee.remove();
-							}
-						}, 200L);
+			try {
+				if (e.getItem().getType() != null
+						&& e.getItem().getType() == Material.RAW_CHICKEN) {
+					Location loc = e.getClickedBlock().getLocation();
+					loc.setY(e.getClickedBlock().getLocation().getY() + 2);
+					final Entity ee = e.getClickedBlock().getWorld()
+							.spawnEntity(loc, EntityType.CHICKEN);
+					Chicken chi = (Chicken) ee;
+					chi.setAdult();
+					chi.setBreed(false);
+					if (tbn.mac) {
+						int iq = game.randInt(6, 25);
+						chi.setCustomName("Murphy " + iq);
+					}
+					Bukkit.getServer().getScheduler()
+							.scheduleSyncDelayedTask(tbn, new Runnable() {
+								public void run() {
+									ee.remove();
+								}
+							}, 200L);
+				}
+			} catch (NullPointerException ee) {
+				tbn.debugMsg("Err_ Null at GameListiner.java:289");
 			}
 
 			if ((e.getItem().getType() == Material.MILK_BUCKET)
 					|| (e.getItem().getType() == Material.RAW_FISH)) {
-				e.setCancelled(true);
 				e.setUseItemInHand(Event.Result.DENY);
+				e.setCancelled(true);
 			}
 		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void a1308a(PlayerInteractEvent event) {
-		if (event.getItem() != null
-				&& (event.getItem().getType() == Material.IRON_HOE)
-				&& ((event.getAction() == Action.LEFT_CLICK_AIR) || (event
-						.getAction() == Action.LEFT_CLICK_BLOCK))) {
-			event.setCancelled(true);
-			if (info.h == 1) {
-				event.getPlayer().sendMessage(
-						ChatColor.DARK_AQUA + "" + ChatColor.BOLD
-								+ "Cooling down...");
-				return;
+		try {
+			if (event.getItem().getType() != null
+					&& (event.getItem().getType() == Material.IRON_HOE)
+					&& ((event.getAction() == Action.LEFT_CLICK_AIR) || (event
+							.getAction() == Action.LEFT_CLICK_BLOCK))) {
+				event.setCancelled(true);
+				if (info.h == 1) {
+					event.getPlayer().sendMessage(
+							ChatColor.DARK_AQUA + "" + ChatColor.BOLD
+									+ "Cooling down...");
+					return;
+				}
+				info.h = 1;
+				final Player player = event.getPlayer();
+				ItemStack item = new ItemStack(Material.NETHER_STAR);
+				final Item i = player.getWorld().dropItem(player.getLocation(),
+						item);
+				i.setVelocity(player.getLocation().getDirection()
+						.multiply(3.0F));
+				i.setPickupDelay(50000);
+				Bukkit.getServer().getScheduler()
+						.scheduleSyncDelayedTask(tbn, new Runnable() {
+							public void run() {
+								player.getWorld().createExplosion(
+										i.getLocation(), 3.8F);
+								player.sendMessage(ChatColor.DARK_AQUA
+										+ "Boom!");
+								i.remove();
+								info.h = 0;
+							}
+						}, 40L);
 			}
-			info.h = 1;
-			final Player player = event.getPlayer();
-			ItemStack item = new ItemStack(Material.NETHER_STAR);
-			final Item i = player.getWorld().dropItem(player.getLocation(),
-					item);
-			i.setVelocity(player.getLocation().getDirection().multiply(3.0F));
-			i.setPickupDelay(50000);
-			Bukkit.getServer().getScheduler()
-					.scheduleSyncDelayedTask(tbn, new Runnable() {
-						public void run() {
-							player.getWorld().createExplosion(i.getLocation(),
-									3.8F);
-							player.sendMessage(ChatColor.DARK_AQUA + "Boom!");
-							i.remove();
-							info.h = 0;
-						}
-					}, 40L);
+		} catch (Exception e) {
+			tbn.debugMsg("Err_ : " + e.getMessage() + " :" + e.getCause());
 		}
 	}
 
@@ -376,7 +395,7 @@ public class GameListiner implements Listener {
 			if (event.getEntity().getShooter() instanceof Player) {
 				Player pp = (Player) event.getEntity().getShooter();
 				PlayerProfile ppp = info.getPP(pp);
-				if (ppp.getType() == PlayType.Puffin) {
+				if (ppp.getType() == PlayType.Puffin && info.puffin == pp) {
 					event.getEntity()
 							.getLocation()
 							.getWorld()
@@ -392,7 +411,8 @@ public class GameListiner implements Listener {
 	public void PlayerThrow123(ProjectileLaunchEvent e) {
 		if (e.getEntityType() == EntityType.EGG) {
 			if (e.getEntity().getShooter() instanceof Player) {
-				if (info.getPP((Player) e.getEntity().getShooter()).getType() == PlayType.Puffin) {
+				if (info.getPP((Player) e.getEntity().getShooter()).getType() == PlayType.Puffin
+						|| info.puffin == (Player) e.getEntity().getShooter()) {
 					Player p = (Player) e.getEntity().getShooter();
 					e.setCancelled(true);
 					p.getInventory().addItem(
@@ -403,6 +423,14 @@ public class GameListiner implements Listener {
 			}
 		}
 	}
-	
+
+	@EventHandler
+	public void b893(PlayerBucketEmptyEvent e) {
+		if (e.getBucket() == Material.MILK_BUCKET) {
+			if (info.getPP(e.getPlayer()).getType() == PlayType.KittyKat) {
+				e.setCancelled(true);
+			}
+		}
+	}
 
 }

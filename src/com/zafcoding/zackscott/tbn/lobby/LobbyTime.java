@@ -5,6 +5,7 @@ import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.zafcoding.zackscott.tbn.Info;
@@ -20,7 +21,6 @@ public class LobbyTime {
 
 	@SuppressWarnings("static-access")
 	public void LobbyHeartBeat() {
-		tbn.debugMsg("LobbyHeartBeat called!");
 		if(info.getActiveWorld() == null){
 			String worldName = "SamCity";
 			info.setActiveWorld(Bukkit.getWorld("SamCity"));
@@ -39,21 +39,17 @@ public class LobbyTime {
 			game = tbn.getG();
 		}
 		if (info.getState() == ServerState.Pre_Game) {
-			tbn.debugMsg("Current State is " + info.getState());
 			for (Player pp : info.getPlayers()) {
-				tbn.debugMsg("Updated player " + pp.getDisplayName());
 				pp.setHealth(20);
 				pp.setCanPickupItems(false);
 				pp.setFoodLevel(20);
 				pp.setFireTicks(0);
 			}
-			tbn.debugMsg("dotime called!");
 			dotime();
 		}
 	}
 
 	private void dotime() {
-		tbn.debugMsg("The time has run! [" + info.getTime() + "]");
 		if (info.getTime() == 120 || info.getTime() == 90
 				|| info.getTime() == 60 || info.getTime() == 30
 				|| info.getTime() == 15 || info.getTime() == 10

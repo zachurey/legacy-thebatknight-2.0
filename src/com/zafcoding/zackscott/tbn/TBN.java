@@ -54,6 +54,10 @@ public class TBN extends JavaPlugin {
 	public boolean debugMode = true;
 	ArrayList<Player> unstuckers = new ArrayList<Player>();
 	public static HashMap<String, String> mods = new HashMap<String, String>();
+	public static ArrayList<Player> gled = new ArrayList<Player>();
+	public static ArrayList<Player> gged = new ArrayList<Player>();
+	public static boolean mac = false;
+	public static boolean macbg = false;
 
 	// public static Object dcAPI;
 
@@ -115,7 +119,26 @@ public class TBN extends JavaPlugin {
 			this.getConfig().set("MinDeath", 5);
 			this.getConfig().set("MaxDeath", 40);
 			this.getConfig().set("MatchLengh", 10);
-			this.getConfig().set("GracePeriod", 10);
+			this.getConfig().set("GoodLuck.1",
+					"%player% wishes all a batty game!");
+			this.getConfig()
+					.set("GoodLuck.2",
+							"%player% enabled #360noscope Doritos Mountaindew Double XP Mode!");
+			this.getConfig().set("GoodLuck.3",
+					"%player% wishes for no one to get salty this game");
+			this.getConfig().set("GoodLuck.4",
+					"%player% hopes everyone does grrrrrrrrreat!");
+			this.getConfig().set("GoodLuck.5",
+					"%player% dropped it like it's hot");
+			this.getConfig().set("GoodGame.1",
+					"%player% thinks the game was enjoyable!");
+			this.getConfig().set("GoodGame.2",
+					"%player% offers his congratz to %winner%");
+			this.getConfig().set("GoodGame.3",
+					"%player% could have won if he wanted!");
+			this.getConfig().set("GoodGame.4", "%player%> Good game!");
+			this.getConfig().set("GoodGame.5",
+					"%player% thinks Zach made a very good game!");
 			this.getConfig().set("Chests.amount", 3);
 			this.getConfig().set("Chests.SamCity.1", "-1194,18,-550");
 			this.getConfig().set("Chests.SamCity.2", "-1186,18,-549");
@@ -140,6 +163,7 @@ public class TBN extends JavaPlugin {
 		return game;
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
@@ -163,6 +187,51 @@ public class TBN extends JavaPlugin {
 				p.teleport(info.getActiveWorld().getSpawnLocation());
 				p.sendMessage(ChatColor.GREEN + "Teleported to spawn!");
 				return true;
+			}
+			if (label.equalsIgnoreCase("gg")) {
+				GoodGame(p);
+				return true;
+			}
+			if (label.equalsIgnoreCase("gl")) {
+				GoodLuck(p);
+				return true;
+			}
+			if (label.equalsIgnoreCase("bg")) {
+				if (p.getDisplayName().equalsIgnoreCase("Evilmacaroon")
+						|| p.isOp() || p.hasPermission("tbn.bg")) {
+					int ib = game.randInt(1, 2);
+					if (info.getState() == ServerState.Post_Game) {
+						if (!macbg) {
+							if (ib == 1) {
+								info.broadCast(ChatColor.DARK_PURPLE
+										+ "Evilmacaroon"
+										+ ChatColor.YELLOW
+										+ " lost only because she IS JUST CAT LADY WITH A LOPSIDED HEAD!!");
+							}
+							if (ib == 2) {
+								info.broadCast(ChatColor.AQUA
+										+ info.winner.getPlayer()
+												.getCustomName()
+										+ ChatColor.LIGHT_PURPLE
+										+ " only won because they laaaaaag");
+							}
+							if (ib == 3) {
+								info.broadCast(ChatColor.AQUA
+										+ info.winner.getPlayer()
+												.getCustomName()
+										+ ChatColor.LIGHT_PURPLE
+										+ " only won because they laaaaaag");
+							}
+							macbg = true;
+						} else {
+							p.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD
+									+ "I told u not to spam it");
+						}
+					} else {
+						p.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD
+								+ "You havn't even finished the game yet!");
+					}
+				}
 			}
 			if (label.equalsIgnoreCase("tbn")) {
 				if (args.length == 1) {
@@ -211,6 +280,21 @@ public class TBN extends JavaPlugin {
 							return true;
 						}
 					}
+					if (args[0].equalsIgnoreCase("mac")) {
+						if (p.isOp()) {
+							if (mac) {
+								mac = false;
+								p.sendMessage(ChatColor.GRAY
+										+ "Mac mode has been turned off!");
+							}
+							if (!mac) {
+								mac = true;
+								p.sendMessage(ChatColor.GRAY
+										+ "Mac mode has been turned on!");
+							}
+							return true;
+						}
+					}
 					if (args[0].equalsIgnoreCase("finish")) {
 						if (p.isOp()) {
 							p.sendMessage(ChatColor.GRAY + "Ending the game...");
@@ -234,6 +318,14 @@ public class TBN extends JavaPlugin {
 							return true;
 						}
 					}
+					if (args[0].equalsIgnoreCase("removents")) {
+						if (p.isOp()) {
+							int i = game.removeEnts();
+							p.sendMessage(pre + ChatColor.GRAY + "Removed " + i
+									+ " ents!");
+							return true;
+						}
+					}
 					if (args[0].equalsIgnoreCase("batknight")) {
 						if (p.isOp()) {
 							info.batman = p;
@@ -253,7 +345,8 @@ public class TBN extends JavaPlugin {
 									+ ChatColor.GOLD + "!");
 							return true;
 						}
-					}if (args[0].equalsIgnoreCase("puffin")) {
+					}
+					if (args[0].equalsIgnoreCase("puffin")) {
 						if (p.isOp()) {
 							info.puffin = p;
 							ppp.setType(PlayType.Puffin);
@@ -635,16 +728,28 @@ public class TBN extends JavaPlugin {
 									game.setListName(info.catwomen,
 											info.catwomen.getDisplayName(),
 											ChatColor.LIGHT_PURPLE);
-								}if(info.puffin != null && info.puffin == p){
+								}
+								if (info.puffin != null && info.puffin == p) {
 									List<String> ll = new ArrayList<String>();
-									info.puffin.getInventory().addItem(
-											new ItemStack[] {
-													game.setName(Material.IRON_HOE, ChatColor.DARK_PURPLE
-															+ "Umbrella", ll),
-															game.setName(Material.EGG, ChatColor.YELLOW
-															+ "Minion Spawner", ll),
-															game.setName(Material.RAW_CHICKEN, ChatColor.GRAY
-															+ "The Puffinator", ll) });
+									info.puffin
+											.getInventory()
+											.addItem(
+													new ItemStack[] {
+															game.setName(
+																	Material.IRON_HOE,
+																	ChatColor.DARK_PURPLE
+																			+ "Umbrella",
+																	ll),
+															game.setName(
+																	Material.EGG,
+																	ChatColor.YELLOW
+																			+ "Minion Spawner",
+																	ll),
+															game.setName(
+																	Material.RAW_CHICKEN,
+																	ChatColor.GRAY
+																			+ "The Puffinator",
+																	ll) });
 								}
 							}
 						}
@@ -853,6 +958,43 @@ public class TBN extends JavaPlugin {
 			}
 		} finally {
 			br.close();
+		}
+	}
+
+	public void GoodGame(Player p) {
+		if (gged.contains(p)) {
+			p.sendMessage(ChatColor.RED + "You already wished a good game boy!");
+			return;
+		}
+		if (info.getState() == ServerState.Post_Game) {
+			if (ChatColor.stripColor(p.getDisplayName()).equalsIgnoreCase(
+					"Evilmacaroon")) {
+				p.sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD
+						+ "I assume you won this game.");
+			}
+			int rand = game.randInt(1, 5);
+			String ss = getConfig().getString("GoodGame." + rand).replace(
+					"%player%", p.getPlayer().getDisplayName());
+			if (ss.contains("%winner%")) {
+				ss.replace("%winner%", info.getWinner().getPlayer()
+						.getDisplayName());
+			}
+			info.broadCast(ChatColor.GOLD + "" + ss);
+			gged.add(p);
+		}
+	}
+
+	public void GoodLuck(Player p) {
+		if (gled.contains(p)) {
+			p.sendMessage(ChatColor.RED + "You already wished a good game boy!");
+			return;
+		}
+		if (info.getState() == ServerState.Pre_Game) {
+			int rand = game.randInt(1, 5);
+			String ss = getConfig().getString("GoodLuck." + rand).replace(
+					"%player%", p.getPlayer().getDisplayName());
+			info.broadCast(ChatColor.BLUE + "" + ss);
+			gled.add(p);
 		}
 	}
 

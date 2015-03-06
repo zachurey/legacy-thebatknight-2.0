@@ -6,3 +6,6 @@ commands:
   spawn:
   unstuck:
   setspawn:
+  gg:
+  gl:
+  bg:

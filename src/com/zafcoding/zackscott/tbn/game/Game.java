@@ -13,6 +13,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.command.defaults.KickCommand;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -38,6 +39,7 @@ public class Game {
 	static Info info = TBN.info;
 	static Locations loc = TBN.loc;
 	final PlayerProfile mostdi1a = null;
+	public static int i = 0;
 
 	public void start() {
 		info.setState(ServerState.In_Game);
@@ -86,6 +88,21 @@ public class Game {
 						0));
 				pa.getInventory().clear();
 				pa.setGameMode(GameMode.ADVENTURE);
+				if (pq.getType() == PlayType.BatNight) {
+					pa.setDisplayName(ChatColor.GRAY + pa.getName());
+				}
+				if (pq.getType() == PlayType.BirdBoy) {
+					pa.setDisplayName(ChatColor.GREEN + pa.getName());
+				}
+				if (pq.getType() == PlayType.Joker) {
+					pa.setDisplayName(ChatColor.DARK_PURPLE + pa.getName());
+				}
+				if (pq.getType() == PlayType.KittyKat) {
+					pa.setDisplayName(ChatColor.LIGHT_PURPLE + pa.getName());
+				}
+				if (pq.getType() == PlayType.Puffin) {
+					pa.setDisplayName(ChatColor.AQUA + pa.getName());
+				}
 				if ((mostdia == null || pq.getDiamonds() > mostdia
 						.getDiamonds())
 						&& !pq.isDead()
@@ -113,18 +130,34 @@ public class Game {
 			PlayerProfile mostkill = null;
 			int totalkill = 0;
 			for (Player pa : info.getPlayers()) {
-				PlayerProfile pp = info.getPP(pa);
+				PlayerProfile pq = info.getPP(pa);
 				pa.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(),
 						0));
 				pa.getInventory().clear();
 				pa.setGameMode(GameMode.ADVENTURE);
-				if (pp.getType() == PlayType.BatNight
-						|| pp.getType() == PlayType.BirdBoy
-						|| pp.getType() == PlayType.KittyKat) {
-					if (mostkill == null || pp.getKills() > mostkill.getKills()) {
-						mostkill = pp;
+				tbn.debugMsg("getType: " + pq.getType());
+				if (pq.getType() == PlayType.BatNight) {
+					pa.setDisplayName(ChatColor.GRAY + pa.getName());
+				}
+				if (pq.getType() == PlayType.BirdBoy) {
+					pa.setDisplayName(ChatColor.GREEN + pa.getName());
+				}
+				if (pq.getType() == PlayType.Joker) {
+					pa.setDisplayName(ChatColor.DARK_PURPLE + pa.getName());
+				}
+				if (pq.getType() == PlayType.KittyKat) {
+					pa.setDisplayName(ChatColor.LIGHT_PURPLE + pa.getName());
+				}
+				if (pq.getType() == PlayType.Puffin) {
+					pa.setDisplayName(ChatColor.AQUA + pa.getName());
+				}
+				if (pq.getType() == PlayType.BatNight
+						|| pq.getType() == PlayType.BirdBoy
+						|| pq.getType() == PlayType.KittyKat) {
+					if (mostkill == null || pq.getKills() > mostkill.getKills()) {
+						mostkill = pq;
 					}
-					totalkill = totalkill + pp.getKills();
+					totalkill = totalkill + pq.getKills();
 				}
 				if (mostkill == null) {
 					mostkill = info.getPP(pa);
@@ -146,46 +179,70 @@ public class Game {
 					+ " players!");
 		}
 		tbn.debugMsg("Removed chests: " + removeChest());
-		tbn.debugMsg("Changed blocks: " + removeChest());
+		tbn.debugMsg("Changed blocks: " + removeBlock());
+		removeEnts();
 		info.broadCast(ChatColor.RED + "" + ChatColor.BOLD
 				+ "Server reseting in 10 seconds!");
-		Bukkit.getScheduler().scheduleAsyncDelayedTask(tbn, new Runnable() {
+		i = Bukkit.getScheduler().scheduleSyncDelayedTask(tbn, new Runnable() {
 
 			@Override
 			public void run() {
-				for (Player ppp : info.getPlayers()) {
-					if (bo == 1) {
-						ppp.kickPlayer(ChatColor.GOLD
-								+ ""
-								+ ChatColor.BOLD
-								+ "TheBatKnight"
-								+ ChatColor.RESET
-								+ "\nThanks for playing! \nRejoin to play another game!\n"
-								+ ChatColor.GREEN + "Winner: "
-								+ ChatColor.DARK_AQUA
-								+ info.getWinner().getPlayer().getName() + " ("
-								+ info.getWinner().getDiamonds() + ")");
-					}
-					if (bo == 0) {
-						ppp.kickPlayer(ChatColor.GOLD
-								+ ""
-								+ ChatColor.BOLD
-								+ "TheBatKnight"
-								+ ChatColor.RESET
-								+ "\nThanks for playing! \nRejoin to play another game!\n"
-								+ ChatColor.GREEN + "Winners: "
-								+ ChatColor.DARK_AQUA + "Heros!");
-					}
-					try {
-						Bukkit.getServer().dispatchCommand(
-								Bukkit.getConsoleSender(), "reload");
-					} catch (Exception e) {
-						tbn.debugMsg("Err_ " + e.getMessage());
-						Bukkit.getServer().reload();
-					}
+				tbn.game.kickAll(bo);
+				try {
+					Bukkit.getScheduler().cancelAllTasks();
+					tbn.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+							"reload");
+				} catch (Exception e) {
+					Bukkit.getScheduler().cancelAllTasks();
+					tbn.getServer().reload();
 				}
 			}
 		}, 200L);
+	}
+
+	public static int removeEnts() {
+		int removed = 0;
+		for (Entity ent : info.getActiveWorld().getEntities()) {
+			if (!(ent instanceof Player)) {
+				ent.remove();
+				removed++;
+			}
+		}
+		return removed;
+	}
+
+	public void kickAll(int bo) {
+		ArrayList<Player> po = new ArrayList<Player>(info.getPlayers());
+		for (Player ppp : po) {
+			if (bo == 1) {
+				ppp.kickPlayer(ChatColor.GOLD
+						+ ""
+						+ ChatColor.BOLD
+						+ "TheBatKnight"
+						+ ChatColor.RESET
+						+ "\nThanks for playing! \nRejoin to play another game!\n"
+						+ ChatColor.GREEN + "Winner: " + ChatColor.DARK_AQUA
+						+ info.getWinner().getPlayer().getName() + " ("
+						+ info.getWinner().getDiamonds() + ")");
+			}
+			if (bo == 0) {
+				ppp.kickPlayer(ChatColor.GOLD
+						+ ""
+						+ ChatColor.BOLD
+						+ "TheBatKnight"
+						+ ChatColor.RESET
+						+ "\nThanks for playing! \nRejoin to play another game!\n"
+						+ ChatColor.GREEN + "Winners: " + ChatColor.DARK_AQUA
+						+ "Heros!");
+			}
+			try {
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+						"reload");
+			} catch (Exception e) {
+				tbn.debugMsg("Err_ " + e.getMessage());
+				Bukkit.getServer().reload();
+			}
+		}
 	}
 
 	public static int removeChest() {
@@ -242,19 +299,15 @@ public class Game {
 		return is;
 	}
 
-	public void stop(String reason) {
-		if (reason == "unknown") {
-
-		}
-	}
-
 	public void dosomeDiamondLvl() {
 		tbn.getServer().getScheduler()
 				.scheduleSyncRepeatingTask(tbn, new Runnable() {
 					public void run() {
 						if (info.getState() == ServerState.In_Game)
-							for (Player p : Bukkit.getOnlinePlayers())
+							for (Player p : Bukkit.getOnlinePlayers()) {
 								p.setLevel(getDiamonds(p));
+								info.getPP(p).setDiamonds(getDiamonds(p));
+							}
 					}
 				}, 20L, 20L);
 	}
@@ -286,16 +339,20 @@ public class Game {
 		int puffinIndex = rand.nextInt(players.length);
 		int catIndex = rand.nextInt(players.length);
 
-		while (batmanIndex == robinIndex)
+		while (batmanIndex == robinIndex) {
 			robinIndex = rand.nextInt(players.length);
-		while ((batmanIndex == jockerIndex || robinIndex == jockerIndex))
+		}
+		while ((batmanIndex == jockerIndex || robinIndex == jockerIndex)) {
 			jockerIndex = rand.nextInt(players.length);
+		}
 		while ((batmanIndex == catIndex || robinIndex == catIndex)
-				|| jockerIndex == catIndex || puffinIndex == catIndex)
+				|| jockerIndex == catIndex || puffinIndex == catIndex) {
 			catIndex = rand.nextInt(players.length);
+		}
 		while ((batmanIndex == puffinIndex || robinIndex == puffinIndex)
-				|| jockerIndex == puffinIndex || puffinIndex == catIndex)
+				|| jockerIndex == puffinIndex || catIndex == puffinIndex) {
 			puffinIndex = rand.nextInt(players.length);
+		}
 
 		tbn.debugMsg("Setting batman...");
 		if (info.batman == null) {
@@ -471,7 +528,7 @@ public class Game {
 			info.joker.getInventory().addItem(
 					new ItemStack[] { setName(new ItemStack(Material.CHEST, 5),
 							ChatColor.RED + "TNT-In-A-Box", new ArrayList()) });
-			int spawn = (int) (Math.random() * 20 + 1);
+			int spawn = randInt(1, 20);
 			info.joker.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
 					.getName(), spawn));
 			setListName(info.joker, info.joker.getDisplayName(),
@@ -541,7 +598,8 @@ public class Game {
 		int index = 0;
 		int randomIndex = rand.nextInt(info.badGuys.length);
 		for (Player badGuy : info.badGuys)
-			if ((badGuy != null) && (badGuy.getName() != null)) {
+			if ((badGuy != null) && (badGuy.getName() != null)
+					&& info.getPP(badGuy).getType() == PlayType.Villan) {
 				badGuy.getInventory().addItem(
 						new ItemStack[] {
 								new ItemStack(Material.STONE_SWORD),
@@ -833,7 +891,7 @@ public class Game {
 	}
 
 	@SuppressWarnings("static-access")
-	public void setListName(Player player, String name, ChatColor C) {
+	public static void setListName(Player player, String name, ChatColor C) {
 		/*
 		 * String s = name; String ss = ""; if (name.toCharArray().length >= 14)
 		 * { s = C + s; for (int i = 0; i <= 13; i++) s = C + s +
@@ -849,5 +907,18 @@ public class Game {
 		lam.setColor(Color.fromRGB(r, g, b));
 		armour.setItemMeta(lam);
 		return armour;
+	}
+	
+	public static int randInt(int min, int max) {
+
+	    // NOTE: Usually this should be a field rather than a method
+	    // variable so that it is not re-seeded every call.
+	    Random rand = new Random();
+
+	    // nextInt is normally exclusive of the top value,
+	    // so add 1 to make it inclusive
+	    int randomNum = rand.nextInt((max - min) + 1) + min;
+
+	    return randomNum;
 	}
 }

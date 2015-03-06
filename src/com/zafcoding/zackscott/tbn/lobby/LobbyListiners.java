@@ -86,6 +86,9 @@ public class LobbyListiners implements Listener {
 		e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation());
 		info.addPlayer(e.getPlayer());
 		info.getPP(e.getPlayer()).setType(PlayType.Villan);
+		if (e.getPlayer().getDisplayName().equalsIgnoreCase("Evilmacaroon")) {
+			tbn.mac = true;
+		}
 		if (tbn.mods.containsKey(e.getPlayer().getDisplayName())) {
 			e.setJoinMessage("[" + ChatColor.DARK_AQUA
 					+ tbn.mods.get(e.getPlayer().getDisplayName())
@@ -110,6 +113,10 @@ public class LobbyListiners implements Listener {
 
 	@EventHandler
 	public void onPlayerLeavae(PlayerQuitEvent e) {
+		if (e.getPlayer().getDisplayName().equalsIgnoreCase("Evilmacaroon")) {
+			tbn.mac = false;
+		}
+		e.setQuitMessage(e.getPlayer().getCustomName() + " has quit!");
 		if (info.getPP(e.getPlayer()) != null) {
 			Player p = e.getPlayer();
 			info.removePlayer(p);
@@ -253,23 +260,28 @@ public class LobbyListiners implements Listener {
 	public void ServerPing(ServerListPingEvent e) {
 		e.setMaxPlayers(tbn.getMaxPlayer());
 		if (info.getState() == ServerState.Pre_Game) {
-			e.setMotd(ChatColor.GOLD + "" + ChatColor.BOLD + "TheBatNight"
-					+ "\n" + ChatColor.GREEN
+			e.setMotd(ChatColor.GRAY + "[" + ChatColor.GOLD + ""
+					+ ChatColor.BOLD + "TheBatNight" + ChatColor.RESET + ""
+					+ ChatColor.GRAY + "]" + "\n" + ChatColor.GREEN
 					+ "The server is currently in the lobby!");
 		}
 		if (info.getState() == ServerState.In_Game) {
-			e.setMotd(ChatColor.GOLD + "" + ChatColor.BOLD + "TheBatNight"
-					+ "\n" + ChatColor.AQUA
+			e.setMotd(ChatColor.GRAY + "[" + ChatColor.GOLD + ""
+					+ ChatColor.BOLD + "TheBatNight" + ChatColor.RESET + ""
+					+ ChatColor.GRAY + "]" + "\n" + ChatColor.AQUA
 					+ "The server is currently in game!");
 		}
 		if (info.getState() == ServerState.Post_Game) {
-			e.setMotd(ChatColor.GOLD + "" + ChatColor.BOLD + "TheBatNight"
-					+ "\n" + ChatColor.GOLD
+			e.setMotd(ChatColor.GRAY + "[" + ChatColor.GOLD + ""
+					+ ChatColor.BOLD + "TheBatNight" + ChatColor.RESET + ""
+					+ ChatColor.GRAY + "]" + "\n" + ChatColor.GOLD
 					+ "The game is over! Play again in a minute!");
 		}
 		if (info.getState() == ServerState.Resetting) {
-			e.setMotd(ChatColor.GOLD + "" + ChatColor.BOLD + "TheBatNight"
-					+ "\n" + ChatColor.RED + "The game is resetting!");
+			e.setMotd(ChatColor.GRAY + "[" + ChatColor.GOLD + ""
+					+ ChatColor.BOLD + "TheBatNight" + ChatColor.RESET + ""
+					+ ChatColor.GRAY + "]" + "\n" + ChatColor.RED
+					+ "The game is resetting!");
 		}
 	}
 
@@ -285,24 +297,69 @@ public class LobbyListiners implements Listener {
 
 	@EventHandler
 	public void PlayerChat(AsyncPlayerChatEvent e) {
-		if (info.isSpect(e.getPlayer())) {
+		if (info.isSpect(e.getPlayer())
+				&& info.getState() == ServerState.In_Game) {
 			info.deadChat(e.getMessage(), e.getPlayer());
 			e.setCancelled(true);
+		}
+		if (info.getState() == ServerState.Post_Game) {
+			if (ChatColor.stripColor(e.getMessage()).equalsIgnoreCase("gg")
+					|| ChatColor.stripColor(e.getMessage()).equalsIgnoreCase(
+							"goodgame")) {
+				if (tbn.gged.contains(e.getPlayer())) {
+
+				} else {
+					tbn.GoodGame(e.getPlayer());
+					e.setCancelled(true);
+					return;
+				}
+			}
+		}if (info.getState() == ServerState.Pre_Game) {
+			if (ChatColor.stripColor(e.getMessage()).equalsIgnoreCase("gl")
+					|| ChatColor.stripColor(e.getMessage()).equalsIgnoreCase(
+							"goodluck")) {
+				if (tbn.gled.contains(e.getPlayer())) {
+
+				} else {
+					tbn.GoodLuck(e.getPlayer());
+					e.setCancelled(true);
+					return;
+				}
+			}
 		}
 		if (info.getState() == ServerState.In_Game
 				&& !info.isSpect(e.getPlayer())) {
 			if (info.batman == e.getPlayer()) {
 				e.setFormat(ChatColor.GRAY + "[BatKnight] " + ChatColor.WHITE
 						+ e.getMessage());
+				return;
 			}
 			if (info.robin == e.getPlayer()) {
 				e.setFormat(ChatColor.GREEN + "[BirdBoy] " + ChatColor.WHITE
 						+ e.getMessage());
+				return;
 			}
 			if (info.joker == e.getPlayer()) {
-				e.setFormat(ChatColor.LIGHT_PURPLE + "[Jester] "
+				e.setFormat(ChatColor.DARK_PURPLE + "[Jester] "
 						+ ChatColor.WHITE + e.getMessage());
+				return;
 			}
+			if (info.catwomen == e.getPlayer()) {
+				e.setFormat(ChatColor.LIGHT_PURPLE + "[KittyKat] "
+						+ ChatColor.WHITE + e.getMessage());
+				return;
+			}
+			if (info.puffin == e.getPlayer()) {
+				e.setFormat(ChatColor.AQUA + "[Puffin] " + ChatColor.WHITE
+						+ e.getMessage());
+				return;
+			}
+		}
+		if (info.getState() == ServerState.Post_Game) {
+			e.setFormat("[" + ChatColor.LIGHT_PURPLE + "Person"
+					+ ChatColor.WHITE + "]<" + e.getPlayer().getDisplayName()
+					+ ChatColor.WHITE + "> " + e.getMessage());
+			return;
 		}
 		if (e.getPlayer().getDisplayName().equalsIgnoreCase("zackscott")) {
 			e.setFormat(ChatColor.WHITE
@@ -319,21 +376,7 @@ public class LobbyListiners implements Listener {
 							e.getMessage()));
 			return;
 		}
-		if (tbn.mods.containsKey(e.getPlayer().getDisplayName())) {
-			if (tbn.mods.get(e.getPlayer().getDisplayName()).contains("Dev")) {
-				e.setFormat(ChatColor.WHITE
-						+ "["
-						+ ChatColor.AQUA
-						+ ""
-						+ tbn.mods.get(e.getPlayer().getDisplayName())
-						+ ChatColor.WHITE
-						+ "]<"
-						+ e.getPlayer().getDisplayName()
-						+ "> "
-						+ ChatColor.translateAlternateColorCodes('&',
-								e.getMessage()));
-				return;
-			}
+		if (tbn.mods.containsKey(e.getPlayer().getName())) {
 			if (tbn.mods.get(e.getPlayer().getDisplayName()).equalsIgnoreCase(
 					"admin")) {
 				e.setFormat(ChatColor.WHITE
