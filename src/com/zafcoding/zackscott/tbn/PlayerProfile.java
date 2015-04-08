@@ -24,7 +24,7 @@ public class PlayerProfile {
 	public boolean did = false;
 	private boolean de = false;
 	private boolean ra = false;
-	PlayType ty;
+	PlayType ty = PlayType.Villan;
 	public ArrayList<Location> loc = new ArrayList<Location>();
 
 	public PlayerProfile(Player player, PlayType pt) {

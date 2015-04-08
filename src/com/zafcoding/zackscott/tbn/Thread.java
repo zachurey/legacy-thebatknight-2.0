@@ -31,7 +31,7 @@ public class Thread implements Runnable {
 		}
 		if (info.didsuperChest == false) {
 			int rand = (int) (Math.random() * 100 + 1);
-			if (rand <= 2) {
+			if (rand <= 5) {
 				info.didsuperChest = true;
 				info.superChest = true;
 			} else {
@@ -61,7 +61,7 @@ public class Thread implements Runnable {
 			}
 			if (info.getPP(pp).getType() == PlayType.Puffin) {
 				if (pp.getItemInHand() != null
-						&& pp.getItemInHand().getType() == Material.EGG) {
+						&& pp.getItemInHand().getType() == Material.RAW_CHICKEN) {
 					if (info.getPP(pp).getRap() == false) {
 						DisguiseAPI.disguiseToAll(pp, new MobDisguise(
 								DisguiseType.CHICKEN));
@@ -70,7 +70,8 @@ public class Thread implements Runnable {
 						info.getPP(pp).setRap(true);
 					}
 				}
-			}if (info.getPP(pp).getRap()
+			}
+			if (info.getPP(pp).getRap()
 					&& info.getPP(pp).getType() == PlayType.Puffin) {
 				if (pp.getItemInHand() == null) {
 					DisguiseAPI.undisguiseToAll(pp);
@@ -79,7 +80,7 @@ public class Thread implements Runnable {
 					info.getPP(pp).setRap(false);
 				}
 				if (pp.getItemInHand() != null
-						&& !(pp.getItemInHand().getType() == Material.EGG)) {
+						&& !(pp.getItemInHand().getType() == Material.RAW_CHICKEN)) {
 					DisguiseAPI.undisguiseToAll(pp);
 					pp.sendMessage(ChatColor.RED + "" + ChatColor.BOLD
 							+ "You have been undisguised!");
@@ -98,26 +99,16 @@ public class Thread implements Runnable {
 					}
 				}
 			}
-			if (info.getState() == ServerState.In_Game || tbn.debugMode) {
-				if (info.isSpect(pp)) {
-					pp.setAllowFlight(true);
-					pp.setFlying(true);
-					return;
-				}
-				if (pp.getItemInHand().getType() == Material.FEATHER) {
-					pp.setAllowFlight(true);
-					pp.setFlying(true);
-					return;
-				}
-				if (!(pp.getGameMode() == GameMode.CREATIVE)) {
-					pp.setAllowFlight(false);
-					pp.setFlying(false);
-				}
-			} else {
-				if (!(pp.getGameMode() == GameMode.CREATIVE)
-						&& info.getPP(pp).getType() == PlayType.Villan) {
-					pp.setFlying(false);
-				}
+			if (pp.getItemInHand().getType() == Material.FEATHER
+					&& !(pp.getGameMode() == GameMode.CREATIVE)) {
+				pp.setAllowFlight(true);
+				pp.setFlying(true);
+			}
+			if (!(pp.getItemInHand().getType() == Material.FEATHER)
+					&& !(pp.getGameMode() == GameMode.CREATIVE)
+					&& !(pp.getGameMode() == GameMode.SPECTATOR)) {
+				pp.setAllowFlight(false);
+				pp.setFlying(false);
 			}
 		}
 

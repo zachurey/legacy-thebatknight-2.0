@@ -40,7 +40,7 @@ public class Info {
 	public static Player joker = null;
 	public static Player puffin = null;
 	public static Player catwomen = null;
-	public static Player[] badGuys = null;
+	public static ArrayList<Player> badGuys = new ArrayList<Player>();
 	public static int h = 0;
 	World active = null;
 	public boolean pvp = true;
@@ -52,11 +52,49 @@ public class Info {
 	public static ArrayList<Location> chests = new ArrayList<Location>();
 	public static ArrayList<Block> block = new ArrayList<Block>();
 	public static HashMap<Location, Material> broke = new HashMap<Location, Material>();
+	public static HashMap<String, Integer> coin = new HashMap<String, Integer>();
 	PlayerProfile winner = null;
 	public static boolean poo = false;
 
+	public void clean() {
+		ArrayList<Player> players = new ArrayList<Player>();
+		lobbytime = 120;
+		gametime = 600;
+		playerc = 0;
+		spawnwitch = 1;
+		superChest = false;
+		didsuperChest = false;
+		herofreeze = false;
+		mapId = 0;
+		mapName = "";
+		batman = null;
+		robin = null;
+		joker = null;
+		puffin = null;
+		catwomen = null;
+		badGuys = new ArrayList<Player>();
+		h = 0;
+		active = null;
+		pvp = true;
+		state = ServerState.Pre_Game;
+		profiles = new ArrayList<PlayerProfile>();
+		spects = new ArrayList<Player>();
+		ingame = new ArrayList<Player>();
+		fakechests = new ArrayList<Location>();
+		chests = new ArrayList<Location>();
+		block = new ArrayList<Block>();
+		broke = new HashMap<Location, Material>();
+		coin = new HashMap<String, Integer>();
+		winner = null;
+		poo = false;
+	}
+
 	public boolean isSpect(Player p) {
 		return spects.contains(p);
+	}
+
+	public ArrayList<Player> getSpects() {
+		return spects;
 	}
 
 	public World getActiveWorld() {
@@ -122,16 +160,11 @@ public class Info {
 				return;
 			}
 			playerc++;
-			tbn.debugMsg("Increased player count! (" + playerc + ")");
 			players.add(p);
-			tbn.debugMsg("Player added to the ArrayList!");
 			ingame.add(p);
-			tbn.debugMsg("Player added to the In_Game ArrayList!");
 			p.getInventory().clear();
-			tbn.debugMsg("Player's Inventory Cleared!");
 			PlayerProfile pp = new PlayerProfile(p, PlayType.Villan);
 			addPlayerPro(pp);
-			tbn.debugMsg("Created and added new PlayerProfile!");
 			p.sendMessage(ChatColor.YELLOW + "You have joined the game!");
 			return;
 		} else {
@@ -152,6 +185,18 @@ public class Info {
 			p.setGameMode(GameMode.SPECTATOR);
 			spects.add(p);
 		}
+	}
+
+	public void specMode(Player p) {
+		PlayerProfile pp = new PlayerProfile(p, PlayType.Villan);
+		players.add(p);
+		profiles.add(pp);
+		pp.setSpec(true);
+		pp.setDeath(true);
+		p.setGameMode(GameMode.SPECTATOR);
+		spects.add(p);
+		p.teleport(p.getWorld().getSpawnLocation());
+		return;
 	}
 
 	public static void hidePlayer(Player player) {
@@ -241,12 +286,23 @@ public class Info {
 	}
 
 	public void deadChat(String message, Player player) {
-		for (Player pl : players) {
-			if (pl.hasPermission("tbk.mod")
-					|| (pl.hasPermission("tbk.admin") || isSpect(pl))) {
-				pl.sendMessage(ChatColor.RED + "[DEAD] " + ChatColor.YELLOW
-						+ "" + player.getDisplayName() + ChatColor.WHITE + " "
-						+ message);
+		if (!tbn.mods.containsKey(player.getName())) {
+			for (Player pl : players) {
+				if (pl.hasPermission("tbk.mod")
+						|| (pl.hasPermission("tbk.admin") || isSpect(pl))) {
+					pl.sendMessage(ChatColor.RED + "[DEAD] " + ChatColor.YELLOW
+							+ "" + player.getDisplayName() + ChatColor.WHITE
+							+ " " + message);
+				}
+			}
+		} else {
+			String rank = tbn.mods.get(player.getName());
+			for (Player pl : players) {
+				pl.sendMessage(ChatColor.RED + "[DEAD] " + ChatColor.WHITE
+						+ "[" + ChatColor.DARK_AQUA + "" + rank + ""
+						+ ChatColor.WHITE + "] " + ChatColor.YELLOW + ""
+						+ player.getName() + ChatColor.RESET + " "
+						+ ChatColor.translateAlternateColorCodes('&', message));
 			}
 		}
 	}

@@ -31,6 +31,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 
 import com.zafcoding.zackscott.tbn.Info;
 import com.zafcoding.zackscott.tbn.Info.ServerState;
@@ -47,34 +48,48 @@ public class LobbyListiners implements Listener {
 
 	@EventHandler
 	public void PlayerPre(AsyncPlayerPreLoginEvent e) {
-		tbn.debugMsg("The PreLoginEvent has been called!");
-		if (info.getState() == ServerState.In_Game
-				|| info.getState() == ServerState.Post_Game
-				|| info.getState() == ServerState.Resetting) {
+		if (tbn.mods.containsKey(e.getName())) {
+			e.allow();
+			return;
+		} else {
 			tbn.debugMsg("The PreLoginEvent has been called!");
-			e.disallow(
-					AsyncPlayerPreLoginEvent.Result.KICK_BANNED,
-					ChatColor.RED
-							+ "You can not join the game while the game state is: "
-							+ info.getState());
-			tbn.debugMsg("The player " + e.getName()
-					+ " has been kicked due to the wrong state!");
-			// pp.kickPlayer(ChatColor.RED +
-			// "You can not join the game while the game state is: " +
-			// info.getState());
-			return;
-		}
-		if (info.getPlayerCount() >= 30) {
-			tbn.debugMsg("Too many players! " + e.getName()
-					+ " has been disallowed!");
-			e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED,
-					ChatColor.RED + "The game is currently full!");
-			return;
+			if (info.getState() == ServerState.In_Game
+					|| info.getState() == ServerState.Post_Game
+					|| info.getState() == ServerState.Resetting) {
+				tbn.debugMsg("The PreLoginEvent has been called!");
+				e.disallow(
+						AsyncPlayerPreLoginEvent.Result.KICK_BANNED,
+						ChatColor.RED
+								+ "You can not join the game while the game state is: "
+								+ info.getState());
+				tbn.debugMsg("The player " + e.getName()
+						+ " has been kicked due to the wrong state!");
+				// pp.kickPlayer(ChatColor.RED +
+				// "You can not join the game while the game state is: " +
+				// info.getState());
+				return;
+			}
+			if (info.getPlayerCount() >= 30) {
+				tbn.debugMsg("Too many players! " + e.getName()
+						+ " has been disallowed!");
+				e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED,
+						ChatColor.RED + "The game is currently full!");
+				return;
+			}
 		}
 	}
 
 	@EventHandler
 	public void PlayerJoin(PlayerJoinEvent e) {
+		for (PotionEffect effect : e.getPlayer().getActivePotionEffects()) {
+			e.getPlayer().removePotionEffect(effect.getType());
+		}
+		if (info.getState() == ServerState.In_Game) {
+			e.setJoinMessage(ChatColor.GRAY + "Spectator "
+					+ e.getPlayer().getDisplayName() + " is now spectating!");
+			info.specMode(e.getPlayer());
+			return;
+		}
 		tbn.debugMsg("Join Event Called!");
 		e.getPlayer().setGameMode(GameMode.SURVIVAL);
 		e.getPlayer().setMaxHealth(20);
@@ -88,6 +103,9 @@ public class LobbyListiners implements Listener {
 		info.getPP(e.getPlayer()).setType(PlayType.Villan);
 		if (e.getPlayer().getDisplayName().equalsIgnoreCase("Evilmacaroon")) {
 			tbn.mac = true;
+		}
+		if (e.getPlayer().getDisplayName().equalsIgnoreCase("ZackScott")) {
+			tbn.zack = true;
 		}
 		if (tbn.mods.containsKey(e.getPlayer().getDisplayName())) {
 			e.setJoinMessage("[" + ChatColor.DARK_AQUA
@@ -116,7 +134,7 @@ public class LobbyListiners implements Listener {
 		if (e.getPlayer().getDisplayName().equalsIgnoreCase("Evilmacaroon")) {
 			tbn.mac = false;
 		}
-		e.setQuitMessage(e.getPlayer().getCustomName() + " has quit!");
+		e.setQuitMessage(e.getPlayer().getDisplayName() + " has quit!");
 		if (info.getPP(e.getPlayer()) != null) {
 			Player p = e.getPlayer();
 			info.removePlayer(p);
@@ -240,7 +258,6 @@ public class LobbyListiners implements Listener {
 	@EventHandler
 	public void BlockBreak(BlockBreakEvent e) {
 		Player p = e.getPlayer();
-		tbn.debugMsg("Block Break Event! (e.getBlock=" + e.getBlock().getType());
 		if (p.getGameMode() == GameMode.CREATIVE) {
 			return;
 		}
@@ -314,7 +331,8 @@ public class LobbyListiners implements Listener {
 					return;
 				}
 			}
-		}if (info.getState() == ServerState.Pre_Game) {
+		}
+		if (info.getState() == ServerState.Pre_Game) {
 			if (ChatColor.stripColor(e.getMessage()).equalsIgnoreCase("gl")
 					|| ChatColor.stripColor(e.getMessage()).equalsIgnoreCase(
 							"goodluck")) {
@@ -358,7 +376,7 @@ public class LobbyListiners implements Listener {
 		if (info.getState() == ServerState.Post_Game) {
 			e.setFormat("[" + ChatColor.LIGHT_PURPLE + "Person"
 					+ ChatColor.WHITE + "]<" + e.getPlayer().getDisplayName()
-					+ ChatColor.WHITE + "> " + e.getMessage());
+					+ ChatColor.WHITE + "> " + ChatColor.RESET + e.getMessage());
 			return;
 		}
 		if (e.getPlayer().getDisplayName().equalsIgnoreCase("zackscott")) {
@@ -370,7 +388,10 @@ public class LobbyListiners implements Listener {
 					+ ChatColor.RESET
 					+ ChatColor.WHITE
 					+ "]<"
+					+ ChatColor.GOLD
+					+ ""
 					+ e.getPlayer().getDisplayName()
+					+ ChatColor.WHITE
 					+ "> "
 					+ ChatColor.translateAlternateColorCodes('&',
 							e.getMessage()));
@@ -385,7 +406,9 @@ public class LobbyListiners implements Listener {
 						+ "Admin"
 						+ ChatColor.WHITE
 						+ "]<"
+						+ ChatColor.GOLD
 						+ e.getPlayer().getDisplayName()
+						+ ChatColor.WHITE
 						+ "> "
 						+ ChatColor.translateAlternateColorCodes('&',
 								e.getMessage()));
@@ -399,7 +422,9 @@ public class LobbyListiners implements Listener {
 						+ "Mod"
 						+ ChatColor.WHITE
 						+ "]<"
+						+ ChatColor.GOLD
 						+ e.getPlayer().getDisplayName()
+						+ ChatColor.WHITE
 						+ "> "
 						+ ChatColor.translateAlternateColorCodes('&',
 								e.getMessage()));
@@ -409,22 +434,34 @@ public class LobbyListiners implements Listener {
 					+ "["
 					+ ChatColor.DARK_AQUA
 					+ ""
+					+ ChatColor.GOLD
 					+ tbn.mods.get(e.getPlayer().getDisplayName())
 					+ ChatColor.WHITE
 					+ "]<"
+					+ ChatColor.GOLD
 					+ e.getPlayer().getDisplayName()
+					+ ChatColor.WHITE
 					+ "> "
 					+ ChatColor.translateAlternateColorCodes('&',
 							e.getMessage()));
 			return;
 		}
-		/*
-		 * if (tbn.vips.contains(e.getPlayer().getDisplayName())) {
-		 * e.setFormat(ChatColor.WHITE + "[" + ChatColor.GREEN + "VIP" +
-		 * ChatColor.WHITE + "]<" + e.getPlayer().getDisplayName() + "> " +
-		 * ChatColor.translateAlternateColorCodes('&', e.getMessage())); return;
-		 * }
-		 */
+
+		if (e.getPlayer().hasPermission("tbk.pro")) {
+			e.setFormat(ChatColor.WHITE
+					+ "["
+					+ ChatColor.WHITE
+					+ "PRO"
+					+ ChatColor.WHITE
+					+ "]<"
+					+ ChatColor.AQUA
+					+ e.getPlayer().getDisplayName()
+					+ ChatColor.WHITE
+					+ "> "
+					+ ChatColor.translateAlternateColorCodes('&',
+							e.getMessage()));
+			return;
+		}
 		e.setFormat(ChatColor.GRAY + "<" + e.getPlayer().getDisplayName()
 				+ "> " + e.getMessage());
 	}
@@ -436,7 +473,8 @@ public class LobbyListiners implements Listener {
 
 	@EventHandler
 	public void onBlockForm(BlockFormEvent e) {
-		if (e.getBlock().getType() == Material.ICE) {
+		if (e.getBlock().getType() == Material.ICE
+				|| e.getBlock().getType() == Material.VINE) {
 			e.setCancelled(true);
 		}
 	}

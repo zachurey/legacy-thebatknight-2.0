@@ -47,6 +47,7 @@ import com.zafcoding.zackscott.tbn.Info;
 import com.zafcoding.zackscott.tbn.Info.ServerState;
 import com.zafcoding.zackscott.tbn.PlayerProfile;
 import com.zafcoding.zackscott.tbn.PlayerProfile.PlayType;
+import com.zafcoding.zackscott.tbn.orginial.TheBatKnight;
 import com.zafcoding.zackscott.tbn.TBN;
 
 public class GameListiner implements Listener {
@@ -57,12 +58,18 @@ public class GameListiner implements Listener {
 
 	@EventHandler
 	public void PlayerFall(EntityDamageEvent e) {
+		if (info.getGameTime() >= ((tbn.getConfig().getInt("MatchLengh") * 60) - 3)) {
+			e.setCancelled(true);
+		}
 		if (!(info.getState() == ServerState.In_Game)) {
 			e.setCancelled(true);
 		}
 		if (e.getCause() == DamageCause.FALL) {
 			if (e.getEntity() instanceof Player) {
 				PlayerProfile pp = info.getPP((Player) e.getEntity());
+				if (pp == null) {
+					return;
+				}
 				if (pp.getType() == PlayType.BatNight
 						|| pp.getType() == PlayType.BirdBoy
 						|| pp.getType() == PlayType.KittyKat) {
@@ -75,28 +82,20 @@ public class GameListiner implements Listener {
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent event) {
 		try {
-			tbn.debugMsg("Chest place called!");
 			if ((info.joker == event.getPlayer())
 					&& event.getBlock().getType() != null
 					&& (event.getBlock().getType() == Material.CHEST)) {
 				if (!event.getBlock().getLocation().add(1.0D, 0.0D, 0.0D)
 						.getBlock().getType().equals(Material.CHEST)) {
-					tbn.debugMsg("1 Chest place called!");
 					if (!event.getBlock().getLocation().add(0.0D, 0.0D, 1.0D)
 							.getBlock().getType().equals(Material.CHEST)) {
-						tbn.debugMsg("2 Chest place called!");
 						if (!event.getBlock().getLocation()
 								.subtract(1.0D, 0.0D, 0.0D).getBlock()
 								.getType().equals(Material.CHEST)) {
-							tbn.debugMsg("3 Chest place called!");
 							if (!event.getBlock().getLocation()
 									.subtract(0.0D, 0.0D, 1.0D).getBlock()
 									.getType().equals(Material.CHEST)) {
-								tbn.debugMsg("4 Chest place called!");
 								event.setCancelled(false);
-								tbn.debugMsg(event.getBlock().getLocation()
-										.toString()
-										+ "");
 								info.joker.sendMessage(ChatColor.RED
 										+ "Trap Chest Placed...");
 								event.getBlockPlaced().setType(Material.CHEST);
@@ -138,14 +137,9 @@ public class GameListiner implements Listener {
 						|| info.getPP((Player) event.getPlayer()).getType() == PlayType.BirdBoy) {
 					event.setCancelled(true);
 				}
-				tbn.debugMsg("It's a chest!");
-				tbn.debugMsg(((Chest) event.getView().getTopInventory()
-						.getHolder()).getBlock().getLocation().toString()
-						+ "");
 				if (info.fakechests.contains(((Chest) event.getView()
 						.getTopInventory().getHolder()).getBlock()
 						.getLocation())) {
-					tbn.debugMsg("Right location!");
 					Chest c = (Chest) event.getView().getTopInventory()
 							.getHolder();
 					event.setCancelled(true);
@@ -188,6 +182,10 @@ public class GameListiner implements Listener {
 			return;
 		}
 		if (info.ingame.contains(e.getEntity())) {
+			if (e.getEntity().getKiller() instanceof Player) {
+				PlayerProfile pp = info.getPP(e.getEntity().getKiller());
+				pp.setKills(pp.getKills() + 1);
+			}
 			info.outplayer(e.getEntity());
 			int amount = game.randInt(tbn.getConfig().getInt("MinDeath"), tbn
 					.getConfig().getInt("MaxDeath"));
@@ -211,8 +209,9 @@ public class GameListiner implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void PlayerInteract(PlayerInteractEvent e) {
+		tbn.debugMsg("Testing 1, 2, 3");
 		PlayerProfile pe = info.getPP(e.getPlayer());
 		if (pe != null && pe.isDead()) {
 			if (pe.getPlayer().getItemInHand() != null
@@ -261,19 +260,27 @@ public class GameListiner implements Listener {
 					Ocelot oc = (Ocelot) ee;
 					oc.setAdult();
 					oc.setBreed(false);
+					if (tbn.zack) {
+						int rand = game.randInt(1, 2);
+						if (rand == 1) {
+							oc.setCustomName("Otto");
+						}
+						if (rand == 2) {
+							oc.setCustomName("Egon");
+						}
+					}
 					Bukkit.getServer().getScheduler()
 							.scheduleSyncDelayedTask(tbn, new Runnable() {
 								public void run() {
 									ee.remove();
 								}
-							}, 200L);
+							}, 260L);
 				}
 			} catch (NullPointerException ee) {
-				tbn.debugMsg("Err_ Null at GameListiner.java:252");
 			}
 			try {
 				if (e.getItem().getType() != null
-						&& e.getItem().getType() == Material.RAW_CHICKEN) {
+						&& e.getItem().getType() == Material.EGG) {
 					Location loc = e.getClickedBlock().getLocation();
 					loc.setY(e.getClickedBlock().getLocation().getY() + 2);
 					final Entity ee = e.getClickedBlock().getWorld()
@@ -290,37 +297,42 @@ public class GameListiner implements Listener {
 								public void run() {
 									ee.remove();
 								}
-							}, 200L);
+							}, 260L);
 				}
 			} catch (NullPointerException ee) {
-				tbn.debugMsg("Err_ Null at GameListiner.java:289");
 			}
-
-			if ((e.getItem().getType() == Material.MILK_BUCKET)
-					|| (e.getItem().getType() == Material.RAW_FISH)) {
-				e.setUseItemInHand(Event.Result.DENY);
-				e.setCancelled(true);
+			try {
+				if ((e.getItem().getType() == Material.MILK_BUCKET)
+						|| (e.getItem().getType() == Material.RAW_FISH)) {
+					e.setUseItemInHand(Event.Result.DENY);
+					e.setCancelled(true);
+				}
+			} catch (NullPointerException eee) {
 			}
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler
 	public void a1308a(PlayerInteractEvent event) {
+		if (event.getItem() == null) {
+			return;
+		}
 		try {
-			if (event.getItem().getType() != null
-					&& (event.getItem().getType() == Material.IRON_HOE)
+			if ((event.getItem().getType() == Material.IRON_HOE)
 					&& ((event.getAction() == Action.LEFT_CLICK_AIR) || (event
 							.getAction() == Action.LEFT_CLICK_BLOCK))) {
-				event.setCancelled(true);
+				event.setCancelled(false);
 				if (info.h == 1) {
 					event.getPlayer().sendMessage(
 							ChatColor.DARK_AQUA + "" + ChatColor.BOLD
 									+ "Cooling down...");
 					return;
 				}
+				event.getPlayer().sendMessage(
+						ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Shoot!");
 				info.h = 1;
 				final Player player = event.getPlayer();
-				ItemStack item = new ItemStack(Material.NETHER_STAR);
+				ItemStack item = new ItemStack(Material.SLIME_BALL);
 				final Item i = player.getWorld().dropItem(player.getLocation(),
 						item);
 				i.setVelocity(player.getLocation().getDirection()
@@ -337,9 +349,39 @@ public class GameListiner implements Listener {
 								info.h = 0;
 							}
 						}, 40L);
+				return;
 			}
-		} catch (Exception e) {
-			tbn.debugMsg("Err_ : " + e.getMessage() + " :" + e.getCause());
+			if ((event.getItem().getType() == Material.IRON_HOE)
+					&& ((event.getAction() == Action.RIGHT_CLICK_AIR) || (event
+							.getAction() == Action.RIGHT_CLICK_BLOCK))) {
+				event.setCancelled(false);
+				if (info.h == 1) {
+					event.getPlayer().sendMessage(
+							ChatColor.DARK_AQUA + "" + ChatColor.BOLD
+									+ "Cooling down...");
+					return;
+				}
+				info.h = 1;
+				final Player player = event.getPlayer();
+				ItemStack item = new ItemStack(Material.NETHER_STAR);
+				final Item i = player.getWorld().dropItem(player.getLocation(),
+						item);
+				info.puffin.sendMessage(ChatColor.DARK_AQUA + "Shoot!");
+				i.setPickupDelay(50000);
+				tbn.getServer().getScheduler()
+						.scheduleSyncDelayedTask(tbn, new Runnable() {
+							public void run() {
+								player.getWorld().createExplosion(
+										i.getLocation(), 3.8F);
+								i.remove();
+								info.puffin.sendMessage(ChatColor.DARK_AQUA
+										+ "" + ChatColor.BOLD + "Boom!");
+								info.h = 0;
+							}
+						}, 40L);
+			}
+		} catch (NullPointerException e) {
+
 		}
 	}
 
@@ -389,6 +431,7 @@ public class GameListiner implements Listener {
 		}
 	}
 
+	// TODO:
 	@EventHandler
 	public void ProjectHit(ProjectileHitEvent event) {
 		if (event.getEntityType() == EntityType.SNOWBALL) {

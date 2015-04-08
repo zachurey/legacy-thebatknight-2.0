@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -32,6 +33,7 @@ import org.bukkit.util.Vector;
 
 import com.zafcoding.zackscott.tbn.Info.ServerState;
 import com.zafcoding.zackscott.tbn.PlayerProfile.PlayType;
+import com.zafcoding.zackscott.tbn.api.Score;
 import com.zafcoding.zackscott.tbn.game.Game;
 import com.zafcoding.zackscott.tbn.game.GameListiner;
 import com.zafcoding.zackscott.tbn.game.GameTime;
@@ -47,8 +49,9 @@ public class TBN extends JavaPlugin {
 	public static GameTime gt;
 	public static Game game;
 	public static Locations loc;
+	public static Score sco;
 	static boolean debug = true;
-	double version = 1.6;
+	double version = 1.9;
 	public String pre = ChatColor.GOLD + "[TBN] ";
 	public static Inventory inv;
 	public boolean debugMode = true;
@@ -57,9 +60,22 @@ public class TBN extends JavaPlugin {
 	public static ArrayList<Player> gled = new ArrayList<Player>();
 	public static ArrayList<Player> gged = new ArrayList<Player>();
 	public static boolean mac = false;
+	public static boolean zack = false;
 	public static boolean macbg = false;
+	public static boolean jump = true;
 
 	// public static Object dcAPI;
+
+	public void clean() {
+		unstuckers = new ArrayList<Player>();
+		mods = new HashMap<String, String>();
+		gled = new ArrayList<Player>();
+		gged = new ArrayList<Player>();
+		mac = false;
+		zack = false;
+		macbg = false;
+		jump = true;
+	}
 
 	@Override
 	public void onEnable() {
@@ -70,34 +86,20 @@ public class TBN extends JavaPlugin {
 		gt = new GameTime();
 		game = new Game();
 		loc = new Locations();
-		loadConfiguration();
+		sco = new Score();
+		// loadConfiguration();
 		getServer().getPluginManager().registerEvents(new GameListiner(), this);
 		getServer().getPluginManager().registerEvents(new LobbyListiners(),
 				this);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Thread(), 20,
 				20);
-		System.out.print("Loading DisguiseCraft...");
-		/*
-		 * try { dcAPI = DisguiseCraft.getAPI(); } catch (Exception e) {
-		 * System.out.println("==================================");
-		 * System.out.println("|Made sure you have DisguiseCraft|");
-		 * System.out.println("|  DisguiseCraft on the server!  |");
-		 * System.out.println("=================================="); } if (dcAPI
-		 * == null) { System.out.println("==================================");
-		 * System.out.println("|Made sure you have DisguiseCraft|");
-		 * System.out.println("|  DisguiseCraft on the server!  |");
-		 * System.out.println("=================================="); } else {
-		 * System.out.print("Success!"); }
-		 */
-		// String[] ss = getConfig().getString("Worlds").split(",");
-		// int randy = info.getRandom(1, ss.length);
-		// info.setActiveWorld(Bukkit.getWorld((String) ss[randy - 1]));
 		try {
 			updateMods();
+			// sco.updateScores(true);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		startDebugcheck();
 		debug = getConfig().getBoolean("debug");
 		System.out.print("[TBN] The Bat Night v." + version + " enabled!");
 	}
@@ -177,9 +179,58 @@ public class TBN extends JavaPlugin {
 					p.setVelocity(v);
 					unstuckers.add(p);
 					p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Pop!");
+					return true;
 				} else {
 					p.sendMessage(ChatColor.RED
 							+ "I'm gonna put ya on da list boy!");
+					return true;
+				}
+			}
+			if (label.equalsIgnoreCase("gmc")) {
+				if (p.isOp()) {
+					if (p.getGameMode() == GameMode.CREATIVE) {
+						p.setGameMode(GameMode.SURVIVAL);
+						p.sendMessage(ChatColor.GRAY
+								+ "Changed your game mode!");
+						return true;
+					}
+					p.setGameMode(GameMode.CREATIVE);
+					p.sendMessage(ChatColor.GRAY + "Changed your game mode!");
+					return true;
+				}
+			}
+			if (label.equalsIgnoreCase("jump")) {
+				if (p.hasPermission("tbn.vip")) {
+					if (!(info.getState() == ServerState.Pre_Game)) {
+						p.sendMessage(ChatColor.RED
+								+ "You can only use this command before the game starts!");
+					}
+					Vector vec = new Vector(0, 10, 0);
+					if (args.length == 0) {
+						p.setVelocity(vec);
+						p.sendMessage(ChatColor.LIGHT_PURPLE + "*jump*");
+					}
+					if (args.length == 1) {
+						Player tp = Bukkit.getPlayer(args[1]);
+						if (tp != null) {
+							tp.setVelocity(vec);
+							tp.sendMessage(ChatColor.LIGHT_PURPLE + "*jump*");
+							p.sendMessage(ChatColor.DARK_PURPLE + "Jumped "
+									+ p.getName());
+							return true;
+						} else {
+							p.sendMessage(ChatColor.RED
+									+ "Could not find player '" + args[1] + "'");
+							return true;
+						}
+					}
+					if (args.length > 1) {
+						p.sendMessage(ChatColor.RED
+								+ "Correct usage: /jump <player>");
+					}
+				} else {
+					p.sendMessage(ChatColor.RED
+							+ "You must be Pro to use this command!");
 				}
 			}
 			if (label.equalsIgnoreCase("spawn")
@@ -196,6 +247,34 @@ public class TBN extends JavaPlugin {
 				GoodLuck(p);
 				return true;
 			}
+			if (label.equalsIgnoreCase("start")) {
+				if (p.hasPermission("tbn.mod")) {
+					if (info.getPlayerCount() < 5) {
+						p.sendMessage(ChatColor.RED
+								+ ""
+								+ ChatColor.BOLD
+								+ "▇▇ Do not force start the game without at ▇▇\n"
+								+ "▇▇           least 5 players on!               ▇▇\n"
+								+ ChatColor.RESET
+								+ ""
+								+ ChatColor.RED
+								+ "(It will crash the server and no one will be happy)");
+						return true;
+					}
+					p.sendMessage(ChatColor.GRAY + "Starting the game...");
+					game.start();
+					return true;
+				}
+			}
+			if (label.equalsIgnoreCase("end")) {
+				if (p.hasPermission("tbn.mod")) {
+					p.sendMessage(ChatColor.GRAY + "Ending the game...");
+					game.endGame(0);
+					return true;
+				} else {
+					p.sendMessage("You pervert...");
+				}
+			}
 			if (label.equalsIgnoreCase("bg")) {
 				if (p.getDisplayName().equalsIgnoreCase("Evilmacaroon")
 						|| p.isOp() || p.hasPermission("tbn.bg")) {
@@ -204,16 +283,18 @@ public class TBN extends JavaPlugin {
 						if (!macbg) {
 							if (ib == 1) {
 								info.broadCast(ChatColor.DARK_PURPLE
-										+ "Evilmacaroon"
+										+ ""
+										+ p.getName()
 										+ ChatColor.YELLOW
 										+ " lost only because she IS JUST CAT LADY WITH A LOPSIDED HEAD!!");
+								return true;
 							}
 							if (ib == 2) {
 								info.broadCast(ChatColor.AQUA
-										+ info.winner.getPlayer()
-												.getCustomName()
+										+ info.winner.getPlayer().getName()
 										+ ChatColor.LIGHT_PURPLE
 										+ " only won because they laaaaaag");
+								return true;
 							}
 							if (ib == 3) {
 								info.broadCast(ChatColor.AQUA
@@ -221,15 +302,18 @@ public class TBN extends JavaPlugin {
 												.getCustomName()
 										+ ChatColor.LIGHT_PURPLE
 										+ " only won because they laaaaaag");
+								return true;
 							}
 							macbg = true;
 						} else {
 							p.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD
 									+ "I told u not to spam it");
+							return true;
 						}
 					} else {
 						p.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD
 								+ "You havn't even finished the game yet!");
+						return true;
 					}
 				}
 			}
@@ -240,6 +324,32 @@ public class TBN extends JavaPlugin {
 								+ ChatColor.WHITE + "]" + ChatColor.GREEN
 								+ " The current active world is "
 								+ info.getActiveWorld().getName());
+						return true;
+					}
+					if (args[0].equalsIgnoreCase("jump")) {
+						if (jump) {
+							jump = false;
+						} else {
+							jump = true;
+						}
+						p.sendMessage("Jump mode is now " + jump);
+						return true;
+					}
+					if (args[0].equalsIgnoreCase("jumptest")) {
+						if (jump) {
+							p.addPotionEffect(new PotionEffect(
+									PotionEffectType.JUMP, 100000000, -10));
+						}
+						return true;
+					}
+					if (args[0].equalsIgnoreCase("superchest")) {
+						if (info.superChest) {
+							info.superChest = false;
+						} else {
+							info.superChest = true;
+						}
+						p.sendMessage("SuperChest mode is now "
+								+ info.superChest);
 						return true;
 					}
 					if (args[0].equalsIgnoreCase("debug")) {
@@ -263,7 +373,6 @@ public class TBN extends JavaPlugin {
 								+ "!");
 						return true;
 					}
-
 					if (args[0].equalsIgnoreCase("chest")) {
 						if (p.isOp()) {
 							int i = loc.populateChests(false);
@@ -272,11 +381,15 @@ public class TBN extends JavaPlugin {
 							return true;
 						}
 					}
-					if (args[0].equalsIgnoreCase("force")) {
+					if (args[0].equalsIgnoreCase("poo")) {
 						if (p.isOp()) {
-							p.sendMessage(ChatColor.GRAY
-									+ "Starting the game...");
-							game.start();
+							if (info.poo) {
+								info.poo = false;
+							} else {
+								info.poo = true;
+							}
+							p.sendMessage(ChatColor.GRAY + "Poo is now "
+									+ info.poo);
 							return true;
 						}
 					}
@@ -295,13 +408,22 @@ public class TBN extends JavaPlugin {
 							return true;
 						}
 					}
-					if (args[0].equalsIgnoreCase("finish")) {
+					if (args[0].equalsIgnoreCase("zack")) {
 						if (p.isOp()) {
-							p.sendMessage(ChatColor.GRAY + "Ending the game...");
-							game.endGame(0);
+							if (zack) {
+								zack = false;
+								p.sendMessage(ChatColor.GRAY
+										+ "Zack mode has been turned off!");
+							}
+							if (!zack) {
+								zack = true;
+								p.sendMessage(ChatColor.GRAY
+										+ "Zack mode has been turned on!");
+							}
 							return true;
 						}
 					}
+
 					if (args[0].equalsIgnoreCase("blockchange")) {
 						if (p.isOp()) {
 							int i = game.removeBlock();
@@ -752,6 +874,7 @@ public class TBN extends JavaPlugin {
 																	ll) });
 								}
 							}
+							return true;
 						}
 					}
 				}
@@ -766,6 +889,38 @@ public class TBN extends JavaPlugin {
 						} else {
 							p.sendMessage("You don't got the permissions!");
 							return true;
+						}
+					}
+					if (args[0].equalsIgnoreCase("setstate")) {
+						if (p.isOp()) {
+							if (args[1].equalsIgnoreCase("1")) {
+								info.setState(ServerState.Pre_Game);
+								p.sendMessage(ChatColor.GRAY
+										+ "GameState has been set to: "
+										+ info.getState());
+								return true;
+							}
+							if (args[1].equalsIgnoreCase("2")) {
+								info.setState(ServerState.In_Game);
+								p.sendMessage(ChatColor.GRAY
+										+ "GameState has been set to: "
+										+ info.getState());
+								return true;
+							}
+							if (args[1].equalsIgnoreCase("3")) {
+								info.setState(ServerState.Post_Game);
+								p.sendMessage(ChatColor.GRAY
+										+ "GameState has been set to: "
+										+ info.getState());
+								return true;
+							}
+							if (args[1].equalsIgnoreCase("4")) {
+								info.setState(ServerState.Resetting);
+								p.sendMessage(ChatColor.GRAY
+										+ "GameState has been set to: "
+										+ info.getState());
+								return true;
+							}
 						}
 					}
 					if (args[0].equalsIgnoreCase("settime")) {
@@ -855,6 +1010,12 @@ public class TBN extends JavaPlugin {
 				"Location." + loca.getWorld().getName() + ".chest." + i + ".z",
 				loca.getBlockZ());
 		saveAll();
+	}
+
+	private void startDebugcheck() {
+		if (tbn.mods.containsKey("done")) {
+			Bukkit.getServer().reload();
+		}
 	}
 
 	public Location getPlayerSpawn(String world, int i) {

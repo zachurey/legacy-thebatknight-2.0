@@ -29,60 +29,6 @@ public class Locations {
 	static Info info = TBN.info;
 	static Game game = TBN.game;
 
-	public static void teleportPlayers(int mapId, String mapName) {
-		Location batmanLocation = null;
-		Location robinLocation = null;
-		Location catwomanLocation = null;
-		int random1 = new Random().nextInt(10) + 1;
-		batmanLocation = new Location(info.batman.getWorld(), tbn.getConfig()
-				.getInt("Spawns." + info.getActiveWorld().getName()
-						+ ".Batman.x"), tbn.getConfig().getInt(
-				"Spawns." + info.getActiveWorld().getName() + ".Batman.y"), tbn
-				.getConfig().getInt(
-						"Spawns." + info.getActiveWorld().getName()
-								+ ".Batman.z"));
-		robinLocation = new Location(info.robin.getWorld(), tbn.getConfig()
-				.getInt("Spawns." + info.getActiveWorld().getName()
-						+ ".Robin.x"), tbn.getConfig().getInt(
-				"Spawns." + info.getActiveWorld().getName() + ".Robin.y"), tbn
-				.getConfig().getInt(
-						"Spawns." + info.getActiveWorld().getName()
-								+ ".Robin.z"));
-		catwomanLocation = new Location(info.robin.getWorld(), 510.0D, 147.0D,
-				-36.0D);
-
-		if (!batmanLocation.getChunk().isLoaded())
-			batmanLocation.getChunk().load();
-		if (!robinLocation.getChunk().isLoaded())
-			robinLocation.getChunk().load();
-		info.batman.teleport(batmanLocation);
-		info.robin.teleport(robinLocation);
-
-		for (int i = 1; i <= info.badGuys.length; i++)
-			if (info.badGuys[(i - 1)] != null) {
-				int random = new Random().nextInt(20) + 1;
-				try {
-					if (info.badGuys[(i - 1)] != null) {
-						Location l = null;
-						String unSplit = tbn.getConfig().getString(
-								"Spawns." + info.getActiveWorld().getName()
-										+ ".BadGuys." + String.valueOf(i));
-						String[] xyz = unSplit.split(",");
-						int x = Integer.valueOf(xyz[0]).intValue();
-						int y = Integer.valueOf(xyz[1]).intValue() + 2;
-						int z = Integer.valueOf(xyz[2]).intValue();
-
-						l = new Location(info.batman.getWorld(), x, y, z);
-						l.getChunk().load();
-						for (int j = 0; j < 2; j++)
-							info.badGuys[(i - 1)].teleport(l);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-	}
-
 	/*
 	 * public static void teleportAllToWaitingCell(FileConfiguration config) {
 	 * Location waitingCellLocation = new Location(
@@ -132,9 +78,8 @@ public class Locations {
 							Location chestLoc = new Location(
 									info.getActiveWorld(), x, y, z);
 							if (chestLoc != null) {
-								int randomChests = Map.mapId == 2 ? 750
-										: Map.mapId == 0 ? 350 : 500;
-								if ((new Random().nextInt(1000) < randomChests && chestsSpawned < maxchest)
+								int randomChests = 350;
+								if ((new Random().nextInt(1200) < randomChests && chestsSpawned < maxchest)
 										|| superChestMode) {
 									if (chestLoc.getBlock().getType() != Material.CHEST) {
 										chestLoc.getBlock().setType(

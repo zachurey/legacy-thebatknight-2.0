@@ -38,18 +38,26 @@ public class Game {
 	static TBN tbn = TBN.tbn;
 	static Info info = TBN.info;
 	static Locations loc = TBN.loc;
-	final PlayerProfile mostdi1a = null;
+	static PlayerProfile mostdi1a = null;
 	public static int i = 0;
 
+	public static void clean(){
+		mostdi1a = null;
+		i = 0;
+	}
+	
 	public void start() {
 		info.setState(ServerState.In_Game);
 		info.setGameTime(tbn.getConfig().getInt("MatchLengh") * 60);
 		setHeroesAndBadGuys(tbn);
 		loc.populateChests(info.superChest);
-		sendHowToPlayInfo(info.robin, info.batman, info.badGuys, info.joker);
 		info.herofreeze = true;
 		for (Player pl : info.getPlayers()) {
 			pl.setCanPickupItems(true);
+			if (!tbn.jump) {
+				pl.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
+						100000000, -10));
+			}
 			pl.sendMessage(ChatColor.AQUA + "The game has started!");
 			if (info.batman != null) {
 				pl.sendMessage(ChatColor.GRAY + "Your BatNight is "
@@ -69,10 +77,12 @@ public class Game {
 			}
 			if (info.catwomen != null) {
 				pl.sendMessage(ChatColor.LIGHT_PURPLE + "Your KittyKat is "
-						+ info.puffin.getName());
+						+ info.catwomen.getName());
 			}
 		}
 		dosomeDiamondLvl();
+		flymanager();
+		startCompassEngine();
 		info.poo = true;
 	}
 
@@ -84,8 +94,7 @@ public class Game {
 			int total = 0;
 			for (Player pa : info.getPlayers()) {
 				PlayerProfile pq = info.getPP(pa);
-				pa.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(),
-						0));
+				pa.teleport(pa.getWorld().getSpawnLocation());
 				pa.getInventory().clear();
 				pa.setGameMode(GameMode.ADVENTURE);
 				if (pq.getType() == PlayType.BatNight) {
@@ -131,11 +140,9 @@ public class Game {
 			int totalkill = 0;
 			for (Player pa : info.getPlayers()) {
 				PlayerProfile pq = info.getPP(pa);
-				pa.teleport(tbn.getPlayerSpawn(info.getActiveWorld().getName(),
-						0));
+				pa.teleport(pa.getWorld().getSpawnLocation());
 				pa.getInventory().clear();
 				pa.setGameMode(GameMode.ADVENTURE);
-				tbn.debugMsg("getType: " + pq.getType());
 				if (pq.getType() == PlayType.BatNight) {
 					pa.setDisplayName(ChatColor.GRAY + pa.getName());
 				}
@@ -187,15 +194,13 @@ public class Game {
 
 			@Override
 			public void run() {
-				tbn.game.kickAll(bo);
-				try {
-					Bukkit.getScheduler().cancelAllTasks();
-					tbn.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-							"reload");
-				} catch (Exception e) {
-					Bukkit.getScheduler().cancelAllTasks();
-					tbn.getServer().reload();
+				for (Player p : Bukkit.getOnlinePlayers()) {
+					p.chat("/hub");
 				}
+				clean();
+				tbn.clean();
+				tbn.info.clean();
+				info.setState(ServerState.Pre_Game);
 			}
 		}, 200L);
 	}
@@ -212,37 +217,23 @@ public class Game {
 	}
 
 	public void kickAll(int bo) {
-		ArrayList<Player> po = new ArrayList<Player>(info.getPlayers());
-		for (Player ppp : po) {
-			if (bo == 1) {
-				ppp.kickPlayer(ChatColor.GOLD
-						+ ""
-						+ ChatColor.BOLD
-						+ "TheBatKnight"
-						+ ChatColor.RESET
-						+ "\nThanks for playing! \nRejoin to play another game!\n"
-						+ ChatColor.GREEN + "Winner: " + ChatColor.DARK_AQUA
-						+ info.getWinner().getPlayer().getName() + " ("
-						+ info.getWinner().getDiamonds() + ")");
-			}
-			if (bo == 0) {
-				ppp.kickPlayer(ChatColor.GOLD
-						+ ""
-						+ ChatColor.BOLD
-						+ "TheBatKnight"
-						+ ChatColor.RESET
-						+ "\nThanks for playing! \nRejoin to play another game!\n"
-						+ ChatColor.GREEN + "Winners: " + ChatColor.DARK_AQUA
-						+ "Heros!");
-			}
-			try {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"reload");
-			} catch (Exception e) {
-				tbn.debugMsg("Err_ " + e.getMessage());
-				Bukkit.getServer().reload();
-			}
-		}
+		/*
+		 * ArrayList<Player> po = new ArrayList<Player>(info.getPlayers()); for
+		 * (Player ppp : po) { if (bo == 1) { ppp.kickPlayer(ChatColor.GOLD + ""
+		 * + ChatColor.BOLD + "TheBatKnight" + ChatColor.RESET +
+		 * "\nThanks for playing! \nRejoin to play another game!\n" +
+		 * ChatColor.GREEN + "Winner: " + ChatColor.DARK_AQUA +
+		 * info.getWinner().getPlayer().getName() + " (" +
+		 * info.getWinner().getDiamonds() + ")"); } if (bo == 0) {
+		 * ppp.kickPlayer(ChatColor.GOLD + "" + ChatColor.BOLD + "TheBatKnight"
+		 * + ChatColor.RESET +
+		 * "\nThanks for playing! \nRejoin to play another game!\n" +
+		 * ChatColor.GREEN + "Winners: " + ChatColor.DARK_AQUA + "Heros!"); }
+		 * try { Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+		 * "reload"); } catch (Exception e) { tbn.debugMsg("Err_ " +
+		 * e.getMessage()); Bukkit.getServer().reload(); } }
+		 */
+
 	}
 
 	public static int removeChest() {
@@ -261,6 +252,7 @@ public class Game {
 		return chestdone;
 	}
 
+	// TODO:
 	public static int removeBlock() {
 		int blockchange = 0;
 		int totala = info.broke.size();
@@ -312,6 +304,39 @@ public class Game {
 				}, 20L, 20L);
 	}
 
+	public void flymanager() {
+		tbn.getServer().getScheduler()
+				.scheduleSyncRepeatingTask(tbn, new Runnable() {
+					public void run() {
+						for (Player pp : info.getPlayers()) {
+							if (info.getState() == ServerState.In_Game)
+								if (info.getState() == ServerState.In_Game) {
+									if (info.isSpect(pp)) {
+										pp.setAllowFlight(true);
+										pp.setFlying(true);
+										return;
+									}
+									if (pp.getItemInHand().getType() == Material.FEATHER) {
+										pp.setAllowFlight(true);
+										pp.setFlying(true);
+										return;
+									}
+									if (!(pp.getGameMode() == GameMode.CREATIVE)) {
+										pp.setAllowFlight(false);
+										pp.setFlying(false);
+									}
+								} else {
+									if (!(pp.getGameMode() == GameMode.CREATIVE)
+											&& info.getPP(pp).getType() == PlayType.Villan) {
+										pp.setAllowFlight(false);
+										pp.setFlying(false);
+									}
+								}
+						}
+					}
+				}, 10L, 10L);
+	}
+
 	public int getDiamonds(Player player) {
 		int total = 0;
 		for (ItemStack is : player.getInventory()) {
@@ -323,96 +348,84 @@ public class Game {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked", "static-access", "unused",
-			"deprecation", "null" })
+			"deprecation" })
 	private void setHeroesAndBadGuys(TBN tbn2) {
-		Player[] players = null;
-		players = new Player[info.getPlayers().size()];
-		int io = 0;
-		for (Player pl : info.getPlayers()) {
-			players[io] = pl;
-			io++;
-		}
+		ArrayList<Player> pl = info.getPlayers();
 		Random rand = new Random();
-		int batmanIndex = rand.nextInt(players.length);
-		int robinIndex = rand.nextInt(players.length);
-		int jockerIndex = rand.nextInt(players.length);
-		int puffinIndex = rand.nextInt(players.length);
-		int catIndex = rand.nextInt(players.length);
+		int batmanIndex = rand.nextInt(pl.size());
+		int robinIndex = rand.nextInt(pl.size());
+		int jockerIndex = rand.nextInt(pl.size());
+		int puffinIndex = rand.nextInt(pl.size());
+		int catIndex = rand.nextInt(pl.size());
 
 		while (batmanIndex == robinIndex) {
-			robinIndex = rand.nextInt(players.length);
+			robinIndex = rand.nextInt(pl.size());
 		}
 		while ((batmanIndex == jockerIndex || robinIndex == jockerIndex)) {
-			jockerIndex = rand.nextInt(players.length);
+			jockerIndex = rand.nextInt(pl.size());
 		}
 		while ((batmanIndex == catIndex || robinIndex == catIndex)
-				|| jockerIndex == catIndex || puffinIndex == catIndex) {
-			catIndex = rand.nextInt(players.length);
+				|| jockerIndex == catIndex) {
+			catIndex = rand.nextInt(pl.size());
 		}
 		while ((batmanIndex == puffinIndex || robinIndex == puffinIndex)
 				|| jockerIndex == puffinIndex || catIndex == puffinIndex) {
-			puffinIndex = rand.nextInt(players.length);
+			puffinIndex = rand.nextInt(pl.size());
 		}
 
 		tbn.debugMsg("Setting batman...");
 		if (info.batman == null) {
-			info.batman = players[batmanIndex];
+			info.batman = pl.get(batmanIndex);
 			info.getPP(info.batman).setType(PlayType.BatNight);
 		}
 
 		tbn.debugMsg("Setting robin...");
 		if (info.robin == null) {
-			info.robin = players[robinIndex];
+			info.robin = pl.get(robinIndex);
 			info.getPP(info.robin).setType(PlayType.BirdBoy);
 		}
 
 		tbn.debugMsg("Setting joker...");
 		if (info.joker == null) {
-			info.joker = players[jockerIndex];
+			info.joker = pl.get(jockerIndex);
 			info.getPP(info.joker).setType(PlayType.Joker);
 		}
 		tbn.debugMsg("Setting puffin...");
 		if (info.puffin == null) {
-			info.puffin = players[puffinIndex];
+			info.puffin = pl.get(puffinIndex);
 			info.getPP(info.puffin).setType(PlayType.Puffin);
 		}
 		tbn.debugMsg("Setting catlady...");
 		if (info.catwomen == null) {
-			info.catwomen = players[catIndex];
+			info.catwomen = pl.get(catIndex);
 			info.getPP(info.catwomen).setType(PlayType.KittyKat);
 		}
 
-		info.badGuys = new Player[info.getPlayers().size()];
-
 		tbn.debugMsg("Adding badguys...");
-		for (int i = 0; i < players.length; i++) {
-			if ((!info.batman.getName().equalsIgnoreCase(players[i].getName()))
-					&& (!info.robin.getName().equalsIgnoreCase(
-							players[i].getName())))
-				info.badGuys[i] = players[i];
+		for (Player pp : info.getPlayers()) {
+			PlayerProfile ppp = info.getPP(pp);
+			if (ppp.getType() != PlayType.BatNight
+					&& ppp.getType() != PlayType.BirdBoy) {
+				info.badGuys.add(pp);
+			}
 		}
 
 		tbn.debugMsg("Doing some inv stuffr...");
 		info.clearAllInventories();
 		ItemStack strength = new ItemStack(Material.POTION);
 		Potion p = new Potion(PotionType.STRENGTH);
-		p.setSplash(true);
 		p.apply(strength);
 		ItemStack instantHeal = new ItemStack(Material.POTION);
 		Potion p2 = new Potion(PotionType.INSTANT_HEAL);
-		p2.setSplash(true);
 		p2.apply(instantHeal);
 		ItemStack regen = new ItemStack(Material.POTION);
 		Potion p3 = new Potion(PotionType.REGEN);
-		p3.setSplash(true);
 		p3.apply(regen);
 		ItemStack posion = new ItemStack(Material.POTION);
 		Potion p4 = new Potion(PotionType.POISON);
-		p4.setSplash(true);
 		p4.apply(posion);
 		ItemStack speed = new ItemStack(Material.POTION);
 		Potion p5 = new Potion(PotionType.SPEED);
-		p5.setSplash(true);
 		p5.apply(speed);
 		ItemStack sword;
 		sword = new ItemStack(Material.DIAMOND_SWORD);
@@ -430,39 +443,43 @@ public class Game {
 		featherLore.add(ChatColor.DARK_GRAY
 				+ "Fly like one of your French Girls!");
 
-		info.batman.getInventory()
-				.addItem(
-						new ItemStack[] {
-								setName(sword, ChatColor.DARK_RED + "BatSword",
-										swordLore),
-								setName(strength, ChatColor.GRAY + "Steroids",
-										null),
-								setName(instantHeal, ChatColor.LIGHT_PURPLE
-										+ "Health Serum", null),
-								setName(new ItemStack(Material.COMPASS),
-										ChatColor.GREEN + "Tracker",
-										compassLore),
-								setName(regen, ChatColor.GREEN + "Med Kit",
-										null),
-								setName(posion, ChatColor.DARK_GREEN
-										+ "Gas Bomb", null),
-								setName(speed, ChatColor.BLUE
-										+ "Adrenaline Shot", null),
-								setName(new ItemStack(Material.FEATHER),
-										ChatColor.GRAY + "Feather o' Flight",
-										featherLore) });
-		info.batman.getInventory().setHelmet(
-				setArmourColour(Material.LEATHER_HELMET, 0, 0, 0));
-		info.batman.getInventory().setChestplate(
-				setArmourColour(Material.LEATHER_CHESTPLATE, 0, 0, 0));
-		info.batman.getInventory().setLeggings(
-				setArmourColour(Material.LEATHER_LEGGINGS, 0, 0, 0));
-		info.batman.getInventory().setBoots(
-				setArmourColour(Material.LEATHER_LEGGINGS, 0, 0, 0));
-		setListName(info.batman, info.batman.getDisplayName(), ChatColor.GRAY);
-		info.batman.setDisplayName(ChatColor.GRAY + "[BatKnight]");
-		info.batman.teleport(tbn.getPlayerSpawn(
-				info.getActiveWorld().getName(), -1));
+		if (info.batman != null) {
+			info.batman.getInventory()
+					.addItem(
+							new ItemStack[] {
+									setName(sword, ChatColor.DARK_RED
+											+ "BatSword", swordLore),
+									setName(strength, ChatColor.GRAY
+											+ "Steroids", null),
+									setName(instantHeal, ChatColor.LIGHT_PURPLE
+											+ "Health Serum", null),
+									setName(new ItemStack(Material.COMPASS),
+											ChatColor.GREEN + "Tracker",
+											compassLore),
+									setName(regen, ChatColor.GREEN + "Med Kit",
+											null),
+									setName(posion, ChatColor.DARK_GREEN
+											+ "Gas Bomb", null),
+									setName(speed, ChatColor.BLUE
+											+ "Adrenaline Shot", null),
+									setName(new ItemStack(Material.FEATHER),
+											ChatColor.GRAY
+													+ "Feather o' Flight",
+											featherLore) });
+			info.batman.getInventory().setHelmet(
+					setArmourColour(Material.LEATHER_HELMET, 0, 0, 0));
+			info.batman.getInventory().setChestplate(
+					setArmourColour(Material.LEATHER_CHESTPLATE, 0, 0, 0));
+			info.batman.getInventory().setLeggings(
+					setArmourColour(Material.LEATHER_LEGGINGS, 0, 0, 0));
+			info.batman.getInventory().setBoots(
+					setArmourColour(Material.LEATHER_BOOTS, 0, 0, 0));
+			setListName(info.batman, info.batman.getDisplayName(),
+					ChatColor.GRAY);
+			info.batman.setDisplayName(ChatColor.GRAY + "[BatKnight]");
+			info.batman.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+					.getName(), -1));
+		}
 		if (info.robin != null) {
 			info.robin.getInventory().addItem(
 					new ItemStack[] {
@@ -480,7 +497,7 @@ public class Game {
 			info.robin.getInventory().setLeggings(
 					setArmourColour(Material.LEATHER_LEGGINGS, 64, 193, 55));
 			info.robin.getInventory().setBoots(
-					setArmourColour(Material.LEATHER_LEGGINGS, 64, 193, 55));
+					setArmourColour(Material.LEATHER_BOOTS, 64, 193, 55));
 			setListName(info.robin, info.robin.getDisplayName(),
 					ChatColor.GREEN);
 			info.robin.setDisplayName(ChatColor.GREEN + "[BirdBoy]");
@@ -582,7 +599,7 @@ public class Game {
 			info.catwomen.getInventory().setBoots(
 					setArmourColour(Material.LEATHER_LEGGINGS, 253, 152, 254));
 			info.catwomen.addPotionEffect(new PotionEffect(
-					PotionEffectType.SPEED, -1, 2));
+					PotionEffectType.SPEED, -1, 3));
 			setListName(info.catwomen, info.catwomen.getDisplayName(),
 					ChatColor.LIGHT_PURPLE);
 			if (info.spawnwitch >= 20) {
@@ -593,11 +610,8 @@ public class Game {
 			info.spawnwitch++;
 		}
 
-		info.updateAllInventories();
-
 		int index = 0;
-		int randomIndex = rand.nextInt(info.badGuys.length);
-		for (Player badGuy : info.badGuys)
+		for (Player badGuy : info.badGuys) {
 			if ((badGuy != null) && (badGuy.getName() != null)
 					&& info.getPP(badGuy).getType() == PlayType.Villan) {
 				badGuy.getInventory().addItem(
@@ -625,6 +639,8 @@ public class Game {
 						.getName(), info.spawnwitch));
 				info.spawnwitch++;
 			}
+		}
+		info.updateAllInventories();
 	}
 
 	public ItemStack setName(Material ma, String name, List<String> lore) {
@@ -725,7 +741,7 @@ public class Game {
 	}
 
 	private void giveBooks(Player batman, Player robin, Player joker,
-			Player[] badGuys) {
+			ArrayList<Player> badGuys) {
 		try {
 			ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
 			BookMeta bm = (BookMeta) book.getItemMeta();
@@ -871,7 +887,6 @@ public class Game {
 							}
 						else
 							try {
-								tbn.debugMsg("I had to do it...");
 								if (info.batman != null)
 									info.batman.setCompassTarget(new Location(
 											info.batman.getWorld(), info.batman
@@ -908,17 +923,17 @@ public class Game {
 		armour.setItemMeta(lam);
 		return armour;
 	}
-	
+
 	public static int randInt(int min, int max) {
 
-	    // NOTE: Usually this should be a field rather than a method
-	    // variable so that it is not re-seeded every call.
-	    Random rand = new Random();
+		// NOTE: Usually this should be a field rather than a method
+		// variable so that it is not re-seeded every call.
+		Random rand = new Random();
 
-	    // nextInt is normally exclusive of the top value,
-	    // so add 1 to make it inclusive
-	    int randomNum = rand.nextInt((max - min) + 1) + min;
+		// nextInt is normally exclusive of the top value,
+		// so add 1 to make it inclusive
+		int randomNum = rand.nextInt((max - min) + 1) + min;
 
-	    return randomNum;
+		return randomNum;
 	}
 }

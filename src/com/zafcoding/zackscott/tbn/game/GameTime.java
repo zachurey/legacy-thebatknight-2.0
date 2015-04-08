@@ -20,35 +20,25 @@ public class GameTime {
 
 	public void GameHeartBeat() {
 		// TODO: test this
-		if (info.getPlayerCount() <= 0) {
-			if (info.getState() == ServerState.In_Game) {
-				tbn.getServer().reload();
-			}
-		}
 		if (info.poo) {
 			int yt = 0;
+			int nt = 0;
 			for (Player op : info.ingame) {
-				if ((info.getPP(op).getType() == PlayType.Villan
+				if ((((info.getPP(op).getType() == PlayType.Villan && !info
+						.getPP(op).isDead())
 						|| info.getPP(op).getType() == PlayType.Joker || info
-						.getPP(op).getType() == PlayType.KittyKat)
+						.getPP(op).getType() == PlayType.Puffin))
 						&& !info.getPP(op).isDead()) {
 					yt++;
 				}
-			}
-			int nt = 0;
-			for (Player op : info.ingame) {
-				if ((info.getPP(op).getType() == PlayType.BatNight
-						|| info.getPP(op).getType() == PlayType.BirdBoy || info
-						.getPP(op).getType() == PlayType.KittyKat)
+				if (((info.getPP(op).getType() == PlayType.BatNight || info
+						.getPP(op).getType() == PlayType.BirdBoy))
 						&& !info.getPP(op).isDead()) {
 					nt++;
 				}
 			}
-			if ((nt == 1 && yt == 1) && info.getPlayerCount() == 1) {
-				game.endGame(1);
-			}
-			if(nt < 0 && yt <0){
-				
+			if (nt < 0 && yt < 0) {
+				game.endGame(0);
 			}
 			if (nt < 1) {
 				game.endGame(1);
@@ -56,9 +46,11 @@ public class GameTime {
 			if (yt < 1) {
 				game.endGame(0);
 			}
-			broadCastShort(info.getGameTime());
 			if (info.getGameTime() <= 0) {
 				game.endGame(1);
+			}
+			if (nt == 2 && yt == 0) {
+
 			}
 			tbn.debugMsg("The current game time is: " + info.getGameTime());
 			info.setGameTime(info.getGameTime() - 1);
