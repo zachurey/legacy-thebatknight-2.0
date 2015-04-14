@@ -11,21 +11,20 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -39,15 +38,16 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
+import org.bukkit.potion.PotionType;
+import org.bukkit.projectiles.ProjectileSource;
 
 import com.zafcoding.zackscott.tbn.Info;
 import com.zafcoding.zackscott.tbn.Info.ServerState;
 import com.zafcoding.zackscott.tbn.PlayerProfile;
 import com.zafcoding.zackscott.tbn.PlayerProfile.PlayType;
-import com.zafcoding.zackscott.tbn.orginial.TheBatKnight;
 import com.zafcoding.zackscott.tbn.TBN;
 
 public class GameListiner implements Listener {
@@ -58,24 +58,28 @@ public class GameListiner implements Listener {
 
 	@EventHandler
 	public void PlayerFall(EntityDamageEvent e) {
-		if (info.getGameTime() >= ((tbn.getConfig().getInt("MatchLengh") * 60) - 3)) {
-			e.setCancelled(true);
-		}
-		if (!(info.getState() == ServerState.In_Game)) {
-			e.setCancelled(true);
-		}
-		if (e.getCause() == DamageCause.FALL) {
-			if (e.getEntity() instanceof Player) {
-				PlayerProfile pp = info.getPP((Player) e.getEntity());
-				if (pp == null) {
-					return;
-				}
-				if (pp.getType() == PlayType.BatNight
-						|| pp.getType() == PlayType.BirdBoy
-						|| pp.getType() == PlayType.KittyKat) {
-					e.setCancelled(true);
+		if (e.getEntity().getType() == EntityType.PLAYER) {
+			if (info.getGameTime() >= ((tbn.getConfig().getInt("MatchLengh") * 60) - 3)) {
+				e.setCancelled(true);
+			}
+			if (!(info.getState() == ServerState.In_Game)) {
+				e.setCancelled(true);
+			}
+			if (e.getCause() == DamageCause.FALL) {
+				if (e.getEntity() instanceof Player) {
+					PlayerProfile pp = info.getPP((Player) e.getEntity());
+					if (pp == null) {
+						return;
+					}
+					if (pp.getType() == PlayType.BatNight
+							|| pp.getType() == PlayType.BirdBoy
+							|| pp.getType() == PlayType.KittyKat) {
+						e.setCancelled(true);
+					}
 				}
 			}
+		} else {
+			e.setCancelled(true);
 		}
 	}
 
@@ -185,6 +189,11 @@ public class GameListiner implements Listener {
 			if (e.getEntity().getKiller() instanceof Player) {
 				PlayerProfile pp = info.getPP(e.getEntity().getKiller());
 				pp.setKills(pp.getKills() + 1);
+				info.coin
+						.put(pp.getPlayer().getUniqueId().toString(),
+								info.coin.get(pp.getPlayer().getUniqueId()
+										.toString() + 1));
+				pp.getPlayer().sendMessage(ChatColor.AQUA + "+1 Bat Bullion");
 			}
 			info.outplayer(e.getEntity());
 			int amount = game.randInt(tbn.getConfig().getInt("MinDeath"), tbn
@@ -200,8 +209,8 @@ public class GameListiner implements Listener {
 					.dropItemNaturally(e.getEntity().getLocation(), ads);
 			e.setDeathMessage(ChatColor.RED + ""
 					+ e.getEntity().getDisplayName() + " has died! "
-					+ ChatColor.GOLD + "" + info.ingame.size() + ChatColor.RED
-					+ " remain!");
+					+ ChatColor.GOLD + "" + (info.ingame.size() - 1)
+					+ ChatColor.RED + " remain!");
 			e.getEntity().teleport(
 					tbn.getPlayerSpawn(info.getActiveWorld().getName(), 0),
 					TeleportCause.PLUGIN);
@@ -276,7 +285,7 @@ public class GameListiner implements Listener {
 								}
 							}, 260L);
 				}
-			} catch (NullPointerException ee) {
+			} catch (Exception ee) {
 			}
 			try {
 				if (e.getItem().getType() != null
@@ -314,43 +323,7 @@ public class GameListiner implements Listener {
 
 	@EventHandler
 	public void a1308a(PlayerInteractEvent event) {
-		if (event.getItem() == null) {
-			return;
-		}
 		try {
-			if ((event.getItem().getType() == Material.IRON_HOE)
-					&& ((event.getAction() == Action.LEFT_CLICK_AIR) || (event
-							.getAction() == Action.LEFT_CLICK_BLOCK))) {
-				event.setCancelled(false);
-				if (info.h == 1) {
-					event.getPlayer().sendMessage(
-							ChatColor.DARK_AQUA + "" + ChatColor.BOLD
-									+ "Cooling down...");
-					return;
-				}
-				event.getPlayer().sendMessage(
-						ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Shoot!");
-				info.h = 1;
-				final Player player = event.getPlayer();
-				ItemStack item = new ItemStack(Material.SLIME_BALL);
-				final Item i = player.getWorld().dropItem(player.getLocation(),
-						item);
-				i.setVelocity(player.getLocation().getDirection()
-						.multiply(3.0F));
-				i.setPickupDelay(50000);
-				Bukkit.getServer().getScheduler()
-						.scheduleSyncDelayedTask(tbn, new Runnable() {
-							public void run() {
-								player.getWorld().createExplosion(
-										i.getLocation(), 3.8F);
-								player.sendMessage(ChatColor.DARK_AQUA
-										+ "Boom!");
-								i.remove();
-								info.h = 0;
-							}
-						}, 40L);
-				return;
-			}
 			if ((event.getItem().getType() == Material.IRON_HOE)
 					&& ((event.getAction() == Action.RIGHT_CLICK_AIR) || (event
 							.getAction() == Action.RIGHT_CLICK_BLOCK))) {
@@ -371,8 +344,8 @@ public class GameListiner implements Listener {
 				tbn.getServer().getScheduler()
 						.scheduleSyncDelayedTask(tbn, new Runnable() {
 							public void run() {
-								player.getWorld().createExplosion(
-										i.getLocation(), 3.8F);
+								i.getLocation().getWorld()
+										.createExplosion(i.getLocation(), 3.8f);
 								i.remove();
 								info.puffin.sendMessage(ChatColor.DARK_AQUA
 										+ "" + ChatColor.BOLD + "Boom!");
@@ -401,7 +374,9 @@ public class GameListiner implements Listener {
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void handleExplosion(EntityExplodeEvent e) {
-
+		if (e.getEntity().getType() != EntityType.PLAYER) {
+			e.setCancelled(true);
+		}
 		/*
 		 * ArrayList<Block> iter = new ArrayList<Block>(event.blockList());
 		 * tbn.debugMsg("Added to the list!"); for (Block bb : iter) {
@@ -445,6 +420,24 @@ public class GameListiner implements Listener {
 							.createExplosion(event.getEntity().getLocation(),
 									4f);
 					info.puffin.sendMessage(ChatColor.DARK_AQUA + "Boom!");
+				}
+			}
+		}
+	}
+
+	@EventHandler
+	public void PlayerDdammam(EntityDamageByEntityEvent e) {
+		if (e.getEntity() instanceof Player) {
+			if (e.getDamager() instanceof Player) {
+				PlayerProfile pp = info.getPP((Player) e.getEntity());
+				PlayerProfile ep = info.getPP((Player) e.getDamager());
+				if (pp.getType() == PlayType.BatNight
+						&& pp.getType() == PlayType.BirdBoy) {
+					e.setCancelled(true);
+				}
+				if (pp.getType() == PlayType.BirdBoy
+						&& pp.getType() == PlayType.BatNight) {
+					e.setCancelled(true);
 				}
 			}
 		}

@@ -4,6 +4,7 @@ import me.libraryaddict.disguise.*;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -23,6 +24,12 @@ public class Thread implements Runnable {
 
 	@Override
 	public void run() {
+		if(Bukkit.getOnlinePlayers().size()<=0){
+			if(!(info.getState() == ServerState.Pre_Game)){
+				tbn.game.endGame(0);
+				info.setState(ServerState.Pre_Game);
+			}
+		}
 		if (info.getState() == ServerState.In_Game) {
 			gt.GameHeartBeat();
 		}
@@ -43,6 +50,9 @@ public class Thread implements Runnable {
 		for (Player pp : info.players) {
 			pp.setFoodLevel(20);
 			pp.setSaturation(20f);
+			if(info.getPP(pp)==null){
+				break;
+			}
 			if (info.getPP(pp).getDis()
 					&& info.getPP(pp).getType() == PlayType.KittyKat) {
 				if (pp.getItemInHand() == null) {

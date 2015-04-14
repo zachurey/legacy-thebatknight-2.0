@@ -50,7 +50,7 @@ public class TBN extends JavaPlugin {
 	public static Game game;
 	public static Locations loc;
 	public static Score sco;
-	static boolean debug = true;
+	static boolean debug = false;
 	double version = 1.9;
 	public String pre = ChatColor.GOLD + "[TBN] ";
 	public static Inventory inv;
@@ -68,13 +68,19 @@ public class TBN extends JavaPlugin {
 
 	public void clean() {
 		unstuckers = new ArrayList<Player>();
-		mods = new HashMap<String, String>();
 		gled = new ArrayList<Player>();
 		gged = new ArrayList<Player>();
 		mac = false;
 		zack = false;
 		macbg = false;
 		jump = true;
+		try {
+			updateMods();
+			sco.updateScores(true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		startDebugcheck();
 	}
 
 	@Override
@@ -95,7 +101,7 @@ public class TBN extends JavaPlugin {
 				20);
 		try {
 			updateMods();
-			// sco.updateScores(true);
+			sco.updateScores(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -247,8 +253,30 @@ public class TBN extends JavaPlugin {
 				GoodLuck(p);
 				return true;
 			}
+			if (label.equalsIgnoreCase("tp")) {
+				if (info.getState() == ServerState.In_Game) {
+					if (info.getPP(p).isDead()) {
+						if (args.length == 1) {
+							Player qw = Bukkit.getPlayer(args[0]);
+							if (qw != null) {
+								p.teleport(qw);
+								return true;
+							} else {
+								p.sendMessage(ChatColor.RED
+										+ "Could not find player '" + args[0]
+										+ "'");
+								return true;
+							}
+						}
+					} else {
+						p.sendMessage(ChatColor.GOLD
+								+ "Cheater cheater pumpkin eater...");
+					}
+				}
+				return true;
+			}
 			if (label.equalsIgnoreCase("start")) {
-				if (p.hasPermission("tbn.mod")) {
+				if (mods.containsKey(p.getName())) {
 					if (info.getPlayerCount() < 5) {
 						p.sendMessage(ChatColor.RED
 								+ ""
@@ -267,9 +295,17 @@ public class TBN extends JavaPlugin {
 				}
 			}
 			if (label.equalsIgnoreCase("end")) {
-				if (p.hasPermission("tbn.mod")) {
+				if (mods.containsKey(p.getName())) {
 					p.sendMessage(ChatColor.GRAY + "Ending the game...");
 					game.endGame(0);
+					return true;
+				} else {
+					p.sendMessage("You pervert...");
+				}
+			}if (label.equalsIgnoreCase("rs")) {
+				if (mods.containsKey(p.getName())) {
+					p.sendMessage(ChatColor.GRAY + "Restarting the server");
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
 					return true;
 				} else {
 					p.sendMessage("You pervert...");
@@ -286,7 +322,7 @@ public class TBN extends JavaPlugin {
 										+ ""
 										+ p.getName()
 										+ ChatColor.YELLOW
-										+ " lost only because she IS JUST CAT LADY WITH A LOPSIDED HEAD!!");
+										+ " lost only because they are JUST A CAT LADY WITH A LOPSIDED HEAD!!");
 								return true;
 							}
 							if (ib == 2) {
@@ -318,6 +354,40 @@ public class TBN extends JavaPlugin {
 				}
 			}
 			if (label.equalsIgnoreCase("tbn")) {
+				if (args[0].equalsIgnoreCase("add")) {
+					if (p.isOp()) {
+						if (args.length != 3) {
+							p.sendMessage(ChatColor.RED
+									+ "Usage: /tbn add <player> <amount>");
+							return true;
+						}
+						Player tp = Bukkit.getPlayer(args[1]);
+						if (tp == null) {
+							p.sendMessage(ChatColor.RED
+									+ "Could not find player `" + args[1] + "`");
+							return true;
+						}
+						int amount = 0;
+						try {
+							amount = Integer.parseInt(args[2]);
+						} catch (Exception e) {
+							p.sendMessage(ChatColor.RED + "" + args[2]
+									+ " is not an integer!");
+							return true;
+						}
+						info.coin.put(
+								tp.getPlayer().getUniqueId().toString(),
+								info.coin.get(tp.getPlayer().getUniqueId()
+										.toString()
+										+ amount));
+						tp.getPlayer().sendMessage(
+								ChatColor.AQUA + "+" + amount + " Bat Bullion");
+						return true;
+					} else {
+						p.sendMessage("Please ask Zack to use Zach's commands!");
+						return true;
+					}
+				}
 				if (args.length == 1) {
 					if (args[0].equalsIgnoreCase("world")) {
 						p.sendMessage("[" + ChatColor.GOLD + "TBN"
@@ -327,12 +397,48 @@ public class TBN extends JavaPlugin {
 						return true;
 					}
 					if (args[0].equalsIgnoreCase("jump")) {
+						if (!p.isOp() || !mods.containsKey(p.getName())) {
+							p.sendMessage("Please ask Zack to use Zach's commands!");
+							return true;
+						}
 						if (jump) {
 							jump = false;
 						} else {
 							jump = true;
 						}
 						p.sendMessage("Jump mode is now " + jump);
+						return true;
+					}
+					if (args[0].equalsIgnoreCase("update")) {
+						if (!p.isOp() || !mods.containsKey(p.getName())) {
+							p.sendMessage("Please ask Zack to use Zach's commands!");
+							return true;
+						}
+						try {
+							sco.updateScores(false);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						p.sendMessage(ChatColor.GRAY + "Updated list!");
+						return true;
+					}
+					if (args[0].equalsIgnoreCase("savescore")) {
+						if (!p.isOp()) {
+							p.sendMessage("Please ask Zack to use Zach's commands!");
+							return true;
+						}
+						try {
+							sco.saveScores();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							p.sendMessage(ChatColor.RED
+									+ "Failed to save scores!");
+							return true;
+						}
+						p.sendMessage(ChatColor.GRAY
+								+ "Successfully saved scores!");
 						return true;
 					}
 					if (args[0].equalsIgnoreCase("jumptest")) {
@@ -1154,7 +1260,7 @@ public class TBN extends JavaPlugin {
 			int rand = game.randInt(1, 5);
 			String ss = getConfig().getString("GoodLuck." + rand).replace(
 					"%player%", p.getPlayer().getDisplayName());
-			info.broadCast(ChatColor.BLUE + "" + ss);
+			info.broadCast(ChatColor.GREEN + "" + ss);
 			gled.add(p);
 		}
 	}

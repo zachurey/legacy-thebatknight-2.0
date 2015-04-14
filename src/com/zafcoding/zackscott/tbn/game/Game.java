@@ -1,5 +1,6 @@
 package com.zafcoding.zackscott.tbn.game;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,8 +13,6 @@ import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.command.defaults.KickCommand;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -41,17 +40,18 @@ public class Game {
 	static PlayerProfile mostdi1a = null;
 	public static int i = 0;
 
-	public static void clean(){
+	public static void clean() {
 		mostdi1a = null;
 		i = 0;
 	}
-	
+
 	public void start() {
 		info.setState(ServerState.In_Game);
 		info.setGameTime(tbn.getConfig().getInt("MatchLengh") * 60);
 		setHeroesAndBadGuys(tbn);
 		loc.populateChests(info.superChest);
 		info.herofreeze = true;
+		info.getActiveWorld().setTime(14000);
 		for (Player pl : info.getPlayers()) {
 			pl.setCanPickupItems(true);
 			if (!tbn.jump) {
@@ -170,24 +170,34 @@ public class Game {
 					mostkill = info.getPP(pa);
 				}
 			}
-			info.setState(ServerState.Post_Game);
-			info.broadCast(ChatColor.WHITE + "----------" + ChatColor.GOLD
-					+ "TheBatKnight" + ChatColor.WHITE + "----------");
-			info.broadCast(ChatColor.GREEN + "Enjoy " + ChatColor.BLUE
-					+ " the last game?" + ChatColor.AQUA
-					+ " Tell everyone with /gg!");
-			info.broadCast(ChatColor.AQUA + "The good guys won!");
-			info.broadCast(ChatColor.AQUA + "The best hero is "
-					+ ChatColor.DARK_AQUA + mostkill.getPlayer().getName()
-					+ ChatColor.AQUA + " (" + ChatColor.DARK_AQUA
-					+ mostkill.getDiamonds() + ChatColor.AQUA + ")");
-			info.broadCast(ChatColor.AQUA + "The heros killed "
-					+ ChatColor.DARK_AQUA + totalkill + "" + ChatColor.AQUA
-					+ " players!");
+			try {
+				info.setState(ServerState.Post_Game);
+				info.broadCast(ChatColor.WHITE + "----------" + ChatColor.GOLD
+						+ "TheBatKnight" + ChatColor.WHITE + "----------");
+				info.broadCast(ChatColor.GREEN + "Enjoy " + ChatColor.BLUE
+						+ " the last game?" + ChatColor.AQUA
+						+ " Tell everyone with /gg!");
+				info.broadCast(ChatColor.AQUA + "The good guys won!");
+				info.broadCast(ChatColor.AQUA + "The best hero is "
+						+ ChatColor.DARK_AQUA + mostkill.getPlayer().getName()
+						+ ChatColor.AQUA + " (" + ChatColor.DARK_AQUA
+						+ mostkill.getDiamonds() + ChatColor.AQUA + ")");
+				info.broadCast(ChatColor.AQUA + "The heros killed "
+						+ ChatColor.DARK_AQUA + totalkill + "" + ChatColor.AQUA
+						+ " players!");
+			} catch (Exception e) {
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
+			}
+		}
+
+		try {
+			tbn.sco.saveScores();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		tbn.debugMsg("Removed chests: " + removeChest());
 		tbn.debugMsg("Changed blocks: " + removeBlock());
-		removeEnts();
 		info.broadCast(ChatColor.RED + "" + ChatColor.BOLD
 				+ "Server reseting in 10 seconds!");
 		i = Bukkit.getScheduler().scheduleSyncDelayedTask(tbn, new Runnable() {
@@ -197,10 +207,7 @@ public class Game {
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					p.chat("/hub");
 				}
-				clean();
-				tbn.clean();
-				tbn.info.clean();
-				info.setState(ServerState.Pre_Game);
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
 			}
 		}, 200L);
 	}
@@ -659,76 +666,70 @@ public class Game {
 			Player[] badGuys, Player joker) {
 		String badGuyList = ChatColor.GRAY + "Bad Guys: " + ChatColor.DARK_GRAY;
 		if (info.robin != null) {
-			robin.sendMessage(ChatColor.WHITE + "------" + ChatColor.GOLD
-					+ "TheBatKnight" + ChatColor.WHITE + "------");
-			sendMessage(robin, "You Are " + ChatColor.DARK_RED + "BIRDBOY!");
+			sendMessage(robin, "You Are " + ChatColor.GREEN + "BIRDBOY!");
+			info.robin.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+			info.robin
+					.sendMessage(ChatColor.GREEN
+							+ "As BirdBoy, you must assit BatKnight in killing all the villians in the city!");
+			info.robin.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
 		}
-		batman.sendMessage(ChatColor.WHITE + "------" + ChatColor.GOLD
-				+ "TheBatKnight" + ChatColor.WHITE + "------");
-		sendMessage(batman, "You Are " + ChatColor.DARK_RED + "BATKNGIHT!");
+		if (info.batman != null) {
+			sendMessage(batman, "You Are " + ChatColor.GRAY + "BATKNGIHT!");
+			info.batman.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+			info.batman
+					.sendMessage(ChatColor.GREEN
+							+ "As BatKnight, you, with the help of BirdBoy, must kill all the villians in the city!");
+			info.batman.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+		}
 
-		/*
-		 * if (catwoman != null) { catwoman.sendMessage(ChatColor.WHITE +
-		 * "------" + ChatColor.GOLD + "TheBatKnight" + ChatColor.WHITE +
-		 * "------"); sendMessage(catwoman, "You Are " + ChatColor.DARK_RED +
-		 * "CATWOMAN!"); } if (mrFreeze != null) {
-		 * mrFreeze.sendMessage(ChatColor.WHITE + "------" + ChatColor.GOLD +
-		 * "TheBatKnight" + ChatColor.WHITE + "------"); sendMessage(mrFreeze,
-		 * "You Are " + ChatColor.AQUA + "DR.COLD!"); } if (posionivy != null) {
-		 * posionivy.sendMessage(ChatColor.WHITE + "------" + ChatColor.GOLD +
-		 * "TheBatKnight" + ChatColor.WHITE + "------"); sendMessage(posionivy,
-		 * "You Are " + ChatColor.AQUA + "DR.COLD!"); } if (penguin != null) {
-		 * penguin.sendMessage(ChatColor.WHITE + "------" + ChatColor.GOLD +
-		 * "TheBatKnight" + ChatColor.WHITE + "------"); sendMessage(penguin,
-		 * "You Are " + ChatColor.WHITE + "THE PUFFIN!"); }
-		 */
+		if (info.catwomen != null) {
+			info.puffin.sendMessage(ChatColor.LIGHT_PURPLE
+					+ "You are KITTYKAT!");
+			info.catwomen.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+			info.catwomen
+					.sendMessage(ChatColor.GREEN
+							+ "You are KittyKat, you can choose your side! You can either aid the heros and kill the villians, or try and outwit fellow villians to capture the most diamonds!");
+			info.catwomen.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+		}
+		if (info.puffin != null) {
+			info.puffin.sendMessage(ChatColor.AQUA + "You are PUFFIN!");
+			info.puffin.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+			info.puffin
+					.sendMessage(ChatColor.GREEN
+							+ "As BatKnight, you, with the help of BirdBoy, must kill all the villians in the city!");
+			info.puffin.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+		}
+		if (info.joker != null) {
+			info.joker.sendMessage(ChatColor.DARK_PURPLE + "You are JESTER!");
+			info.joker.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+			info.joker
+					.sendMessage(ChatColor.GREEN
+							+ "As Jester, you must try and get the most diamonds, and plant decoy ones to throw off your fellow villians!");
+			info.joker.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+		}
 
 		int i = 1;
-		for (Player player : badGuys) {
-			if ((player != null) && (player != joker)) {
-				player.sendMessage(ChatColor.WHITE + "------" + ChatColor.GOLD
-						+ "TheBatKnight" + ChatColor.WHITE + "------");
-				sendMessage(player, "You Are " + ChatColor.DARK_RED
-						+ "A Bad Guy!");
-
-				ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-				BookMeta bm = (BookMeta) book.getItemMeta();
-				bm.setTitle(ChatColor.DARK_RED + "How To Play: "
-						+ ChatColor.DARK_GRAY + "BadGuy");
-				bm.setPages(Arrays
-						.asList(new String[] { ChatColor.DARK_GREEN
-								+ "--"
-								+ ChatColor.GOLD
-								+ "TheBatKnight"
-								+ ChatColor.DARK_GREEN
-								+ "--\n "
-								+ ChatColor.GRAY
-								+ "As a BadGuy you must attempt to steal all the diamonds"
-								+ " without getting killed! Never trust anyone...\n \n" /*
-																						 * +
-																						 * ChatColor
-																						 * .
-																						 * RED
-																						 * +
-																						 * "Use /Shop to shop for items!"
-																						 */}));
-				book.setItemMeta(bm);
-				player.getInventory().addItem(new ItemStack[] { book });
-
-				if (i == badGuys.length)
-					badGuyList = badGuyList + player.getName() + ".";
-				else {
-					badGuyList = badGuyList + player.getName() + ChatColor.GRAY
-							+ ", " + ChatColor.DARK_GRAY;
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (info.getPP(player).getType() == PlayType.Villan) {
+				if ((player != null) && (player != joker)) {
+					player.sendMessage(ChatColor.WHITE + "------"
+							+ ChatColor.GOLD + "TheBatKnight" + ChatColor.WHITE
+							+ "------");
+					sendMessage(player, "You Are " + ChatColor.GRAY
+							+ "A Bad Guy!");
+					info.batman.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+					info.batman
+							.sendMessage(ChatColor.GREEN
+									+ "As a bad guy, you must run around the city trying to get the most diamonds! Remember, you can not get the most diamonds if you are killed by a hero or fellow villians!");
+					info.batman.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+					if (i == badGuys.length)
+						badGuyList = badGuyList + player.getName() + ".";
+					else {
+						badGuyList = badGuyList + player.getName()
+								+ ChatColor.GRAY + ", " + ChatColor.DARK_GRAY;
+					}
+					i++;
 				}
-				i++;
-			}
-
-			if ((player == joker) && (joker != null)) {
-				joker.sendMessage(ChatColor.WHITE + "------" + ChatColor.GOLD
-						+ "TheBatKnight" + ChatColor.WHITE + "------");
-				sendMessage(joker, "You Are " + ChatColor.DARK_RED
-						+ "The Jester!");
 			}
 		}
 

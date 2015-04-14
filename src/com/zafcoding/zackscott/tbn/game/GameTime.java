@@ -23,11 +23,11 @@ public class GameTime {
 		if (info.poo) {
 			int yt = 0;
 			int nt = 0;
+			int kt = 0;
 			for (Player op : info.ingame) {
-				if ((((info.getPP(op).getType() == PlayType.Villan && !info
-						.getPP(op).isDead())
+				if ((((info.getPP(op).getType() == PlayType.Villan
 						|| info.getPP(op).getType() == PlayType.Joker || info
-						.getPP(op).getType() == PlayType.Puffin))
+						.getPP(op).getType() == PlayType.Puffin)))
 						&& !info.getPP(op).isDead()) {
 					yt++;
 				}
@@ -36,7 +36,12 @@ public class GameTime {
 						&& !info.getPP(op).isDead()) {
 					nt++;
 				}
+				if (((info.getPP(op).getType() == PlayType.KittyKat))
+						&& !info.getPP(op).isDead()) {
+					kt++;
+				}
 			}
+			System.out.println("" + yt + "bad guys!");
 			if (nt < 0 && yt < 0) {
 				game.endGame(0);
 			}
@@ -49,11 +54,12 @@ public class GameTime {
 			if (info.getGameTime() <= 0) {
 				game.endGame(1);
 			}
-			if (nt == 2 && yt == 0) {
-
+			if ((nt <= 2 && nt > 0) && yt <= 0) {
+				game.endGame(0);
 			}
 			tbn.debugMsg("The current game time is: " + info.getGameTime());
 			info.setGameTime(info.getGameTime() - 1);
+			broadCastShort(info.getGameTime());
 		}
 	}
 

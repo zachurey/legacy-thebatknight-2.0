@@ -55,9 +55,10 @@ public class Info {
 	public static HashMap<String, Integer> coin = new HashMap<String, Integer>();
 	PlayerProfile winner = null;
 	public static boolean poo = false;
+	//public static remain = 0;
 
 	public void clean() {
-		ArrayList<Player> players = new ArrayList<Player>();
+		players.clear();
 		lobbytime = 120;
 		gametime = 600;
 		playerc = 0;
@@ -72,19 +73,19 @@ public class Info {
 		joker = null;
 		puffin = null;
 		catwomen = null;
-		badGuys = new ArrayList<Player>();
+		badGuys.clear();
 		h = 0;
 		active = null;
 		pvp = true;
 		state = ServerState.Pre_Game;
-		profiles = new ArrayList<PlayerProfile>();
-		spects = new ArrayList<Player>();
-		ingame = new ArrayList<Player>();
-		fakechests = new ArrayList<Location>();
-		chests = new ArrayList<Location>();
-		block = new ArrayList<Block>();
-		broke = new HashMap<Location, Material>();
-		coin = new HashMap<String, Integer>();
+		profiles.clear();
+		spects.clear();
+		ingame.clear();
+		fakechests.clear();
+		chests.clear();
+		block.clear();
+		broke.clear();
+		coin.clear();
 		winner = null;
 		poo = false;
 	}
@@ -196,6 +197,8 @@ public class Info {
 		p.setGameMode(GameMode.SPECTATOR);
 		spects.add(p);
 		p.teleport(p.getWorld().getSpawnLocation());
+		p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD
+				+ "Do /tp <player_name> to teleport to different players!");
 		return;
 	}
 
@@ -286,7 +289,8 @@ public class Info {
 	}
 
 	public void deadChat(String message, Player player) {
-		if (!tbn.mods.containsKey(player.getName())) {
+		if (!tbn.mods.containsKey(player.getName())
+				&& !player.hasPermission("tbk.pro")) {
 			for (Player pl : players) {
 				if (pl.hasPermission("tbk.mod")
 						|| (pl.hasPermission("tbk.admin") || isSpect(pl))) {
@@ -296,13 +300,40 @@ public class Info {
 				}
 			}
 		} else {
-			String rank = tbn.mods.get(player.getName());
-			for (Player pl : players) {
-				pl.sendMessage(ChatColor.RED + "[DEAD] " + ChatColor.WHITE
-						+ "[" + ChatColor.DARK_AQUA + "" + rank + ""
-						+ ChatColor.WHITE + "] " + ChatColor.YELLOW + ""
-						+ player.getName() + ChatColor.RESET + " "
-						+ ChatColor.translateAlternateColorCodes('&', message));
+			if (tbn.mods.containsKey(player.getName())) {
+				String rank = tbn.mods.get(player.getName());
+				for (Player pl : players) {
+					pl.sendMessage(ChatColor.RED
+							+ "[DEAD] "
+							+ ChatColor.WHITE
+							+ "["
+							+ ChatColor.DARK_AQUA
+							+ ""
+							+ rank
+							+ ""
+							+ ChatColor.WHITE
+							+ "] "
+							+ ChatColor.YELLOW
+							+ ""
+							+ player.getName()
+							+ ChatColor.RESET
+							+ " "
+							+ ChatColor.translateAlternateColorCodes('&',
+									message));
+				}
+			} else if (player.hasPermission("tbk.pro")) {
+				for (Player pl : players) {
+					if (pl.hasPermission("tbk.mod")
+							|| (pl.hasPermission("tbk.admin") || isSpect(pl))) {
+						pl.sendMessage(ChatColor.RED + "[DEAD] "
+								+ ChatColor.LIGHT_PURPLE + "["
+								+ ChatColor.WHITE + "Pro"
+								+ ChatColor.LIGHT_PURPLE + "]"
+								+ ChatColor.YELLOW + " "
+								+ player.getDisplayName() + ChatColor.WHITE
+								+ " " + message);
+					}
+				}
 			}
 		}
 	}

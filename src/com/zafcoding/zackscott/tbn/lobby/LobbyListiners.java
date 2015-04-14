@@ -20,6 +20,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -78,11 +79,14 @@ public class LobbyListiners implements Listener {
 			}
 		}
 	}
-
+	
 	@EventHandler
 	public void PlayerJoin(PlayerJoinEvent e) {
 		for (PotionEffect effect : e.getPlayer().getActivePotionEffects()) {
 			e.getPlayer().removePotionEffect(effect.getType());
+		}
+		if (!info.coin.containsKey(e.getPlayer().getUniqueId().toString())) {
+			info.coin.put(e.getPlayer().getUniqueId().toString(), 0);
 		}
 		if (info.getState() == ServerState.In_Game) {
 			e.setJoinMessage(ChatColor.GRAY + "Spectator "
@@ -131,9 +135,6 @@ public class LobbyListiners implements Listener {
 
 	@EventHandler
 	public void onPlayerLeavae(PlayerQuitEvent e) {
-		if (e.getPlayer().getDisplayName().equalsIgnoreCase("Evilmacaroon")) {
-			tbn.mac = false;
-		}
 		e.setQuitMessage(e.getPlayer().getDisplayName() + " has quit!");
 		if (info.getPP(e.getPlayer()) != null) {
 			Player p = e.getPlayer();

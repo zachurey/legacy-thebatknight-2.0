@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="/Users/zfarley/Downloads/bukkit-1.8-R0.1-SNAPSHOT-b5.jar"/>
-	<classpathentry kind="lib" path="/Users/zfarley/Desktop/BukkitServer/plugins/LibsDisguises.jar"/>
-	<classpathentry kind="lib" path="/Users/zfarley/Desktop/BukkitServer/plugins/ProtocolLib.jar"/>
-	<classpathentry kind="lib" path="/Users/zfarley/Desktop/BukkitServer/craftbukkit.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Zachary 3C/workspace/Downloads/bukkit-1.8.3-R0.1-SNAPSHOT-latest.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Zachary 3C/workspace/Downloads/LibsDisguises.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Zachary 3C/workspace/Downloads/ProtocolLib.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Zachary 3C/Downloads/craftbukkit-1.8-R0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
