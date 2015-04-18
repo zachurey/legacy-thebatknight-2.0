@@ -33,7 +33,7 @@ import org.bukkit.util.Vector;
 
 import com.zafcoding.zackscott.tbn.Info.ServerState;
 import com.zafcoding.zackscott.tbn.PlayerProfile.PlayType;
-import com.zafcoding.zackscott.tbn.api.Score;
+//import com.zafcoding.zackscott.tbn.api.Score;
 import com.zafcoding.zackscott.tbn.game.Game;
 import com.zafcoding.zackscott.tbn.game.GameListiner;
 import com.zafcoding.zackscott.tbn.game.GameTime;
@@ -49,7 +49,7 @@ public class TBN extends JavaPlugin {
 	public static GameTime gt;
 	public static Game game;
 	public static Locations loc;
-	public static Score sco;
+	//public static Score sco;
 	static boolean debug = false;
 	double version = 1.9;
 	public String pre = ChatColor.GOLD + "[TBN] ";
@@ -76,7 +76,7 @@ public class TBN extends JavaPlugin {
 		jump = true;
 		try {
 			updateMods();
-			sco.updateScores(true);
+		//	sco.updateScores(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -92,7 +92,7 @@ public class TBN extends JavaPlugin {
 		gt = new GameTime();
 		game = new Game();
 		loc = new Locations();
-		sco = new Score();
+		//sco = new Score();
 		// loadConfiguration();
 		getServer().getPluginManager().registerEvents(new GameListiner(), this);
 		getServer().getPluginManager().registerEvents(new LobbyListiners(),
@@ -101,7 +101,7 @@ public class TBN extends JavaPlugin {
 				20);
 		try {
 			updateMods();
-			sco.updateScores(true);
+		//	sco.updateScores(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -414,12 +414,7 @@ public class TBN extends JavaPlugin {
 							p.sendMessage("Please ask Zack to use Zach's commands!");
 							return true;
 						}
-						try {
-							sco.updateScores(false);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+						
 						p.sendMessage(ChatColor.GRAY + "Updated list!");
 						return true;
 					}
@@ -428,15 +423,7 @@ public class TBN extends JavaPlugin {
 							p.sendMessage("Please ask Zack to use Zach's commands!");
 							return true;
 						}
-						try {
-							sco.saveScores();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							p.sendMessage(ChatColor.RED
-									+ "Failed to save scores!");
-							return true;
-						}
+						
 						p.sendMessage(ChatColor.GRAY
 								+ "Successfully saved scores!");
 						return true;

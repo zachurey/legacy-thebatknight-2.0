@@ -40,14 +40,12 @@ public class Info {
 	public static Player joker = null;
 	public static Player puffin = null;
 	public static Player catwomen = null;
-	public static ArrayList<Player> badGuys = new ArrayList<Player>();
 	public static int h = 0;
 	World active = null;
 	public boolean pvp = true;
 	ServerState state = ServerState.Pre_Game;
 	ArrayList<PlayerProfile> profiles = new ArrayList<PlayerProfile>();
 	ArrayList<Player> spects = new ArrayList<Player>();
-	public static ArrayList<Player> ingame = new ArrayList<Player>();
 	public static ArrayList<Location> fakechests = new ArrayList<Location>();
 	public static ArrayList<Location> chests = new ArrayList<Location>();
 	public static ArrayList<Block> block = new ArrayList<Block>();
@@ -55,7 +53,9 @@ public class Info {
 	public static HashMap<String, Integer> coin = new HashMap<String, Integer>();
 	PlayerProfile winner = null;
 	public static boolean poo = false;
-	//public static remain = 0;
+	public static ArrayList<Player> badguys = new ArrayList<Player>();
+
+	// public static remain = 0;
 
 	public void clean() {
 		players.clear();
@@ -73,14 +73,12 @@ public class Info {
 		joker = null;
 		puffin = null;
 		catwomen = null;
-		badGuys.clear();
 		h = 0;
 		active = null;
 		pvp = true;
 		state = ServerState.Pre_Game;
 		profiles.clear();
 		spects.clear();
-		ingame.clear();
 		fakechests.clear();
 		chests.clear();
 		block.clear();
@@ -162,7 +160,6 @@ public class Info {
 			}
 			playerc++;
 			players.add(p);
-			ingame.add(p);
 			p.getInventory().clear();
 			PlayerProfile pp = new PlayerProfile(p, PlayType.Villan);
 			addPlayerPro(pp);
@@ -181,8 +178,22 @@ public class Info {
 			PlayerProfile pp = getPP(p);
 			pp.setSpec(true);
 			pp.setDeath(true);
+			if (batman == p) {
+				batman = null;
+			}
+			if (robin == p) {
+				robin = null;
+			}
+			if (joker == p) {
+				joker = null;
+			}
+			if (puffin == p) {
+				puffin = null;
+			}
+			if (catwomen == p) {
+				catwomen = null;
+			}
 			playerc--;
-			ingame.remove(p);
 			p.setGameMode(GameMode.SPECTATOR);
 			spects.add(p);
 		}

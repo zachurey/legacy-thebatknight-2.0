@@ -185,37 +185,32 @@ public class GameListiner implements Listener {
 			e.getEntity().setHealth(20);
 			return;
 		}
-		if (info.ingame.contains(e.getEntity())) {
-			if (e.getEntity().getKiller() instanceof Player) {
-				PlayerProfile pp = info.getPP(e.getEntity().getKiller());
-				pp.setKills(pp.getKills() + 1);
-				info.coin
-						.put(pp.getPlayer().getUniqueId().toString(),
-								info.coin.get(pp.getPlayer().getUniqueId()
-										.toString() + 1));
-				pp.getPlayer().sendMessage(ChatColor.AQUA + "+1 Bat Bullion");
-			}
-			info.outplayer(e.getEntity());
-			int amount = game.randInt(tbn.getConfig().getInt("MinDeath"), tbn
-					.getConfig().getInt("MaxDeath"));
-			List diamondLore = new ArrayList();
-			diamondLore.add(ChatColor.DARK_AQUA + "Collect The Most "
-					+ ChatColor.AQUA + "Diamonds " + ChatColor.DARK_AQUA
-					+ "To Win!");
-			ItemStack ads = game.setName(
-					new ItemStack(Material.DIAMOND, amount), ChatColor.AQUA
-							+ "Diamond", diamondLore);
-			e.getEntity().getWorld()
-					.dropItemNaturally(e.getEntity().getLocation(), ads);
-			e.setDeathMessage(ChatColor.RED + ""
-					+ e.getEntity().getDisplayName() + " has died! "
-					+ ChatColor.GOLD + "" + (info.ingame.size() - 1)
-					+ ChatColor.RED + " remain!");
-			e.getEntity().teleport(
-					tbn.getPlayerSpawn(info.getActiveWorld().getName(), 0),
-					TeleportCause.PLUGIN);
-		} else {
+		if (e.getEntity().getKiller() instanceof Player) {
+			PlayerProfile pp = info.getPP(e.getEntity().getKiller());
+			pp.setKills(pp.getKills() + 1);
+			info.coin.put(pp.getPlayer().getUniqueId().toString(),
+					info.coin.get(pp.getPlayer().getUniqueId().toString() + 1));
+			pp.getPlayer().sendMessage(ChatColor.AQUA + "+1 Bat Bullion");
 		}
+		info.outplayer(e.getEntity());
+		int amount = game.randInt(tbn.getConfig().getInt("MinDeath"), tbn
+				.getConfig().getInt("MaxDeath"));
+		List diamondLore = new ArrayList();
+		diamondLore.add(ChatColor.DARK_AQUA + "Collect The Most "
+				+ ChatColor.AQUA + "Diamonds " + ChatColor.DARK_AQUA
+				+ "To Win!");
+		ItemStack ads = game.setName(new ItemStack(Material.DIAMOND, amount),
+				ChatColor.AQUA + "Diamond", diamondLore);
+		e.getEntity().getWorld()
+				.dropItemNaturally(e.getEntity().getLocation(), ads);
+		e.setDeathMessage(ChatColor.RED + ""
+				+ ChatColor.stripColor(e.getEntity().getDisplayName())
+				+ " has died! " + ChatColor.GOLD + "" + info.getPlayerCount()
+				+ ChatColor.RED + " remain!");
+		e.getEntity().teleport(
+				tbn.getPlayerSpawn(info.getActiveWorld().getName(), 0),
+				TeleportCause.PLUGIN);
+
 	}
 
 	@EventHandler(ignoreCancelled = true)

@@ -1,6 +1,7 @@
 package com.zafcoding.zackscott.tbn.lobby;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
@@ -32,6 +33,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.potion.PotionEffect;
 
 import com.zafcoding.zackscott.tbn.Info;
@@ -79,7 +81,7 @@ public class LobbyListiners implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void PlayerJoin(PlayerJoinEvent e) {
 		for (PotionEffect effect : e.getPlayer().getActivePotionEffects()) {
@@ -105,6 +107,43 @@ public class LobbyListiners implements Listener {
 		e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation());
 		info.addPlayer(e.getPlayer());
 		info.getPP(e.getPlayer()).setType(PlayType.Villan);
+		ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+		BookMeta bm = (BookMeta) book.getItemMeta();
+		bm.setAuthor(ChatColor.GOLD + "TheBatKnight");
+		bm.setTitle(ChatColor.RED + "Rules and How to Play");
+		bm.setPages(Arrays
+				.asList(new String[] { ChatColor.DARK_GREEN
+						+ "--"
+						+ ChatColor.GOLD
+						+ "TheBatKnight"
+						+ ChatColor.DARK_GREEN
+						+ "--\n "
+						+ ChatColor.RESET
+						+ "When you start, you are either a "
+						+ ChatColor.GREEN
+						+ " GoodGuy "
+						+ ChatColor.RESET
+						+ "or a "
+						+ ChatColor.GRAY
+						+ " BadGuy!\n"
+						+ ChatColor.GREEN
+						+ "As a goodguy, you can team up with "
+						+ ChatColor.LIGHT_PURPLE
+						+ "KittyKat "
+						+ ChatColor.GREEN
+						+ "to kill all the villians within your time frame!\n"
+						+ ChatColor.GRAY
+						+ "As a villian, your job is to collect the most "
+						+ ChatColor.AQUA
+						+ "diamonds "
+						+ ChatColor.GRAY
+						+ "and not get killed by the "
+						+ ChatColor.GREEN
+						+ "GoodGuys! \n "
+						+ ChatColor.GRAY
+						+ "Be careful however, trust no one, your fellow villians can kill you also!" }));
+		book.setItemMeta(bm);
+		e.getPlayer().getInventory().addItem(new ItemStack[] { book });
 		if (e.getPlayer().getDisplayName().equalsIgnoreCase("Evilmacaroon")) {
 			tbn.mac = true;
 		}

@@ -190,12 +190,10 @@ public class Game {
 			}
 		}
 
-		try {
-			tbn.sco.saveScores();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		/*
+		 * try { tbn.sco.saveScores(); } catch (IOException e) { // TODO
+		 * Auto-generated catch block e.printStackTrace(); }
+		 */
 		tbn.debugMsg("Removed chests: " + removeChest());
 		tbn.debugMsg("Changed blocks: " + removeBlock());
 		info.broadCast(ChatColor.RED + "" + ChatColor.BOLD
@@ -413,7 +411,7 @@ public class Game {
 			PlayerProfile ppp = info.getPP(pp);
 			if (ppp.getType() != PlayType.BatNight
 					&& ppp.getType() != PlayType.BirdBoy) {
-				info.badGuys.add(pp);
+				info.badguys.add(pp);
 			}
 		}
 
@@ -618,7 +616,7 @@ public class Game {
 		}
 
 		int index = 0;
-		for (Player badGuy : info.badGuys) {
+		for (Player badGuy : info.badguys) {
 			if ((badGuy != null) && (badGuy.getName() != null)
 					&& info.getPP(badGuy).getType() == PlayType.Villan) {
 				badGuy.getInventory().addItem(
@@ -648,6 +646,7 @@ public class Game {
 			}
 		}
 		info.updateAllInventories();
+		sendHowToPlayInfo();
 	}
 
 	public ItemStack setName(Material ma, String name, List<String> lore) {
@@ -662,11 +661,10 @@ public class Game {
 	}
 
 	@SuppressWarnings({ "unused", "static-access" })
-	private void sendHowToPlayInfo(Player robin, Player batman,
-			Player[] badGuys, Player joker) {
-		String badGuyList = ChatColor.GRAY + "Bad Guys: " + ChatColor.DARK_GRAY;
+	private void sendHowToPlayInfo() {
 		if (info.robin != null) {
-			sendMessage(robin, "You Are " + ChatColor.GREEN + "BIRDBOY!");
+			info.robin.sendMessage(ChatColor.GOLD + "You Are "
+					+ ChatColor.GREEN + "BIRDBOY!");
 			info.robin.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
 			info.robin
 					.sendMessage(ChatColor.GREEN
@@ -674,7 +672,8 @@ public class Game {
 			info.robin.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
 		}
 		if (info.batman != null) {
-			sendMessage(batman, "You Are " + ChatColor.GRAY + "BATKNGIHT!");
+			info.batman.sendMessage(ChatColor.GOLD + "You Are "
+					+ ChatColor.GRAY + "BATKNGIHT!");
 			info.batman.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
 			info.batman
 					.sendMessage(ChatColor.GREEN
@@ -683,8 +682,8 @@ public class Game {
 		}
 
 		if (info.catwomen != null) {
-			info.puffin.sendMessage(ChatColor.LIGHT_PURPLE
-					+ "You are KITTYKAT!");
+			info.catwomen.sendMessage(ChatColor.GOLD + "You are "
+					+ ChatColor.LIGHT_PURPLE + "KITTYKAT!");
 			info.catwomen.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
 			info.catwomen
 					.sendMessage(ChatColor.GREEN
@@ -692,7 +691,8 @@ public class Game {
 			info.catwomen.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
 		}
 		if (info.puffin != null) {
-			info.puffin.sendMessage(ChatColor.AQUA + "You are PUFFIN!");
+			info.puffin.sendMessage(ChatColor.GOLD + "You are "
+					+ ChatColor.AQUA + "PUFFIN!");
 			info.puffin.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
 			info.puffin
 					.sendMessage(ChatColor.GREEN
@@ -700,7 +700,8 @@ public class Game {
 			info.puffin.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
 		}
 		if (info.joker != null) {
-			info.joker.sendMessage(ChatColor.DARK_PURPLE + "You are JESTER!");
+			info.joker.sendMessage(ChatColor.GOLD + "You are "
+					+ ChatColor.DARK_PURPLE + "JESTER!");
 			info.joker.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
 			info.joker
 					.sendMessage(ChatColor.GREEN
@@ -708,123 +709,16 @@ public class Game {
 			info.joker.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
 		}
 
-		int i = 1;
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (info.getPP(player).getType() == PlayType.Villan) {
-				if ((player != null) && (player != joker)) {
-					player.sendMessage(ChatColor.WHITE + "------"
-							+ ChatColor.GOLD + "TheBatKnight" + ChatColor.WHITE
-							+ "------");
-					sendMessage(player, "You Are " + ChatColor.GRAY
-							+ "A Bad Guy!");
-					info.batman.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
-					info.batman
-							.sendMessage(ChatColor.GREEN
-									+ "As a bad guy, you must run around the city trying to get the most diamonds! Remember, you can not get the most diamonds if you are killed by a hero or fellow villians!");
-					info.batman.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
-					if (i == badGuys.length)
-						badGuyList = badGuyList + player.getName() + ".";
-					else {
-						badGuyList = badGuyList + player.getName()
-								+ ChatColor.GRAY + ", " + ChatColor.DARK_GRAY;
-					}
-					i++;
-				}
-			}
-		}
+		for (Player player : info.badguys) {
+			player.sendMessage(ChatColor.WHITE + "------" + ChatColor.GOLD
+					+ "TheBatKnight" + ChatColor.WHITE + "------");
+			sendMessage(player, "You Are " + ChatColor.GRAY + "A Bad Guy!");
+			info.batman.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
+			info.batman
+					.sendMessage(ChatColor.GREEN
+							+ "As a bad guy, you must run around the city trying to get the most diamonds! Remember, you can not get the most diamonds if you are killed by a hero or fellow villians!");
+			info.batman.sendMessage(ChatColor.BOLD + "▇▇▇▇▇▇▇▇▇▇▇▇▇▇");
 
-		for (Player player : info.getPlayers()) {
-			sendMessage(player, "");
-			sendMessage(player, ChatColor.YELLOW + "Stuck? Use /unstuck!");
-		}
-
-		giveBooks(info.batman, info.robin, info.joker, info.badGuys);
-	}
-
-	private void giveBooks(Player batman, Player robin, Player joker,
-			ArrayList<Player> badGuys) {
-		try {
-			ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-			BookMeta bm = (BookMeta) book.getItemMeta();
-			bm.setAuthor(ChatColor.GOLD + "TheBatKnight");
-			bm.setTitle(ChatColor.DARK_RED + "How To Play: "
-					+ ChatColor.DARK_GRAY + "BatKnight");
-			bm.setPages(Arrays.asList(new String[] { ChatColor.DARK_GREEN
-					+ "--" + ChatColor.GOLD + "TheBatKnight"
-					+ ChatColor.DARK_GREEN + "--\n " + ChatColor.GRAY
-					+ "Kill all the badguys with the aid of" + ChatColor.GREEN
-					+ " BirdBoy" + ChatColor.GRAY
-					+ " without being killed first!" }));
-			book.setItemMeta(bm);
-			batman.getInventory().addItem(new ItemStack[] { book });
-			bm.setTitle(ChatColor.DARK_RED + "How To Play: " + ChatColor.GREEN
-					+ "BirdBoy");
-			bm.setPages(Arrays.asList(new String[] { ChatColor.DARK_GREEN
-					+ "--" + ChatColor.GOLD + "TheBatKnight"
-					+ ChatColor.DARK_GREEN + "--\n " + ChatColor.GRAY
-					+ "Kill all the badguys with the aid of"
-					+ ChatColor.DARK_GRAY + " BatKnight" + ChatColor.GRAY
-					+ " without being killed first!" }));
-			book.setItemMeta(bm);
-			robin.getInventory().addItem(new ItemStack[] { book });
-			bm.setTitle(ChatColor.DARK_RED + "How To Play: "
-					+ ChatColor.LIGHT_PURPLE + "KittyKat");
-			bm.setPages(Arrays.asList(new String[] { ChatColor.DARK_GREEN
-					+ "--" + ChatColor.GOLD + "TheBatKnight"
-					+ ChatColor.DARK_GREEN + "--\n " + ChatColor.GRAY + "As "
-					+ ChatColor.LIGHT_PURPLE + "KittyKat" + ChatColor.GRAY
-					+ " you go solo. You can team up with the "
-					+ ChatColor.DARK_GRAY + "BadGuys" + ChatColor.GRAY
-					+ " or roam the streets with the heroes."
-					+ " Whatever you choose, always watch your back..." }));
-			book.setItemMeta(bm);
-			/*
-			 * catwoman.getInventory().addItem(new ItemStack[] { book });
-			 * bm.setTitle(ChatColor.DARK_RED + "How To Play: " +
-			 * ChatColor.DARK_PURPLE + "Jester"); bm.setPages( Arrays.asList(new
-			 * String[] { ChatColor.DARK_GREEN + "--" + ChatColor.GOLD +
-			 * "TheBatKnight" + ChatColor.DARK_GREEN + "--\n " + ChatColor.GRAY
-			 * + "As " + ChatColor.DARK_PURPLE + "The Jester" + ChatColor.GRAY +
-			 * ", you should lead the " + ChatColor.DARK_GRAY + "BadGuys" +
-			 * ChatColor.GRAY +
-			 * " to victory. Use the Fate Changer and your Iron Imperators " +
-			 * "to save you from tricky situations..." }));
-			 * book.setItemMeta(bm); joker.getInventory().addItem(new
-			 * ItemStack[] { book }); bm.setTitle(ChatColor.DARK_RED +
-			 * "How To Play: " + ChatColor.DARK_GREEN + "Toxic Ivy");
-			 * bm.setPages(Arrays.asList(new String[] { ChatColor.DARK_GREEN +
-			 * "--" + ChatColor.GOLD + "TheBatKnight" + ChatColor.DARK_GREEN +
-			 * "--\n " + ChatColor.GRAY + "As " + ChatColor.DARK_GREEN +
-			 * "Toxic Ivy" + ChatColor.GRAY +
-			 * ", you can use your surroundings to your advantage" +
-			 * ". Climb buildings and posion playe" +
-			 * "rs with your toxic traits..." })); book.setItemMeta(bm);
-			 * posionivy.getInventory().addItem(new ItemStack[] { book });
-			 * 
-			 * bm.setTitle(ChatColor.DARK_RED + "How To Play: " + ChatColor.AQUA
-			 * + "Dr. Freeze"); bm.setPages(Arrays.asList(new String[] {
-			 * ChatColor.DARK_GREEN + "--" + ChatColor.GOLD + "TheBatKnight" +
-			 * ChatColor.DARK_GREEN + "--\n " + ChatColor.GRAY + "As " +
-			 * ChatColor.AQUA + "Dr. Freeze" + ChatColor.GRAY +
-			 * ", you can use the element of " +
-			 * "distraction to your advantage. " +
-			 * "Freeze someone on the spot and" +
-			 * " slaughter them before they can " +
-			 * "defrost to elimenate your opponents!" })); book.setItemMeta(bm);
-			 * mrFreeze.getInventory().addItem(new ItemStack[] { book });
-			 * bm.setTitle(ChatColor.DARK_RED + "How To Play: " +
-			 * ChatColor.WHITE + "The Puffin"); bm.setPages( Arrays.asList(new
-			 * String[] { ChatColor.DARK_GREEN + "--" + ChatColor.GOLD +
-			 * "TheBatKnight" + ChatColor.DARK_GREEN + "--\n " + ChatColor.GRAY
-			 * + "As " + ChatColor.WHITE + "The Puffin" + ChatColor.GRAY +
-			 * ", You are the The Puffin! Don't forget you're a villain! " +
-			 * "Try to steal as many diamonds as you can before time runs out, and remember: Don't trust just anyone! "
-			 * +
-			 * "Turn into a chicken to decieve your enemies, and shoot powerful poison at anyone who stands before you!"
-			 * })); book.setItemMeta(bm); penguin.getInventory().addItem(new
-			 * ItemStack[] { book });
-			 */
-		} catch (Exception localException) {
 		}
 	}
 
