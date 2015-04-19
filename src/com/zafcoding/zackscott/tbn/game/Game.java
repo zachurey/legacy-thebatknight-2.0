@@ -31,6 +31,7 @@ import com.zafcoding.zackscott.tbn.Info;
 import com.zafcoding.zackscott.tbn.Info.ServerState;
 import com.zafcoding.zackscott.tbn.PlayerProfile;
 import com.zafcoding.zackscott.tbn.PlayerProfile.PlayType;
+import com.zafcoding.zackscott.tbn.orginial.TheBatKnight;
 import com.zafcoding.zackscott.tbn.TBN;
 
 public class Game {
@@ -40,6 +41,7 @@ public class Game {
 	static Locations loc = TBN.loc;
 	static PlayerProfile mostdi1a = null;
 	public static int i = 0;
+	int oldrand = 2;
 
 	public static void clean() {
 		mostdi1a = null;
@@ -196,7 +198,7 @@ public class Game {
 		 * Auto-generated catch block e.printStackTrace(); }
 		 */
 		tbn.debugMsg("Removed chests: " + removeChest());
-		//tbn.debugMsg("Changed blocks: " + removeBlock());
+		// tbn.debugMsg("Changed blocks: " + removeBlock());
 		info.broadCast(ChatColor.RED + "" + ChatColor.BOLD
 				+ "Server reseting in 10 seconds!");
 		i = Bukkit.getScheduler().scheduleSyncDelayedTask(tbn, new Runnable() {
@@ -838,23 +840,117 @@ public class Game {
 
 		return randomNum;
 	}
-	
-	//Unloading maps, to rollback maps. Will delete all player builds until last server save
-    public static void unloadMap(String mapname){
-        if(Bukkit.getServer().unloadWorld(Bukkit.getServer().getWorld(mapname), false)){
-           System.out.println("Successfully unloaded " + mapname);
-        }else{
-        	 System.out.println("COULD NOT UNLOAD " + mapname);
-        }
-    }
-    //Loading maps (MUST BE CALLED AFTER UNLOAD MAPS TO FINISH THE ROLLBACK PROCESS)
-    public static void loadMap(String mapname){
-        Bukkit.getServer().createWorld(new WorldCreator(mapname));
-    }
- 
-    //Maprollback method, because were too lazy to type 2 lines
-    public static void rollback(String mapname){
-        unloadMap(mapname);
-        loadMap(mapname);
-    }
+
+	// Unloading maps, to rollback maps. Will delete all player builds until
+	// last server save
+	public static void unloadMap(String mapname) {
+		if (Bukkit.getServer().unloadWorld(
+				Bukkit.getServer().getWorld(mapname), false)) {
+			System.out.println("Successfully unloaded " + mapname);
+		} else {
+			System.out.println("COULD NOT UNLOAD " + mapname);
+		}
+	}
+
+	// Loading maps (MUST BE CALLED AFTER UNLOAD MAPS TO FINISH THE ROLLBACK
+	// PROCESS)
+	public static void loadMap(String mapname) {
+		Bukkit.getServer().createWorld(new WorldCreator(mapname));
+	}
+
+	// Maprollback method, because were too lazy to type 2 lines
+	public static void rollback(String mapname) {
+		unloadMap(mapname);
+		loadMap(mapname);
+	}
+
+	public void startHintsAndTipsLoop() {
+		tbn.getServer().getScheduler()
+				.scheduleSyncRepeatingTask(tbn, new Runnable() {
+					public void run() {
+						int rand = new Random().nextInt(13);
+						while (rand == oldrand) {
+							rand = new Random().nextInt(13);
+						}
+						switch (rand) {
+						case 0:
+						case 2:
+						default:
+							Bukkit.broadcastMessage(ChatColor.GOLD
+									+ "BatKnight's name shows up as "
+									+ ChatColor.DARK_GRAY
+									+ "Grey"
+									+ ChatColor.GOLD
+									+ " in the list of players names. BirdBoy is "
+									+ ChatColor.GREEN + "Green"
+									+ ChatColor.GOLD + " and Jester is"
+									+ ChatColor.DARK_PURPLE + " Purple"
+									+ ChatColor.GOLD + ".");
+							break;
+						case 1:
+							Bukkit.broadcastMessage(ChatColor.GOLD
+									+ "When you die, you can only talk to "
+									+ ChatColor.RED + "dead " + ChatColor.GOLD
+									+ "players!");
+							break;
+						case 3:
+							Bukkit.broadcastMessage(ChatColor.GOLD
+									+ "Watch out for trap chests placed by the "
+									+ ChatColor.DARK_PURPLE + "Jester"
+									+ ChatColor.GOLD + "!");
+							break;
+						case 4:
+							Bukkit.broadcastMessage(ChatColor.GOLD
+									+ "The villian left alive at the end with the most "
+									+ ChatColor.AQUA + "diamonds"
+									+ ChatColor.GOLD
+									+ " will win. How many have you gotten?");
+							break;
+						case 5:
+							Bukkit.broadcastMessage(ChatColor.GOLD + "When "
+									+ ChatColor.WHITE + "Pro" + ChatColor.GOLD
+									+ " players die, they explode into "
+									+ ChatColor.LIGHT_PURPLE + "glitter!");
+							break;
+						case 6:
+							Bukkit.broadcastMessage(ChatColor.GOLD
+									+ "Seen someone breaking the "
+									+ ChatColor.GREEN + "rules "
+									+ ChatColor.GOLD + "? Report them at "
+									+ ChatColor.RED
+									+ "www.scottlandstudios.com");
+							break;
+						case 7:
+							Bukkit.broadcastMessage(ChatColor.GOLD
+									+ ""
+									+ ChatColor.LIGHT_PURPLE
+									+ " KittyKat "
+									+ ChatColor.GOLD
+									+ "is the most cat-loving villian in the city!");
+							break;
+						case 8:
+							Bukkit.broadcastMessage(ChatColor.GOLD
+									+ "Hold your " + ChatColor.WHITE
+									+ "Feather " + ChatColor.GOLD + "as "
+									+ ChatColor.DARK_GRAY + "BatKnight"
+									+ ChatColor.GOLD + " and "
+									+ ChatColor.GREEN + "BirdBoy"
+									+ ChatColor.GOLD + " to fly!");
+							break;
+						case 10:
+							Bukkit.broadcastMessage(ChatColor.GOLD
+									+ "To get the lastest development "
+									+ ChatColor.GREEN + "news" + ChatColor.GOLD
+									+ ", " + ChatColor.LIGHT_PURPLE + "hints,"
+									+ ChatColor.GOLD + " and "
+									+ ChatColor.YELLOW + "more"
+									+ ChatColor.GOLD
+									+ ", follow the Developer on "
+									+ ChatColor.AQUA + "Twitter "
+									+ ChatColor.RED + "@Legostarwarszac");
+							break;
+						}
+					}
+				}, 900L, 2340L);
+	}
 }

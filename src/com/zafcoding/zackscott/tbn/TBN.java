@@ -51,7 +51,7 @@ public class TBN extends JavaPlugin {
 	public static Locations loc;
 	//public static Score sco;
 	static boolean debug = false;
-	double version = 1.9;
+	double version = 2.0;
 	public String pre = ChatColor.GOLD + "[TBN] ";
 	public static Inventory inv;
 	public boolean debugMode = true;
