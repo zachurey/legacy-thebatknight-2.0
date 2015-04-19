@@ -14,6 +14,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
@@ -39,6 +40,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import com.zafcoding.zackscott.tbn.Info;
 import com.zafcoding.zackscott.tbn.Info.ServerState;
@@ -210,7 +212,7 @@ public class GameListiner implements Listener {
 				TeleportCause.PLUGIN);
 		displayPart(e.getEntity());
 		info.checkEnd();
-		
+
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -318,6 +320,7 @@ public class GameListiner implements Listener {
 	@EventHandler
 	public void a1308a(PlayerInteractEvent event) {
 		try {
+			event.setCancelled(false);
 			if ((event.getItem().getType() == Material.IRON_HOE)
 					&& ((event.getAction() == Action.RIGHT_CLICK_AIR) || (event
 							.getAction() == Action.RIGHT_CLICK_BLOCK))) {
@@ -333,6 +336,37 @@ public class GameListiner implements Listener {
 				ItemStack item = new ItemStack(Material.NETHER_STAR);
 				final Item i = player.getWorld().dropItem(player.getLocation(),
 						item);
+				info.puffin.sendMessage(ChatColor.DARK_AQUA + "Shoot!");
+				i.setPickupDelay(50000);
+				tbn.getServer().getScheduler()
+						.scheduleSyncDelayedTask(tbn, new Runnable() {
+							public void run() {
+								i.getLocation().getWorld()
+										.createExplosion(i.getLocation(), 3.8f);
+								i.remove();
+								info.puffin.sendMessage(ChatColor.DARK_AQUA
+										+ "" + ChatColor.BOLD + "Boom!");
+								info.h = 0;
+							}
+						}, 40L);
+			}
+			if ((event.getItem().getType() == Material.IRON_HOE)
+					&& ((event.getAction() == Action.LEFT_CLICK_AIR) || (event
+							.getAction() == Action.LEFT_CLICK_BLOCK))) {
+				event.setCancelled(false);
+				if (info.h == 1) {
+					event.getPlayer().sendMessage(
+							ChatColor.DARK_AQUA + "" + ChatColor.BOLD
+									+ "Cooling down...");
+					return;
+				}
+				info.h = 1;
+				final Player player = event.getPlayer();
+				ItemStack item = new ItemStack(Material.NETHER_STAR);
+				final Item i = player.getWorld().dropItem(player.getLocation(),
+						item);
+				i.setVelocity(player.getLocation().getDirection()
+						.multiply(3.0F));
 				info.puffin.sendMessage(ChatColor.DARK_AQUA + "Shoot!");
 				i.setPickupDelay(50000);
 				tbn.getServer().getScheduler()
@@ -371,11 +405,7 @@ public class GameListiner implements Listener {
 		if (e.getEntity().getType() != EntityType.PLAYER) {
 			e.setCancelled(true);
 		}
-		/*
-		 * ArrayList<Block> iter = new ArrayList<Block>(event.blockList());
-		 * tbn.debugMsg("Added to the list!"); for (Block bb : iter) {
-		 * info.broke.put(bb.getLocation(), bb.getType()); iter.remove(bb); }
-		 */
+
 		double x = 0;
 		double y = 0;
 		double z = 0;
@@ -392,11 +422,10 @@ public class GameListiner implements Listener {
 			x = bLoc.getX() - eLoc.getX();
 			y = bLoc.getY() - eLoc.getY() + 0.5;
 			z = bLoc.getZ() - eLoc.getZ();
-			// FallingBlock fb = w.spawnFallingBlock(bLoc, b.getType(),
-			// (byte)b.getData());
-			// fb.setDropItem(false);
-			// fb.setVelocity(new Vector(x,y,z));
-			info.broke.put(bLoc, b.getType());
+			FallingBlock fb = w.spawnFallingBlock(bLoc, b.getType(),
+					(byte) b.getData());
+			fb.setDropItem(false);
+			fb.setVelocity(new Vector(x, y, z));
 		}
 	}
 
@@ -482,5 +511,5 @@ public class GameListiner implements Listener {
 					(Player[]) Bukkit.getOnlinePlayers().toArray());
 		}
 	}
-	
+
 }

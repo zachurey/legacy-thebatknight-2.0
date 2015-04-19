@@ -80,6 +80,13 @@ public class Game {
 				pl.sendMessage(ChatColor.LIGHT_PURPLE + "Your KittyKat is "
 						+ Info.catwomen.getName());
 			}
+			if (Info.badguys.isEmpty() == false) {
+				StringBuilder bd = new StringBuilder();
+				bd.append(ChatColor.BLACK + "BadGuys:");
+				for (Player pal : Info.badguys) {
+					bd.append(" " + pal.getDisplayName());
+				}
+			}
 		}
 		dosomeDiamondLvl();
 		flymanager();

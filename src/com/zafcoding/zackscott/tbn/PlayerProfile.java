@@ -26,6 +26,8 @@ public class PlayerProfile {
 	private boolean ra = false;
 	PlayType ty = PlayType.Villan;
 	public ArrayList<Location> loc = new ArrayList<Location>();
+	public boolean shopuse = false;
+	public ShopUse su = ShopUse.inactive;
 
 	public PlayerProfile(Player player, PlayType pt) {
 		p = player;
@@ -138,6 +140,10 @@ public class PlayerProfile {
 
 	public enum PlayType {
 		Joker, Villan, BatNight, BirdBoy, KittyKat, Puffin
+	}
+	
+	public enum ShopUse{
+		inactive, batblocker, invis
 	}
 
 }
