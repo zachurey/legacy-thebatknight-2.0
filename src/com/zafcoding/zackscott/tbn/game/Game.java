@@ -13,6 +13,7 @@ import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.WorldCreator;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -195,7 +196,7 @@ public class Game {
 		 * Auto-generated catch block e.printStackTrace(); }
 		 */
 		tbn.debugMsg("Removed chests: " + removeChest());
-		tbn.debugMsg("Changed blocks: " + removeBlock());
+		//tbn.debugMsg("Changed blocks: " + removeBlock());
 		info.broadCast(ChatColor.RED + "" + ChatColor.BOLD
 				+ "Server reseting in 10 seconds!");
 		i = Bukkit.getScheduler().scheduleSyncDelayedTask(tbn, new Runnable() {
@@ -413,7 +414,10 @@ public class Game {
 		for (Player pp : info.getPlayers()) {
 			PlayerProfile ppp = info.getPP(pp);
 			if (ppp.getType() != PlayType.BatNight
-					&& ppp.getType() != PlayType.BirdBoy) {
+					&& ppp.getType() != PlayType.BirdBoy
+					&& ppp.getType() != PlayType.KittyKat
+					&& ppp.getType() != PlayType.Joker
+					&& ppp.getType() != PlayType.Puffin) {
 				info.badguys.add(pp);
 			}
 		}
@@ -834,4 +838,23 @@ public class Game {
 
 		return randomNum;
 	}
+	
+	//Unloading maps, to rollback maps. Will delete all player builds until last server save
+    public static void unloadMap(String mapname){
+        if(Bukkit.getServer().unloadWorld(Bukkit.getServer().getWorld(mapname), false)){
+           System.out.println("Successfully unloaded " + mapname);
+        }else{
+        	 System.out.println("COULD NOT UNLOAD " + mapname);
+        }
+    }
+    //Loading maps (MUST BE CALLED AFTER UNLOAD MAPS TO FINISH THE ROLLBACK PROCESS)
+    public static void loadMap(String mapname){
+        Bukkit.getServer().createWorld(new WorldCreator(mapname));
+    }
+ 
+    //Maprollback method, because were too lazy to type 2 lines
+    public static void rollback(String mapname){
+        unloadMap(mapname);
+        loadMap(mapname);
+    }
 }

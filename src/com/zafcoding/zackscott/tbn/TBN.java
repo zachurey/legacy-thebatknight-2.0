@@ -113,6 +113,7 @@ public class TBN extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		System.out.print("[TBN] The Bat Night v." + version + " disabling...");
+		game.rollback(info.getActiveWorld().getName());
 		System.out.print("[TBN] The Bat Night v." + version + " disabled!");
 	}
 
