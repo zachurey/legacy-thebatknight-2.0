@@ -2,6 +2,7 @@ package com.zafcoding.zackscott.tbn.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -219,16 +220,23 @@ public class GameListiner implements Listener {
 	public void PlayerInteract(PlayerInteractEvent e) {
 		PlayerProfile pe = info.getPP(e.getPlayer());
 		if (pe != null && pe.isDead()) {
-			if (pe.getPlayer().getItemInHand() != null
-					&& pe.getPlayer().getItemInHand().getType() == Material.COMPASS) {
-				List ss = new ArrayList<>();
-				for (Player p : info.getPlayers()) {
-					tbn.inv.addItem(game.setName(new ItemStack(Material.SKULL),
-							p.getDisplayName() + "", ss));
+			if (e.getAction() == Action.LEFT_CLICK_AIR
+					|| (e.getAction() == Action.LEFT_CLICK_BLOCK)) {
+				int rand = new Random().nextInt(Bukkit.getOnlinePlayers()
+						.size() - 1);
+				while (info.getPlayers().get(rand) == pe.getPlayer()
+						|| info.getPP(info.getPlayers().get(rand)).isDead()) {
+					rand = new Random().nextInt(Bukkit.getOnlinePlayers()
+							.size() - 1);
 				}
-				pe.getPlayer().openInventory(tbn.inv);
-				return;
+				pe.getPlayer().teleport(info.getPlayers().get(rand));
+				pe.getPlayer().sendMessage(
+						ChatColor.AQUA + "" + ChatColor.BOLD
+								+ "You have been teleport to "
+								+ info.getPlayers().get(rand).getName());
 			}
+			e.setCancelled(true);
+			return;
 		} else {
 			if (e.getClickedBlock() != null
 					&& e.getClickedBlock().getType() == Material.ENCHANTMENT_TABLE) {
@@ -320,7 +328,6 @@ public class GameListiner implements Listener {
 	@EventHandler
 	public void a1308a(PlayerInteractEvent event) {
 		try {
-			event.setCancelled(false);
 			if ((event.getItem().getType() == Material.IRON_HOE)
 					&& ((event.getAction() == Action.RIGHT_CLICK_AIR) || (event
 							.getAction() == Action.RIGHT_CLICK_BLOCK))) {

@@ -192,11 +192,17 @@ public class Info {
 			}
 			if (catwomen == p) {
 				catwomen = null;
-			}if(badguys.contains(p)){
+			}
+			if (badguys.contains(p)) {
 				badguys.remove(p);
 			}
 			playerc--;
-			p.setGameMode(GameMode.SPECTATOR);
+			p.setGameMode(GameMode.ADVENTURE);
+			p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD
+					+ "Left click to teleport to a random player!");
+			for (Player pl : Bukkit.getOnlinePlayers()) {
+				p.hidePlayer(pl);
+			}
 			spects.add(p);
 		}
 	}
@@ -207,11 +213,14 @@ public class Info {
 		profiles.add(pp);
 		pp.setSpec(true);
 		pp.setDeath(true);
-		p.setGameMode(GameMode.SPECTATOR);
+		p.setGameMode(GameMode.ADVENTURE);
+		p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD
+				+ "Left click to teleport to a random player!");
+		for (Player pl : Bukkit.getOnlinePlayers()) {
+			p.hidePlayer(pl);
+		}
 		spects.add(p);
 		p.teleport(p.getWorld().getSpawnLocation());
-		p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD
-				+ "Do /tp <player_name> to teleport to different players!");
 		return;
 	}
 
@@ -266,7 +275,7 @@ public class Info {
 
 	public void broadCast(String message) {
 		for (Player play : Bukkit.getOnlinePlayers()) {
-				play.sendMessage(message);
+			play.sendMessage(message);
 		}
 	}
 
@@ -388,8 +397,7 @@ public class Info {
 		if (batman == null && robin == null) {
 			tbn.game.endGame(1);
 		}
-		if (joker == null && puffin == null
-				&& badguys.isEmpty()) {
+		if (joker == null && puffin == null && badguys.isEmpty()) {
 			tbn.game.endGame(0);
 		}
 	}
