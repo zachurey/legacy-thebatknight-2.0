@@ -4,6 +4,8 @@ import java.io.File;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -21,7 +23,7 @@ public class LobbyTime {
 
 	@SuppressWarnings("static-access")
 	public void LobbyHeartBeat() {
-		if(info.getActiveWorld() == null){
+		if (info.getActiveWorld() == null) {
 			String worldName = "SamCity";
 			info.setActiveWorld(Bukkit.getWorld("SamCity"));
 			System.out.println("[DEBUG] The world has been set to "
@@ -62,7 +64,7 @@ public class LobbyTime {
 		}
 		if (info.getTime() == 0) {
 			if (info.getPlayerCount() >= tbn.getMinPlayer()) {
-				if(info.getState() == ServerState.In_Game){
+				if (info.getState() == ServerState.In_Game) {
 					return;
 				}
 				info.setState(ServerState.In_Game);
@@ -77,29 +79,36 @@ public class LobbyTime {
 				info.broadCast(ChatColor.AQUA + "Restarting da clock!");
 				info.broadCast("");
 				info.setTime(120);
-				for (Player pl : info.getPlayers()) {
-					pl.playSound(pl.getLocation(), Sound.CLICK, 1, 1);
-					pl.playSound(pl.getLocation(), Sound.CLICK, 1, 1);
-					pl.playSound(pl.getLocation(), Sound.CLICK, 1, 1);
-					pl.setLevel(info.getTime());
-				}
+				for (final Player player : Bukkit.getOnlinePlayers()) {
+				      final Location l = new Location(player.getWorld(), player
+				        .getLocation().getBlockX(), player.getLocation()
+				        .getBlockY() + 3, player.getLocation().getBlockZ());
+				      new Thread(new Runnable() {
+				        public void run() {
+				          try {
+				            for (int i = 0; i < 4; i++) {
+				              player.playEffect(l, Effect.CLICK1, 1);
+				              Thread.sleep(450L);
+				            }
+				          } catch (Exception e) {
+				            e.printStackTrace();
+				          }
+				        }
+				      }).start();
+				    }
 				return;
 			}
 		}
 		info.setTime(info.getTime() - 1);
-		for (Player pl : info.getPlayers()) {
-			pl.playSound(pl.getLocation(), Sound.NOTE_PIANO, 1, 1);
-			pl.setLevel(info.getTime());
-		}
 	}
 
 	private void broadcastTime(int t) {
 		if (t == 120) {
 			info.broadCast(ChatColor.RED + "2 minutes " + ChatColor.GOLD
 					+ "till the game starts!");
-			info.broadCast(ChatColor.GOLD + "Current map: "
+			info.broadCast(ChatColor.GOLD + "Map: "
 					+ info.getActiveWorld().getName());
-			info.broadCast(ChatColor.GOLD + "Player online: " + ChatColor.RED
+			info.broadCast(ChatColor.GOLD + "" + ChatColor.RED
 					+ info.getPlayerCount() + ChatColor.GOLD + "/"
 					+ tbn.getMaxPlayer());
 			info.broadCast(ChatColor.GOLD + "You need " + tbn.getMinPlayer()
@@ -109,9 +118,9 @@ public class LobbyTime {
 		if (t == 90) {
 			info.broadCast(ChatColor.RED + "1 minute 30 seconds "
 					+ ChatColor.GOLD + "till the game starts!");
-			info.broadCast(ChatColor.GOLD + "Current map: "
+			info.broadCast(ChatColor.GOLD + "Map: "
 					+ info.getActiveWorld().getName());
-			info.broadCast(ChatColor.GOLD + "Player online: " + ChatColor.RED
+			info.broadCast(ChatColor.GOLD + "" + ChatColor.RED
 					+ info.getPlayerCount() + ChatColor.GOLD + "/"
 					+ tbn.getMaxPlayer());
 			info.broadCast(ChatColor.GOLD + "You need " + tbn.getMinPlayer()
@@ -121,14 +130,29 @@ public class LobbyTime {
 		if (t == 60) {
 			info.broadCast(ChatColor.RED + "1 minute " + ChatColor.GOLD
 					+ " till the game starts!");
-			info.broadCast(ChatColor.GOLD + "Current map: "
+			info.broadCast(ChatColor.GOLD + "Map: "
 					+ info.getActiveWorld().getName());
-			info.broadCast(ChatColor.GOLD + "Player online: " + ChatColor.RED
+			info.broadCast(ChatColor.GOLD + "" + ChatColor.RED
 					+ info.getPlayerCount() + ChatColor.GOLD + "/"
 					+ tbn.getMaxPlayer());
 			info.broadCast(ChatColor.GOLD + "You need " + tbn.getMinPlayer()
 					+ " players to start the game.");
 			return;
+		}
+		if (t <= 10) {
+			info.broadCast(ChatColor.RED + "" + t + ChatColor.GOLD
+					+ " seconds till the game starts!");
+			for (Player player : Bukkit.getOnlinePlayers()) {
+				player.playSound(player.getLocation(), Sound.NOTE_PLING, 10.0F,
+						0.0F);
+				player.playSound(player.getLocation(), Sound.NOTE_BASS_GUITAR,
+						10.0F, 0.0F);
+				player.playSound(player.getLocation(), Sound.NOTE_BASS, 10.0F,
+						0.0F);
+				player.playSound(player.getLocation(), Sound.NOTE_BASS_DRUM,
+						10.0F, 0.0F);
+				return;
+			}
 		}
 		info.broadCast(ChatColor.RED + "" + t + ChatColor.GOLD
 				+ " seconds till the game starts!");

@@ -48,8 +48,9 @@ public class TBN extends JavaPlugin {
 	public static LobbyTime lt;
 	public static GameTime gt;
 	public static Game game;
+	public static ScoreboardMan scor;
 	public static Locations loc;
-	//public static Score sco;
+	// public static Score sco;
 	static boolean debug = false;
 	double version = 2.0;
 	public String pre = ChatColor.GOLD + "[TBN] ";
@@ -76,7 +77,7 @@ public class TBN extends JavaPlugin {
 		jump = true;
 		try {
 			updateMods();
-		//	sco.updateScores(true);
+			// sco.updateScores(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -92,7 +93,8 @@ public class TBN extends JavaPlugin {
 		gt = new GameTime();
 		game = new Game();
 		loc = new Locations();
-		//sco = new Score();
+		scor = new ScoreboardMan();
+		// sco = new Score();
 		// loadConfiguration();
 		getServer().getPluginManager().registerEvents(new GameListiner(), this);
 		getServer().getPluginManager().registerEvents(new LobbyListiners(),
@@ -101,13 +103,14 @@ public class TBN extends JavaPlugin {
 				20);
 		try {
 			updateMods();
-		//	sco.updateScores(true);
+			// sco.updateScores(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		startDebugcheck();
 		debug = getConfig().getBoolean("debug");
 		game.startHintsAndTipsLoop();
+		info.getActiveWorld().setAutoSave(false);
 		System.out.print("[TBN] The Bat Night v." + version + " enabled!");
 	}
 
@@ -304,7 +307,8 @@ public class TBN extends JavaPlugin {
 				} else {
 					p.sendMessage("You pervert...");
 				}
-			}if (label.equalsIgnoreCase("rs")) {
+			}
+			if (label.equalsIgnoreCase("rs")) {
 				if (mods.containsKey(p.getName())) {
 					p.sendMessage(ChatColor.GRAY + "Restarting the server");
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
@@ -416,7 +420,7 @@ public class TBN extends JavaPlugin {
 							p.sendMessage("Please ask Zack to use Zach's commands!");
 							return true;
 						}
-						
+
 						p.sendMessage(ChatColor.GRAY + "Updated list!");
 						return true;
 					}
@@ -425,7 +429,7 @@ public class TBN extends JavaPlugin {
 							p.sendMessage("Please ask Zack to use Zach's commands!");
 							return true;
 						}
-						
+
 						p.sendMessage(ChatColor.GRAY
 								+ "Successfully saved scores!");
 						return true;
@@ -521,10 +525,8 @@ public class TBN extends JavaPlugin {
 
 					if (args[0].equalsIgnoreCase("blockchange")) {
 						if (p.isOp()) {
-							int i = game.removeBlock();
-							p.sendMessage(pre + ChatColor.GRAY + "Changed " + i
-									+ " blocks!");
-							return true;
+							p.sendMessage(ChatColor.BOLD
+									+ "This command seems to have disappeared :P");
 						}
 					}
 					if (args[0].equalsIgnoreCase("removechest")) {

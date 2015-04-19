@@ -266,9 +266,7 @@ public class Info {
 
 	public void broadCast(String message) {
 		for (Player play : Bukkit.getOnlinePlayers()) {
-			if (players.contains(play)) {
 				play.sendMessage(message);
-			}
 		}
 	}
 

@@ -1,15 +1,13 @@
 package com.zafcoding.zackscott.tbn.game;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,9 +15,10 @@ import org.bukkit.WorldCreator;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.Potion;
@@ -31,7 +30,6 @@ import com.zafcoding.zackscott.tbn.Info;
 import com.zafcoding.zackscott.tbn.Info.ServerState;
 import com.zafcoding.zackscott.tbn.PlayerProfile;
 import com.zafcoding.zackscott.tbn.PlayerProfile.PlayType;
-import com.zafcoding.zackscott.tbn.orginial.TheBatKnight;
 import com.zafcoding.zackscott.tbn.TBN;
 
 public class Game {
@@ -52,44 +50,69 @@ public class Game {
 		info.setState(ServerState.In_Game);
 		info.setGameTime(tbn.getConfig().getInt("MatchLengh") * 60);
 		setHeroesAndBadGuys(tbn);
-		loc.populateChests(info.superChest);
-		info.herofreeze = true;
+		Locations.populateChests(Info.superChest);
+		Info.herofreeze = true;
 		info.getActiveWorld().setTime(14000);
 		for (Player pl : info.getPlayers()) {
 			pl.setCanPickupItems(true);
-			if (!tbn.jump) {
+			if (!TBN.jump) {
 				pl.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
 						100000000, -10));
 			}
 			pl.sendMessage(ChatColor.AQUA + "The game has started!");
-			if (info.batman != null) {
+			if (Info.batman != null) {
 				pl.sendMessage(ChatColor.GRAY + "Your BatNight is "
-						+ info.batman.getName());
+						+ Info.batman.getName());
 			}
-			if (info.robin != null) {
+			if (Info.robin != null) {
 				pl.sendMessage(ChatColor.DARK_GREEN + "Your BirdBoy is "
-						+ info.robin.getName());
+						+ Info.robin.getName());
 			}
-			if (info.joker != null) {
+			if (Info.joker != null) {
 				pl.sendMessage(ChatColor.DARK_PURPLE + "Your Jester is "
-						+ info.joker.getName());
+						+ Info.joker.getName());
 			}
-			if (info.puffin != null) {
+			if (Info.puffin != null) {
 				pl.sendMessage(ChatColor.AQUA + "Your Puffin is "
-						+ info.puffin.getName());
+						+ Info.puffin.getName());
 			}
-			if (info.catwomen != null) {
+			if (Info.catwomen != null) {
 				pl.sendMessage(ChatColor.LIGHT_PURPLE + "Your KittyKat is "
-						+ info.catwomen.getName());
+						+ Info.catwomen.getName());
 			}
 		}
 		dosomeDiamondLvl();
 		flymanager();
 		startCompassEngine();
-		info.poo = true;
+		startGraceStop();
+		Info.poo = true;
 	}
 
-	@SuppressWarnings("deprecation")
+	int time = 10;
+
+	private void startGraceStop() {
+		info.pvp = false;
+		info.broadCast(ChatColor.RED
+				+ "You have been given a grace period for 10 seconds!");
+		Bukkit.getServer().getScheduler()
+				.scheduleSyncRepeatingTask(tbn, new Runnable() {
+
+					@Override
+					public void run() {
+						if (time <= 10 && time > 1) {
+							time--;
+						}
+						if (time <= 1) {
+							info.pvp = true;
+							info.broadCast(ChatColor.GREEN + ""
+									+ ChatColor.BOLD
+									+ "You may kill each other now");
+						}
+					}
+				}, 20, 20);
+
+	}
+
 	public static void endGame(final int bo) {
 		info.setState(ServerState.Post_Game);
 		PlayerProfile mostdia = null;
@@ -137,6 +160,7 @@ public class Game {
 			info.broadCast(ChatColor.YELLOW
 					+ "The bad guys collected a total of " + ChatColor.AQUA
 					+ total + "" + ChatColor.YELLOW + " diamonds!");
+			shootFireworks(mostdia.getPlayer(), 30);
 		}
 		if (bo == 0) {
 			PlayerProfile mostkill = null;
@@ -184,10 +208,11 @@ public class Game {
 				info.broadCast(ChatColor.AQUA + "The best hero is "
 						+ ChatColor.DARK_AQUA + mostkill.getPlayer().getName()
 						+ ChatColor.AQUA + " (" + ChatColor.DARK_AQUA
-						+ mostkill.getDiamonds() + ChatColor.AQUA + ")");
+						+ mostkill.getKills() + ChatColor.AQUA + ")");
 				info.broadCast(ChatColor.AQUA + "The heros killed "
 						+ ChatColor.DARK_AQUA + totalkill + "" + ChatColor.AQUA
 						+ " players!");
+				shootFireworks(mostkill.getPlayer(), 30);
 			} catch (Exception e) {
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
 			}
@@ -197,8 +222,7 @@ public class Game {
 		 * try { tbn.sco.saveScores(); } catch (IOException e) { // TODO
 		 * Auto-generated catch block e.printStackTrace(); }
 		 */
-		tbn.debugMsg("Removed chests: " + removeChest());
-		// tbn.debugMsg("Changed blocks: " + removeBlock());
+		TBN.debugMsg("Removed chests: " + removeChest());
 		info.broadCast(ChatColor.RED + "" + ChatColor.BOLD
 				+ "Server reseting in 10 seconds!");
 		i = Bukkit.getScheduler().scheduleSyncDelayedTask(tbn, new Runnable() {
@@ -246,35 +270,18 @@ public class Game {
 
 	public static int removeChest() {
 		int chestdone = 0;
-		int totala = info.chests.size();
-		for (Object loca : info.chests.toArray()) {
+		int totala = Info.chests.size();
+		for (Object loca : Info.chests.toArray()) {
 			Location loc = (Location) loca;
 			if (loc.getBlock().getType() == Material.CHEST) {
 				loc.getBlock().setType(Material.AIR);
 				chestdone++;
-				tbn.debugMsg("Removed chest " + chestdone + "/" + totala);
-				info.chests.remove(loc);
+				TBN.debugMsg("Removed chest " + chestdone + "/" + totala);
+				Info.chests.remove(loc);
 			}
 		}
 		clearEnts();
 		return chestdone;
-	}
-
-	// TODO:
-	public static int removeBlock() {
-		int blockchange = 0;
-		int totala = info.broke.size();
-		HashMap<Location, Material> newbroke = new HashMap<Location, Material>(
-				info.broke);
-		for (Object loca : newbroke.keySet()) {
-			Location loc = (Location) loca;
-			Material mat = info.broke.get(loca);
-			loc.getBlock().setType(mat);
-			info.broke.remove(loc);
-			blockchange++;
-		}
-		clearEnts();
-		return blockchange;
 	}
 
 	@SuppressWarnings("static-access")
@@ -325,8 +332,8 @@ public class Game {
 										return;
 									}
 									if (pp.getItemInHand().getType() == Material.FEATHER) {
-										if (info.batman == pp.getPlayer()
-												|| info.robin == pp.getPlayer()) {
+										if (Info.batman == pp.getPlayer()
+												|| Info.robin == pp.getPlayer()) {
 											pp.setAllowFlight(true);
 											pp.setFlying(true);
 											return;
@@ -960,5 +967,87 @@ public class Game {
 						}
 					}
 				}, 1200L, 1200L);
+	}
+
+	private static void shootFireworks(final Player entity, final int times) {
+		new Thread(new Runnable() {
+			public void run() {
+				for (int i = 0; i < times; i++) {
+					Firework fw = (Firework) entity.getWorld().spawn(
+							entity.getLocation(), Firework.class);
+					FireworkMeta fm = fw.getFireworkMeta();
+					Random x = new Random();
+					int xf = x.nextInt(4) + 1;
+					FireworkEffect.Type type = FireworkEffect.Type.BALL;
+					if (xf == 1)
+						type = FireworkEffect.Type.BALL;
+					if (xf == 2)
+						type = FireworkEffect.Type.BALL_LARGE;
+					if (xf == 3)
+						type = FireworkEffect.Type.BURST;
+					if (xf == 4)
+						type = FireworkEffect.Type.CREEPER;
+					if (xf == 5)
+						type = FireworkEffect.Type.STAR;
+					int xf1i = x.nextInt(17) + 1;
+					int xf2i = x.nextInt(17) + 1;
+					Color cc = getColor(xf1i);
+					Color cd = getColor(xf2i);
+					FireworkEffect effect = FireworkEffect.builder()
+							.flicker(x.nextBoolean()).withColor(cc)
+							.withFade(cd).with(type).trail(x.nextBoolean())
+							.build();
+					fm.addEffect(effect);
+					int pw = x.nextInt(2) + 1;
+					fm.setPower(pw);
+					fw.setFireworkMeta(fm);
+					try {
+						Thread.sleep(500 + new Random().nextInt(700));
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
+	}
+
+	public static Color getColor(int x) {
+		if (x == 1)
+			return Color.AQUA;
+		if (x == 2)
+			return Color.BLACK;
+		if (x == 3)
+			return Color.BLUE;
+		if (x == 4)
+			return Color.FUCHSIA;
+		if (x == 5)
+			return Color.GRAY;
+		if (x == 6)
+			return Color.GREEN;
+		if (x == 7)
+			return Color.LIME;
+		if (x == 8)
+			return Color.MAROON;
+		if (x == 9)
+			return Color.NAVY;
+		if (x == 10)
+			return Color.OLIVE;
+		if (x == 11)
+			return Color.ORANGE;
+		if (x == 12)
+			return Color.PURPLE;
+		if (x == 13)
+			return Color.RED;
+		if (x == 14)
+			return Color.SILVER;
+		if (x == 15)
+			return Color.TEAL;
+		if (x == 16)
+			return Color.TEAL;
+		if (x == 17)
+			return Color.WHITE;
+		if (x == 18)
+			return Color.YELLOW;
+		return null;
 	}
 }

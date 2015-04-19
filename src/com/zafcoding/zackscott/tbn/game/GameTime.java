@@ -29,6 +29,7 @@ public class GameTime {
 			info.setGameTime(info.getGameTime() - 1);
 			broadCastShort(info.getGameTime());
 		}
+		tbn.scor.updateScoreBoard();
 	}
 
 	private void broadCastShort(int gameTime) {
