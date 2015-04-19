@@ -867,6 +867,9 @@ public class Game {
 	public void startHintsAndTipsLoop() {
 		tbn.getServer().getScheduler()
 				.scheduleSyncRepeatingTask(tbn, new Runnable() {
+					String intro = ChatColor.YELLOW + "TheBatKnight"
+							+ ChatColor.WHITE + "> ";
+
 					public void run() {
 						int rand = new Random().nextInt(13);
 						while (rand == oldrand) {
@@ -876,7 +879,8 @@ public class Game {
 						case 0:
 						case 2:
 						default:
-							Bukkit.broadcastMessage(ChatColor.GOLD
+							Bukkit.broadcastMessage(intro
+									+ ChatColor.GOLD
 									+ "BatKnight's name shows up as "
 									+ ChatColor.DARK_GRAY
 									+ "Grey"
@@ -888,40 +892,44 @@ public class Game {
 									+ ChatColor.GOLD + ".");
 							break;
 						case 1:
-							Bukkit.broadcastMessage(ChatColor.GOLD
+							Bukkit.broadcastMessage(intro + ChatColor.GOLD
 									+ "When you die, you can only talk to "
 									+ ChatColor.RED + "dead " + ChatColor.GOLD
 									+ "players!");
 							break;
 						case 3:
-							Bukkit.broadcastMessage(ChatColor.GOLD
+							Bukkit.broadcastMessage(intro
+									+ ChatColor.GOLD
 									+ "Watch out for trap chests placed by the "
 									+ ChatColor.DARK_PURPLE + "Jester"
 									+ ChatColor.GOLD + "!");
 							break;
 						case 4:
-							Bukkit.broadcastMessage(ChatColor.GOLD
+							Bukkit.broadcastMessage(intro
+									+ ChatColor.GOLD
 									+ "The villian left alive at the end with the most "
 									+ ChatColor.AQUA + "diamonds"
 									+ ChatColor.GOLD
 									+ " will win. How many have you gotten?");
 							break;
 						case 5:
-							Bukkit.broadcastMessage(ChatColor.GOLD + "When "
-									+ ChatColor.WHITE + "Pro" + ChatColor.GOLD
+							Bukkit.broadcastMessage(intro + ChatColor.GOLD
+									+ "When " + ChatColor.WHITE + "Pro"
+									+ ChatColor.GOLD
 									+ " players die, they explode into "
 									+ ChatColor.LIGHT_PURPLE + "glitter!");
 							break;
 						case 6:
-							Bukkit.broadcastMessage(ChatColor.GOLD
+							Bukkit.broadcastMessage(intro + ChatColor.GOLD
 									+ "Seen someone breaking the "
-									+ ChatColor.GREEN + "rules "
+									+ ChatColor.GREEN + "rules"
 									+ ChatColor.GOLD + "? Report them at "
 									+ ChatColor.RED
 									+ "www.scottlandstudios.com");
 							break;
 						case 7:
-							Bukkit.broadcastMessage(ChatColor.GOLD
+							Bukkit.broadcastMessage(intro
+									+ ChatColor.GOLD
 									+ ""
 									+ ChatColor.LIGHT_PURPLE
 									+ " KittyKat "
@@ -929,7 +937,7 @@ public class Game {
 									+ "is the most cat-loving villian in the city!");
 							break;
 						case 8:
-							Bukkit.broadcastMessage(ChatColor.GOLD
+							Bukkit.broadcastMessage(intro + ChatColor.GOLD
 									+ "Hold your " + ChatColor.WHITE
 									+ "Feather " + ChatColor.GOLD + "as "
 									+ ChatColor.DARK_GRAY + "BatKnight"
@@ -938,7 +946,7 @@ public class Game {
 									+ ChatColor.GOLD + " to fly!");
 							break;
 						case 10:
-							Bukkit.broadcastMessage(ChatColor.GOLD
+							Bukkit.broadcastMessage(intro + ChatColor.GOLD
 									+ "To get the lastest development "
 									+ ChatColor.GREEN + "news" + ChatColor.GOLD
 									+ ", " + ChatColor.LIGHT_PURPLE + "hints,"
@@ -951,6 +959,6 @@ public class Game {
 							break;
 						}
 					}
-				}, 900L, 2340L);
+				}, 1200L, 1200L);
 	}
 }

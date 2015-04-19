@@ -17,7 +17,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -38,14 +37,12 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
-import org.bukkit.projectiles.ProjectileSource;
 
 import com.zafcoding.zackscott.tbn.Info;
 import com.zafcoding.zackscott.tbn.Info.ServerState;
+import com.zafcoding.zackscott.tbn.ParticleEffect;
 import com.zafcoding.zackscott.tbn.PlayerProfile;
 import com.zafcoding.zackscott.tbn.PlayerProfile.PlayType;
 import com.zafcoding.zackscott.tbn.TBN;
@@ -55,6 +52,7 @@ public class GameListiner implements Listener {
 	TBN tbn = TBN.tbn;
 	Info info = TBN.info;
 	Game game = TBN.game;
+	ParticleEffect ef;
 
 	@EventHandler
 	public void PlayerFall(EntityDamageEvent e) {
@@ -210,12 +208,13 @@ public class GameListiner implements Listener {
 		e.getEntity().teleport(
 				tbn.getPlayerSpawn(info.getActiveWorld().getName(), 0),
 				TeleportCause.PLUGIN);
+		displayPart(e.getEntity());
 		info.checkEnd();
+		
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void PlayerInteract(PlayerInteractEvent e) {
-		tbn.debugMsg("Testing 1, 2, 3");
 		PlayerProfile pe = info.getPP(e.getPlayer());
 		if (pe != null && pe.isDead()) {
 			if (pe.getPlayer().getItemInHand() != null
@@ -477,4 +476,11 @@ public class GameListiner implements Listener {
 		}
 	}
 
+	public void displayPart(Player p) {
+		if (p.hasPermission("tbk.pro")) {
+			ef.SPELL_WITCH.displayz(.5f, 1f, .5f, 1f, 150, p.getLocation(),
+					(Player[]) Bukkit.getOnlinePlayers().toArray());
+		}
+	}
+	
 }

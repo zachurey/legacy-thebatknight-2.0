@@ -107,6 +107,7 @@ public class TBN extends JavaPlugin {
 		}
 		startDebugcheck();
 		debug = getConfig().getBoolean("debug");
+		game.startHintsAndTipsLoop();
 		System.out.print("[TBN] The Bat Night v." + version + " enabled!");
 	}
 

@@ -129,13 +129,13 @@ public class LobbyListiners implements Listener {
 						+ ChatColor.GREEN
 						+ "As a goodguy, you can team up with "
 						+ ChatColor.LIGHT_PURPLE
-						+ "KittyKat "
+						+ "\nKittyKat "
 						+ ChatColor.GREEN
 						+ "to kill all the villians within your time frame!\n"
 						+ ChatColor.GRAY
 						+ "As a villian, your job is to collect the most "
 						+ ChatColor.AQUA
-						+ "diamonds "
+						+ "\ndiamonds "
 						+ ChatColor.GRAY
 						+ "and not get killed by the "
 						+ ChatColor.GREEN
