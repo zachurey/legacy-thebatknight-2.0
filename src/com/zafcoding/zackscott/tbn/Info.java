@@ -192,6 +192,8 @@ public class Info {
 			}
 			if (catwomen == p) {
 				catwomen = null;
+			}if(badguys.contains(p)){
+				badguys.remove(p);
 			}
 			playerc--;
 			p.setGameMode(GameMode.SPECTATOR);
@@ -378,6 +380,19 @@ public class Info {
 
 			fb.setVelocity(new Vector(x, y, z));
 		} catch (Exception localException) {
+		}
+	}
+
+	public void checkEnd() {
+		if (!(state == ServerState.In_Game)) {
+			return;
+		}
+		if (batman == null && robin == null) {
+			tbn.game.endGame(1);
+		}
+		if (joker == null && puffin == null
+				&& badguys.isEmpty()) {
+			tbn.game.endGame(0);
 		}
 	}
 

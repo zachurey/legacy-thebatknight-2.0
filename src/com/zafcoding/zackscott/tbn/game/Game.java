@@ -322,9 +322,12 @@ public class Game {
 										return;
 									}
 									if (pp.getItemInHand().getType() == Material.FEATHER) {
-										pp.setAllowFlight(true);
-										pp.setFlying(true);
-										return;
+										if (info.batman == pp.getPlayer()
+												|| info.robin == pp.getPlayer()) {
+											pp.setAllowFlight(true);
+											pp.setFlying(true);
+											return;
+										}
 									}
 									if (!(pp.getGameMode() == GameMode.CREATIVE)) {
 										pp.setAllowFlight(false);

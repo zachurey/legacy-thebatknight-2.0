@@ -190,7 +190,7 @@ public class GameListiner implements Listener {
 			pp.setKills(pp.getKills() + 1);
 			info.coin.put(pp.getPlayer().getUniqueId().toString(),
 					info.coin.get(pp.getPlayer().getUniqueId().toString() + 1));
-			pp.getPlayer().sendMessage(ChatColor.AQUA + "+1 Bat Bullion");
+			// pp.getPlayer().sendMessage(ChatColor.AQUA + "+1 Bat Bullion");
 		}
 		info.outplayer(e.getEntity());
 		int amount = game.randInt(tbn.getConfig().getInt("MinDeath"), tbn
@@ -210,7 +210,7 @@ public class GameListiner implements Listener {
 		e.getEntity().teleport(
 				tbn.getPlayerSpawn(info.getActiveWorld().getName(), 0),
 				TeleportCause.PLUGIN);
-
+		info.checkEnd();
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -432,6 +432,19 @@ public class GameListiner implements Listener {
 				}
 				if (pp.getType() == PlayType.BirdBoy
 						&& pp.getType() == PlayType.BatNight) {
+					e.setCancelled(true);
+				}
+				if (info.batman == pp && info.robin == ep) {
+					ep.getPlayer()
+							.sendMessage(
+									ChatColor.RED
+											+ "Why would you want to hurt TheBatKnight!?");
+					e.setCancelled(true);
+				}
+				if (info.batman == ep && info.robin == pp) {
+					ep.getPlayer().sendMessage(
+							ChatColor.RED
+									+ "Why would you want to hurt Robin!?");
 					e.setCancelled(true);
 				}
 			}
