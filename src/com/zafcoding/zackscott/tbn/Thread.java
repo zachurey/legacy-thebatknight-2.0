@@ -24,6 +24,9 @@ public class Thread implements Runnable {
 
 	@Override
 	public void run() {
+			if (info.getState() == ServerState.In_Game || tbn.cando) {
+				tbn.scor.updateScoreBoard();
+			}
 		if(Bukkit.getOnlinePlayers().size()<=0){
 			if(!(info.getState() == ServerState.Pre_Game)){
 				tbn.game.endGame(0);

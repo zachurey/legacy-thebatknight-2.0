@@ -229,13 +229,13 @@ public class GameListiner implements Listener {
 					rand = new Random().nextInt(Bukkit.getOnlinePlayers()
 							.size() - 1);
 				}
-				pe.getPlayer().teleport(info.getPlayers().get(rand));
-				pe.getPlayer().sendMessage(
+				//pe.getPlayer().teleport(info.getPlayers().get(rand));
+				/*pe.getPlayer().sendMessage(
 						ChatColor.AQUA + "" + ChatColor.BOLD
 								+ "You have been teleport to "
-								+ info.getPlayers().get(rand).getName());
+								+ info.getPlayers().get(rand).getName());*/
 			}
-			e.setCancelled(true);
+			//e.setCancelled(true);
 			return;
 		} else {
 			if (e.getClickedBlock() != null

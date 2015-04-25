@@ -197,12 +197,12 @@ public class Info {
 				badguys.remove(p);
 			}
 			playerc--;
-			p.setGameMode(GameMode.ADVENTURE);
+			p.setGameMode(GameMode.SPECTATOR);
 			p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD
 					+ "Left click to teleport to a random player!");
-			for (Player pl : Bukkit.getOnlinePlayers()) {
+			/*for (Player pl : Bukkit.getOnlinePlayers()) {
 				p.hidePlayer(pl);
-			}
+			}*/
 			spects.add(p);
 		}
 	}
@@ -213,12 +213,12 @@ public class Info {
 		profiles.add(pp);
 		pp.setSpec(true);
 		pp.setDeath(true);
-		p.setGameMode(GameMode.ADVENTURE);
+		p.setGameMode(GameMode.SPECTATOR);
 		p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD
 				+ "Left click to teleport to a random player!");
-		for (Player pl : Bukkit.getOnlinePlayers()) {
+		/*for (Player pl : Bukkit.getOnlinePlayers()) {
 			p.hidePlayer(pl);
-		}
+		}*/
 		spects.add(p);
 		p.teleport(p.getWorld().getSpawnLocation());
 		return;

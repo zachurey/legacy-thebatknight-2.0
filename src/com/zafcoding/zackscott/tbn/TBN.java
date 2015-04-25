@@ -64,6 +64,7 @@ public class TBN extends JavaPlugin {
 	public static boolean zack = false;
 	public static boolean macbg = false;
 	public static boolean jump = true;
+	public boolean cando = false;
 
 	// public static Object dcAPI;
 
@@ -400,6 +401,13 @@ public class TBN extends JavaPlugin {
 								+ ChatColor.WHITE + "]" + ChatColor.GREEN
 								+ " The current active world is "
 								+ info.getActiveWorld().getName());
+						return true;
+					}
+					if (args[0].equalsIgnoreCase("cando")) {
+						cando = !cando;
+						p.sendMessage("[" + ChatColor.GOLD + "TBN"
+								+ ChatColor.WHITE + "]" + ChatColor.GREEN
+								+ " Can do is now " + cando);
 						return true;
 					}
 					if (args[0].equalsIgnoreCase("jump")) {

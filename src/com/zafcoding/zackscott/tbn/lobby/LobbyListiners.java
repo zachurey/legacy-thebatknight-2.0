@@ -239,7 +239,7 @@ public class LobbyListiners implements Listener {
 			if (((HumanEntity) en).getGameMode() == GameMode.CREATIVE) {
 				return;
 			}
-			if (!(info.getState() == ServerState.In_Game) || info.pvp == false) {
+			if (!(info.getState() == ServerState.In_Game)) {
 				e.setCancelled(true);
 			}
 			if (e.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {

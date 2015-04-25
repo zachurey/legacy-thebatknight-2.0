@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import me.libraryaddict.disguise.DisguiseAPI;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -110,6 +112,9 @@ public class Game {
 							time--;
 						}
 						if (time <= 1) {
+							if(info.pvp){
+								return;
+							}
 							info.pvp = true;
 							info.broadCast(ChatColor.GREEN + ""
 									+ ChatColor.BOLD
@@ -121,6 +126,9 @@ public class Game {
 	}
 
 	public static void endGame(final int bo) {
+		if(info.getState() == ServerState.Post_Game){
+			return;
+		}
 		info.setState(ServerState.Post_Game);
 		PlayerProfile mostdia = null;
 		if (bo == 1) {

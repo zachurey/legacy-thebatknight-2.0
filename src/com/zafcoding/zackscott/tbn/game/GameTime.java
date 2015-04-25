@@ -1,5 +1,6 @@
 package com.zafcoding.zackscott.tbn.game;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,10 +22,13 @@ public class GameTime {
 	public void GameHeartBeat() {
 		// TODO: test this
 		if (info.poo) {
-			int yt = 0;
-			int nt = 0;
-			int kt = 0;
-			//TODO: Add game checker
+			if (info.batman == null && info.robin == null) {
+				game.endGame(1);
+			}
+			if (info.puffin == null && info.joker == null
+					&& info.badguys.isEmpty()) {
+				game.endGame(0);
+			}
 			tbn.debugMsg("The current game time is: " + info.getGameTime());
 			info.setGameTime(info.getGameTime() - 1);
 			broadCastShort(info.getGameTime());

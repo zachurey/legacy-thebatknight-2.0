@@ -2,12 +2,12 @@ package com.zafcoding.zackscott.tbn;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-
-import com.zafcoding.zackscott.tbn.Info.ServerState;
 
 public class ScoreboardMan {
 
@@ -15,14 +15,18 @@ public class ScoreboardMan {
 	Info info = tbn.info;
 	
 	public void updateScoreBoard(){
-		if(info.getState() != ServerState.In_Game){
-			return;
-		}
+		
 		ScoreboardManager manage = Bukkit.getScoreboardManager();
 		Scoreboard board = manage.getNewScoreboard();
-		Objective obj = board.registerNewObjective("TBK", "dummy");
+		
+		Objective obj = board.registerNewObjective("test", "dummy");
+		obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+		obj.setDisplayName(ChatColor.GOLD + "TBK");
 		Score score = obj.getScore(ChatColor.GREEN + "Time:");
 		score.setScore(info.getGameTime());
+		for(Player pp : Bukkit.getOnlinePlayers()){
+			pp.setScoreboard(board);
+		}
 	}
 	
 }
