@@ -1,5 +1,6 @@
 package com.zafcoding.zackscott.tbn.lobby;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -90,8 +91,19 @@ public class LobbyListiners implements Listener {
 		if (!info.coin.containsKey(e.getPlayer().getUniqueId().toString())) {
 			info.coin.put(e.getPlayer().getUniqueId().toString(), 0);
 		}
+		try {
+			if (!tbn.sql.isPlayer(e.getPlayer())) {
+				tbn.sql.addPlayer(e.getPlayer());
+			}
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		if (info.getState() == ServerState.In_Game) {
-			e.setJoinMessage(ChatColor.GRAY + "Spectator "
+			e.setJoinMessage(ChatColor.GRAY + ""
 					+ e.getPlayer().getDisplayName() + " is now spectating!");
 			info.specMode(e.getPlayer());
 			return;

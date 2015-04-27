@@ -1,5 +1,6 @@
 package com.zafcoding.zackscott.tbn.game;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -191,7 +192,17 @@ public class GameListiner implements Listener {
 			pp.setKills(pp.getKills() + 1);
 			info.coin.put(pp.getPlayer().getUniqueId().toString(),
 					info.coin.get(pp.getPlayer().getUniqueId().toString() + 1));
-			// pp.getPlayer().sendMessage(ChatColor.AQUA + "+1 Bat Bullion");
+			try {
+				tbn.sql.setCoins(pp.getPlayer(),
+						tbn.sql.getCoins(pp.getPlayer()) + 1);
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			pp.getPlayer().sendMessage(ChatColor.AQUA + "+1 Token");
 		}
 		info.outplayer(e.getEntity());
 		int amount = game.randInt(tbn.getConfig().getInt("MinDeath"), tbn
@@ -229,13 +240,14 @@ public class GameListiner implements Listener {
 					rand = new Random().nextInt(Bukkit.getOnlinePlayers()
 							.size() - 1);
 				}
-				//pe.getPlayer().teleport(info.getPlayers().get(rand));
-				/*pe.getPlayer().sendMessage(
-						ChatColor.AQUA + "" + ChatColor.BOLD
-								+ "You have been teleport to "
-								+ info.getPlayers().get(rand).getName());*/
+				// pe.getPlayer().teleport(info.getPlayers().get(rand));
+				/*
+				 * pe.getPlayer().sendMessage( ChatColor.AQUA + "" +
+				 * ChatColor.BOLD + "You have been teleport to " +
+				 * info.getPlayers().get(rand).getName());
+				 */
 			}
-			//e.setCancelled(true);
+			// e.setCancelled(true);
 			return;
 		} else {
 			if (e.getClickedBlock() != null

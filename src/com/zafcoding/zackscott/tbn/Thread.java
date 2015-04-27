@@ -1,5 +1,7 @@
 package com.zafcoding.zackscott.tbn;
 
+import java.sql.SQLException;
+
 import me.libraryaddict.disguise.*;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
@@ -21,6 +23,7 @@ public class Thread implements Runnable {
 	Info info = TBN.info;
 	GameTime gt = TBN.gt;
 	TBN tbn = TBN.tbn;
+	boolean didsql = false;
 
 	@Override
 	public void run() {
@@ -48,6 +51,17 @@ public class Thread implements Runnable {
 				info.didsuperChest = true;
 				info.superChest = false;
 				tbn.debugMsg("So close! The int was " + rand);
+			}
+		}if(!didsql){
+			try {
+				tbn.sql.check();
+				didsql = true;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		for (Player pp : info.players) {

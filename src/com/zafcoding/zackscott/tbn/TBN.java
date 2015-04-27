@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +51,7 @@ public class TBN extends JavaPlugin {
 	public static Game game;
 	public static ScoreboardMan scor;
 	public static Locations loc;
+	public static MySQLer sql;
 	// public static Score sco;
 	static boolean debug = false;
 	double version = 2.0;
@@ -95,6 +97,7 @@ public class TBN extends JavaPlugin {
 		game = new Game();
 		loc = new Locations();
 		scor = new ScoreboardMan();
+		sql = new MySQLer();
 		// sco = new Score();
 		// loadConfiguration();
 		getServer().getPluginManager().registerEvents(new GameListiner(), this);
@@ -112,6 +115,14 @@ public class TBN extends JavaPlugin {
 		debug = getConfig().getBoolean("debug");
 		game.startHintsAndTipsLoop();
 		info.getActiveWorld().setAutoSave(false);
+		try {
+			sql.check();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.print("[TBN] The Bat Night v." + version + " enabled!");
 	}
 
@@ -119,6 +130,12 @@ public class TBN extends JavaPlugin {
 	public void onDisable() {
 		System.out.print("[TBN] The Bat Night v." + version + " disabling...");
 		game.rollback(info.getActiveWorld().getName());
+		try {
+			sql.getConnection().close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.print("[TBN] The Bat Night v." + version + " disabled!");
 	}
 
