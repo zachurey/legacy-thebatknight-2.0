@@ -399,13 +399,18 @@ public class TBN extends JavaPlugin {
 									+ " is not an integer!");
 							return true;
 						}
-						info.coin.put(
-								tp.getPlayer().getUniqueId().toString(),
-								info.coin.get(tp.getPlayer().getUniqueId()
-										.toString()
-										+ amount));
+						info.getPP(tp).setCoins(info.getPP(tp).getCoins() + amount);
+						try {
+							sql.setCoins(tp, sql.getCoins(tp) + amount);
+						} catch (ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						tp.getPlayer().sendMessage(
-								ChatColor.AQUA + "+" + amount + " Bat Bullion");
+								ChatColor.AQUA + "+" + amount + " Token");
 						return true;
 					} else {
 						p.sendMessage("Please ask Zack to use Zach's commands!");

@@ -28,6 +28,7 @@ public class PlayerProfile {
 	public ArrayList<Location> loc = new ArrayList<Location>();
 	public boolean shopuse = false;
 	public ShopUse su = ShopUse.inactive;
+	int coins = 0;
 
 	public PlayerProfile(Player player, PlayType pt) {
 		p = player;
@@ -141,9 +142,17 @@ public class PlayerProfile {
 	public enum PlayType {
 		Joker, Villan, BatNight, BirdBoy, KittyKat, Puffin
 	}
-	
-	public enum ShopUse{
+
+	public enum ShopUse {
 		inactive, batblocker, invis
+	}
+
+	public int getCoins() {
+		return coins;
+	}
+
+	public void setCoins(int i) {
+		coins = i;
 	}
 
 }

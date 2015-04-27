@@ -33,7 +33,6 @@ public class GameTime {
 			info.setGameTime(info.getGameTime() - 1);
 			broadCastShort(info.getGameTime());
 		}
-		tbn.scor.updateScoreBoard();
 	}
 
 	private void broadCastShort(int gameTime) {
@@ -52,6 +51,9 @@ public class GameTime {
 		if (gameTime <= 10) {
 			info.broadCast(ChatColor.RED + "" + gameTime + ChatColor.GOLD
 					+ " seconds till the villians win!");
+		}
+		if (gameTime <= 0) {
+			game.endGame(1);
 		}
 	}
 

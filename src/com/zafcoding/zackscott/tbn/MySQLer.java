@@ -14,8 +14,8 @@ public class MySQLer {
 	boolean exist = false;
 	boolean mysql = true;
 
-	public MySQL MySQL = new MySQL(tbn, "localhost", "3306", "database",
-			"root", "");
+	public MySQL MySQL = new MySQL(tbn, "23.229.139.232", "3306", "Server",
+			"ttPlugin", "DoubleTT!");
 	Connection c = null;
 
 	public Connection getConnection() {
@@ -60,8 +60,8 @@ public class MySQLer {
 		}
 	}
 
-	public boolean isPlayer(Player player) throws SQLException,
-			ClassNotFoundException {
+	public boolean isPlayer(Player player) throws ClassNotFoundException,
+			SQLException {
 		boolean is = false;
 		if (!mysql) {
 			return false;
@@ -69,19 +69,24 @@ public class MySQLer {
 		if (c == null) {
 			connect();
 		}
-		Statement statement = c.createStatement();
-		ResultSet res = statement
-				.executeQuery("SELECT * FROM Minigame_Tokens WHERE UUID = '"
-						+ player.getUniqueId() + "';");
-		res.next();
-		TBN.debugMsg("The player " + player.getDisplayName()
-				+ " has a profile: " + (res.getString("Username")));
-		if (res.getString("DisplayName") != null) {
-			is = true;
-		} else {
-			is = false;
+		try {
+			Statement statement = c.createStatement();
+			ResultSet res = statement
+					.executeQuery("SELECT * FROM Minigame_Tokens WHERE UUID = '"
+							+ player.getUniqueId() + "';");
+			res.next();
+			if (res.getString("Username") != null) {
+				is = true;
+				TBN.debugMsg("The player " + player.getDisplayName()
+						+ " has a profile: " + (res.getString("Username")));
+			} else {
+				is = false;
+				TBN.debugMsg("The player " + player.getDisplayName()
+						+ " does not have a profile!");
+			}
+		} catch (SQLException e) {
+			return false;
 		}
-		;
 		return is;
 	}
 
@@ -93,18 +98,25 @@ public class MySQLer {
 		if (c == null) {
 			connect();
 		}
+		String br = "'";
 		TBN.debugMsg("Creating profile for " + player.getDisplayName() + "...");
+		TBN.debugMsg("INSERT INTO `Minigame_Tokens`(`Table_ID`, `UUID`, `Username`, `Token`) VALUES ('1',"
+				+ br
+				+ ""
+				+ player.getUniqueId().toString()
+				+ br
+				+ ","
+				+ br
+				+ player.getDisplayName() + br + ",0)");
 		Statement statement = c.createStatement();
 		statement
-				.executeUpdate("INSERT INTO `Minigame_Tokens`(`Table_ID`, `UUID`, `Username`, `Token`) VALUES ('',"
+				.executeUpdate("INSERT INTO `Minigame_Tokens`(`Table_ID`, `UUID`, `Username`, `Token`) VALUES ('1',"
+						+ br
+						+ ""
 						+ player.getUniqueId().toString()
+						+ br
 						+ ","
-						+ player.getDisplayName() + ",0)");
-		TBN.debugMsg("INSERT INTO `Minigame_Tokens`(`Table_ID`, `UUID`, `Username`, `Token`) VALUES ('',"
-				+ player.getUniqueId().toString()
-				+ ","
-				+ player.getDisplayName() + ",0)");
-		;
+						+ br + player.getDisplayName() + br + ",0)");
 	}
 
 	public void setCoins(Player player, int i) throws SQLException,
@@ -139,6 +151,11 @@ public class MySQLer {
 		res.next();
 		get = res.getInt("Token");
 		return get;
+	}
+
+	public void synceToken(PlayerProfile pp) throws ClassNotFoundException,
+			SQLException {
+		pp.setCoins(getCoins(pp.getPlayer()));
 	}
 
 }

@@ -27,11 +27,9 @@ public class Thread implements Runnable {
 
 	@Override
 	public void run() {
-			if (info.getState() == ServerState.In_Game || tbn.cando) {
-				tbn.scor.updateScoreBoard();
-			}
-		if(Bukkit.getOnlinePlayers().size()<=0){
-			if(!(info.getState() == ServerState.Pre_Game)){
+		tbn.scor.updateScoreBoard();
+		if (Bukkit.getOnlinePlayers().size() <= 0) {
+			if (!(info.getState() == ServerState.Pre_Game)) {
 				tbn.game.endGame(0);
 				info.setState(ServerState.Pre_Game);
 			}
@@ -52,22 +50,11 @@ public class Thread implements Runnable {
 				info.superChest = false;
 				tbn.debugMsg("So close! The int was " + rand);
 			}
-		}if(!didsql){
-			try {
-				tbn.sql.check();
-				didsql = true;
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 		for (Player pp : info.players) {
 			pp.setFoodLevel(20);
 			pp.setSaturation(20f);
-			if(info.getPP(pp)==null){
+			if (info.getPP(pp) == null) {
 				break;
 			}
 			if (info.getPP(pp).getDis()

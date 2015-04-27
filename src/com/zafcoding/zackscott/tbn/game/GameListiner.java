@@ -202,6 +202,7 @@ public class GameListiner implements Listener {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+			pp.setCoins(pp.getCoins()+1);
 			pp.getPlayer().sendMessage(ChatColor.AQUA + "+1 Token");
 		}
 		info.outplayer(e.getEntity());

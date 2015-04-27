@@ -88,12 +88,10 @@ public class LobbyListiners implements Listener {
 		for (PotionEffect effect : e.getPlayer().getActivePotionEffects()) {
 			e.getPlayer().removePotionEffect(effect.getType());
 		}
-		if (!info.coin.containsKey(e.getPlayer().getUniqueId().toString())) {
-			info.coin.put(e.getPlayer().getUniqueId().toString(), 0);
-		}
 		try {
 			if (!tbn.sql.isPlayer(e.getPlayer())) {
 				tbn.sql.addPlayer(e.getPlayer());
+				tbn.sql.synceToken(info.getPP(e.getPlayer()));
 			}
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block

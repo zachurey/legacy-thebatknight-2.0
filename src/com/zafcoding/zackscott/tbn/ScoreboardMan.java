@@ -9,24 +9,31 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
+import com.zafcoding.zackscott.tbn.Info.ServerState;
+
 public class ScoreboardMan {
 
 	TBN tbn = TBN.tbn;
 	Info info = tbn.info;
-	
-	public void updateScoreBoard(){
-		
-		ScoreboardManager manage = Bukkit.getScoreboardManager();
-		Scoreboard board = manage.getNewScoreboard();
-		
-		Objective obj = board.registerNewObjective("test", "dummy");
+
+	ScoreboardManager manage = Bukkit.getScoreboardManager();
+	Scoreboard board = manage.getNewScoreboard();
+	Objective obj = board.registerNewObjective("test", "dummy");
+
+	public void updateScoreBoard() {
 		obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 		obj.setDisplayName(ChatColor.GOLD + "TBK");
-		Score score = obj.getScore(ChatColor.GREEN + "Time:");
-		score.setScore(info.getGameTime());
-		for(Player pp : Bukkit.getOnlinePlayers()){
+		if (info.getState() == ServerState.In_Game) {
+			Score score = obj.getScore(ChatColor.GREEN + "Time:");
+			score.setScore(info.getGameTime());
+		}
+		for (Player pp : Bukkit.getOnlinePlayers()) {
+			if (info.getState() == ServerState.Pre_Game) {
+				Score coin = obj.getScore(ChatColor.GREEN + "Tokens:");
+				coin.setScore(info.getPP(pp).getCoins());
+			}
 			pp.setScoreboard(board);
 		}
 	}
-	
+
 }
