@@ -88,18 +88,6 @@ public class LobbyListiners implements Listener {
 		for (PotionEffect effect : e.getPlayer().getActivePotionEffects()) {
 			e.getPlayer().removePotionEffect(effect.getType());
 		}
-		try {
-			if (!tbn.sql.isPlayer(e.getPlayer())) {
-				tbn.sql.addPlayer(e.getPlayer());
-				tbn.sql.synceToken(info.getPP(e.getPlayer()));
-			}
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		if (info.getState() == ServerState.In_Game) {
 			e.setJoinMessage(ChatColor.GRAY + ""
 					+ e.getPlayer().getDisplayName() + " is now spectating!");
@@ -117,6 +105,19 @@ public class LobbyListiners implements Listener {
 		e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation());
 		info.addPlayer(e.getPlayer());
 		info.getPP(e.getPlayer()).setType(PlayType.Villan);
+		try {
+			if (!tbn.sql.isPlayer(e.getPlayer())) {
+				tbn.sql.addPlayer(e.getPlayer());
+			}
+			tbn.sql.synceToken(info.getPP(e.getPlayer()));
+
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
 		BookMeta bm = (BookMeta) book.getItemMeta();
 		bm.setAuthor(ChatColor.GOLD + "TheBatKnight");
@@ -545,7 +546,6 @@ public class LobbyListiners implements Listener {
 		 * { s = C + s; for (int i = 0; i <= 13; i++) s = C + s +
 		 * name.toCharArray()[i]; }
 		 */
-		tbn.debugMsg("The listName has been updated!");
 		player.setPlayerListName(C + name);
 	}
 

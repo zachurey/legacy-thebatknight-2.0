@@ -54,6 +54,9 @@ public class Info {
 	PlayerProfile winner = null;
 	public static boolean poo = false;
 	public static ArrayList<Player> badguys = new ArrayList<Player>();
+	public int boost = 0;
+	public String boostRea = "";
+	public boolean isboost = false;
 
 	// public static remain = 0;
 

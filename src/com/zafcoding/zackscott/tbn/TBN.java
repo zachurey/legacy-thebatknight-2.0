@@ -326,6 +326,41 @@ public class TBN extends JavaPlugin {
 					p.sendMessage("You pervert...");
 				}
 			}
+			if (label.equalsIgnoreCase("newboo")) {
+				if (p.isOp()) {
+					if (args.length < 2) {
+						p.sendMessage(ChatColor.LIGHT_PURPLE
+								+ "Usage: /newboo <%> <message>");
+						return true;
+					}
+					int amount = 0;
+					try {
+						amount = Integer.parseInt(args[0]);
+					} catch (Exception e) {
+						p.sendMessage(ChatColor.RED + "" + args[0]
+								+ " is not an integer!");
+						return true;
+					}
+					info.boost = amount;
+					info.isboost = true;
+
+					StringBuilder ss = null;
+					for (String s : args) {
+						if (s != null) {
+							if (args[0] == s) {
+								break;
+							}
+							ss.append(" " + s);
+						}
+					}
+					info.boostRea = ss.toString();
+					Bukkit.broadcastMessage(ChatColor.AQUA + ""
+							+ p.getDisplayName() + " just activated a booster!");
+					return true;
+				} else {
+					p.sendMessage("You pervert...");
+				}
+			}
 			if (label.equalsIgnoreCase("rs")) {
 				if (mods.containsKey(p.getName())) {
 					p.sendMessage(ChatColor.GRAY + "Restarting the server");
@@ -399,7 +434,8 @@ public class TBN extends JavaPlugin {
 									+ " is not an integer!");
 							return true;
 						}
-						info.getPP(tp).setCoins(info.getPP(tp).getCoins() + amount);
+						info.getPP(tp).setCoins(
+								info.getPP(tp).getCoins() + amount);
 						try {
 							sql.setCoins(tp, sql.getCoins(tp) + amount);
 						} catch (ClassNotFoundException e) {

@@ -106,7 +106,7 @@ public class PlayerProfile {
 
 	public void setSpec(boolean spec) {
 		p.getInventory().clear();
-		info.removeArmour(p);
+		Info.removeArmour(p);
 		List itemlore = new ArrayList<>();
 		itemlore.add(ChatColor.DARK_AQUA + "Help you find players!");
 		p.getInventory().addItem(
@@ -152,6 +152,7 @@ public class PlayerProfile {
 	}
 
 	public void setCoins(int i) {
+		TBN.debugMsg("Setting coins for " + p.getDisplayName() + " to " + i);
 		coins = i;
 	}
 

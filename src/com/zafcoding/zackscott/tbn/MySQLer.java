@@ -8,6 +8,8 @@ import java.sql.Statement;
 
 import org.bukkit.entity.Player;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException;
+
 public class MySQLer {
 
 	TBN tbn = TBN.tbn;
@@ -45,7 +47,6 @@ public class MySQLer {
 			connect();
 		}
 		DatabaseMetaData dbm = c.getMetaData();
-		// check if "employee" table is there
 		ResultSet tables = dbm.getTables(null, null, "Minigame_Tokens", null);
 		if (tables.next()) {
 			exist = true;
@@ -84,9 +85,12 @@ public class MySQLer {
 				TBN.debugMsg("The player " + player.getDisplayName()
 						+ " does not have a profile!");
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
+			c.close();
+			c = null;
 			return false;
 		}
+
 		return is;
 	}
 
@@ -117,6 +121,7 @@ public class MySQLer {
 						+ br
 						+ ","
 						+ br + player.getDisplayName() + br + ",0)");
+
 	}
 
 	public void setCoins(Player player, int i) throws SQLException,
@@ -132,11 +137,13 @@ public class MySQLer {
 				+ " WHERE UUID = '" + player.getUniqueId().toString() + "'");
 		TBN.debugMsg("UPDATE `Minigame_Tokens` SET `Token`=" + i
 				+ " WHERE UUID = '" + player.getUniqueId().toString() + "'");
-		;
+
 	}
 
 	public int getCoins(Player player) throws SQLException,
 			ClassNotFoundException {
+		TBN.debugMsg("SELECT * FROM Minigame_Tokens WHERE UUID = '"
+				+ player.getUniqueId().toString() + "';");
 		int get = 0;
 		if (!mysql) {
 			return 0;
@@ -155,6 +162,12 @@ public class MySQLer {
 
 	public void synceToken(PlayerProfile pp) throws ClassNotFoundException,
 			SQLException {
+		if (!mysql) {
+			return;
+		}
+		if (c == null) {
+			connect();
+		}
 		pp.setCoins(getCoins(pp.getPlayer()));
 	}
 

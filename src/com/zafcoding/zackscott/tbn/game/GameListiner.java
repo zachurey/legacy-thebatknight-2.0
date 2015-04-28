@@ -189,21 +189,42 @@ public class GameListiner implements Listener {
 		}
 		if (e.getEntity().getKiller() instanceof Player) {
 			PlayerProfile pp = info.getPP(e.getEntity().getKiller());
-			pp.setKills(pp.getKills() + 1);
-			info.coin.put(pp.getPlayer().getUniqueId().toString(),
-					info.coin.get(pp.getPlayer().getUniqueId().toString() + 1));
-			try {
-				tbn.sql.setCoins(pp.getPlayer(),
-						tbn.sql.getCoins(pp.getPlayer()) + 1);
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (ClassNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			if (!info.isboost) {
+				pp.setKills(pp.getKills() + 1);
+				info.coin
+						.put(pp.getPlayer().getUniqueId().toString(),
+								info.coin.get(pp.getPlayer().getUniqueId()
+										.toString() + 1));
+				try {
+					tbn.sql.setCoins(pp.getPlayer(),
+							tbn.sql.getCoins(pp.getPlayer()) + 1);
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				pp.setCoins(pp.getCoins() + 1);
+				pp.getPlayer().sendMessage(ChatColor.AQUA + "+1 Token");
+			} else {
+				pp.setKills(pp.getKills() + (1));
+				try {
+					tbn.sql.setCoins(pp.getPlayer(),
+							tbn.sql.getCoins(pp.getPlayer())
+									+ (int) (info.boost * 1));
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				pp.setCoins(pp.getCoins() + (int) (info.boost * 1));
+				pp.getPlayer().sendMessage(
+						ChatColor.AQUA + "+" + (int) (info.boost * 1)
+								+ " Token (" + info.boostRea + ")");
 			}
-			pp.setCoins(pp.getCoins()+1);
-			pp.getPlayer().sendMessage(ChatColor.AQUA + "+1 Token");
 		}
 		info.outplayer(e.getEntity());
 		int amount = game.randInt(tbn.getConfig().getInt("MinDeath"), tbn
