@@ -52,6 +52,7 @@ public class TBN extends JavaPlugin {
 	public static ScoreboardMan scor;
 	public static Locations loc;
 	public static MySQLer sql;
+	public static GameListiner gamelist;
 	// public static Score sco;
 	static boolean debug = false;
 	double version = 2.0;
@@ -67,6 +68,7 @@ public class TBN extends JavaPlugin {
 	public static boolean macbg = false;
 	public static boolean jump = true;
 	public boolean cando = false;
+	ParticleEffect ef;
 
 	// public static Object dcAPI;
 
@@ -98,9 +100,10 @@ public class TBN extends JavaPlugin {
 		loc = new Locations();
 		scor = new ScoreboardMan();
 		sql = new MySQLer();
+		gamelist = new GameListiner();
 		// sco = new Score();
 		// loadConfiguration();
-		getServer().getPluginManager().registerEvents(new GameListiner(), this);
+		getServer().getPluginManager().registerEvents(gamelist, this);
 		getServer().getPluginManager().registerEvents(new LobbyListiners(),
 				this);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Thread(), 20,
@@ -504,6 +507,11 @@ public class TBN extends JavaPlugin {
 								+ " Can do is now " + cando);
 						return true;
 					}
+					if (args[0].equalsIgnoreCase("addup")) {
+						tbn.gamelist.updateStates(false, null, info.getPP(p));
+						p.sendMessage(ChatColor.GRAY + "Upped you coins!");
+						return true;
+					}
 					if (args[0].equalsIgnoreCase("jump")) {
 						if (!p.isOp() || !mods.containsKey(p.getName())) {
 							p.sendMessage("Please ask Zack to use Zach's commands!");
@@ -541,6 +549,12 @@ public class TBN extends JavaPlugin {
 							p.addPotionEffect(new PotionEffect(
 									PotionEffectType.JUMP, 100000000, -10));
 						}
+						return true;
+					}
+					if (args[0].equalsIgnoreCase("bubbles")) {
+						ef.SPELL_WITCH.displayz(.5f, 1f, .5f, 1f, 150, p
+								.getLocation(), Bukkit.getOnlinePlayers()
+								.toArray());
 						return true;
 					}
 					if (args[0].equalsIgnoreCase("superchest")) {

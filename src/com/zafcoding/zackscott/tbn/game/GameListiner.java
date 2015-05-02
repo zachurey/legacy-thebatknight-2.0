@@ -195,16 +195,7 @@ public class GameListiner implements Listener {
 						.put(pp.getPlayer().getUniqueId().toString(),
 								info.coin.get(pp.getPlayer().getUniqueId()
 										.toString() + 1));
-				try {
-					tbn.sql.setCoins(pp.getPlayer(),
-							tbn.sql.getCoins(pp.getPlayer()) + 1);
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (ClassNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				updateStates(true, pp, info.getPP(e.getEntity()));
 				pp.setCoins(pp.getCoins() + 1);
 				pp.getPlayer().sendMessage(ChatColor.AQUA + "+1 Token");
 			} else {
@@ -225,6 +216,8 @@ public class GameListiner implements Listener {
 						ChatColor.AQUA + "+" + (int) (info.boost * 1)
 								+ " Token (" + info.boostRea + ")");
 			}
+		} else {
+			updateStates(false, null, info.getPP(e.getEntity()));
 		}
 		info.outplayer(e.getEntity());
 		int amount = game.randInt(tbn.getConfig().getInt("MinDeath"), tbn
@@ -553,4 +546,46 @@ public class GameListiner implements Listener {
 		}
 	}
 
+	public void updateStates(boolean both, final PlayerProfile killer,
+			final PlayerProfile death) {
+		if (both) {
+			Thread t = new Thread(new Runnable() {
+				public void run() {
+					try {
+						tbn.sql.setCoins(killer.getPlayer(),
+								tbn.sql.getCoins(killer.getPlayer()) + 1);
+						tbn.sql.setKills(killer.getPlayer(),
+								tbn.sql.getKills(killer.getPlayer()) + 1);
+						tbn.sql.setDeaths(death.getPlayer(),
+								tbn.sql.getDeaths(death.getPlayer()) + 1);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (ClassNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					return;
+				}
+			});
+			t.start();
+		} else {
+			Thread t = new Thread(new Runnable() {
+				public void run() {
+					try {
+						tbn.sql.setDeaths(death.getPlayer(),
+								tbn.sql.getDeaths(death.getPlayer()) + 1);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (ClassNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					return;
+				}
+			});
+			t.start();
+		}
+	}
 }

@@ -15,6 +15,7 @@ public class MySQLer {
 	TBN tbn = TBN.tbn;
 	boolean exist = false;
 	boolean mysql = true;
+	String database = Data.Minigame_Tokens.toString();
 
 	public MySQL MySQL = new MySQL(tbn, "23.229.139.232", "3306", "Server",
 			"ttPlugin", "DoubleTT!");
@@ -70,9 +71,8 @@ public class MySQLer {
 		}
 		try {
 			Statement statement = c.createStatement();
-			ResultSet res = statement
-					.executeQuery("SELECT * FROM Minigame_Tokens WHERE UUID = '"
-							+ player.getUniqueId() + "';");
+			ResultSet res = statement.executeQuery("SELECT * FROM " + database
+					+ " WHERE UUID = '" + player.getUniqueId() + "';");
 			res.next();
 			if (res.getString("Username") != null) {
 				is = true;
@@ -102,23 +102,15 @@ public class MySQLer {
 		}
 		String br = "'";
 		TBN.debugMsg("Creating profile for " + player.getDisplayName() + "...");
-		TBN.debugMsg("INSERT INTO `Minigame_Tokens`(`UUID`, `Username`, `Token`) VALUES ("
-				+ br
-				+ ""
-				+ player.getUniqueId().toString()
-				+ br
-				+ ","
-				+ br
-				+ player.getDisplayName() + br + ",0)");
+		TBN.debugMsg("INSERT INTO `" + database
+				+ "`(`UUID`, `Username`, `Token`, `Kills`, `Deaths`) VALUES ("
+				+ br + "" + player.getUniqueId().toString() + br + "," + br
+				+ player.getDisplayName() + br + ",0,0,0)");
 		Statement statement = c.createStatement();
-		statement
-				.executeUpdate("INSERT INTO `Minigame_Tokens`(`UUID`, `Username`, `Token`) VALUES ("
-						+ br
-						+ ""
-						+ player.getUniqueId().toString()
-						+ br
-						+ ","
-						+ br + player.getDisplayName() + br + ",0)");
+		statement.executeUpdate("INSERT INTO `" + database
+				+ "`(`UUID`, `Username`, `Token`, `Kills`, `Deaths`) VALUES ("
+				+ br + "" + player.getUniqueId().toString() + br + "," + br
+				+ player.getDisplayName() + br + ",0,0,0)");
 		c.close();
 	}
 
@@ -131,17 +123,13 @@ public class MySQLer {
 			connect();
 		}
 		Statement statement = c.createStatement();
-		statement.executeUpdate("UPDATE `Minigame_Tokens` SET `Token`=" + i
-				+ " WHERE UUID = '" + player.getUniqueId().toString() + "'");
-		TBN.debugMsg("UPDATE `Minigame_Tokens` SET `Token`=" + i
+		statement.executeUpdate("UPDATE `" + database + "` SET `Token`=" + i
 				+ " WHERE UUID = '" + player.getUniqueId().toString() + "'");
 		c.close();
 	}
 
 	public int getCoins(Player player) throws SQLException,
 			ClassNotFoundException {
-		TBN.debugMsg("SELECT * FROM Minigame_Tokens WHERE UUID = '"
-				+ player.getUniqueId().toString() + "';");
 		int get = 0;
 		if (!mysql) {
 			return 0;
@@ -150,11 +138,80 @@ public class MySQLer {
 			connect();
 		}
 		Statement statement = c.createStatement();
-		ResultSet res = statement
-				.executeQuery("SELECT * FROM Minigame_Tokens WHERE UUID = '"
-						+ player.getUniqueId().toString() + "';");
+		ResultSet res = statement.executeQuery("SELECT * FROM " + database
+				+ " WHERE UUID = '" + player.getUniqueId().toString() + "';");
 		res.next();
 		get = res.getInt("Token");
+		c.close();
+		return get;
+	}
+
+	public void setKills(Player player, int i) throws SQLException,
+			ClassNotFoundException {
+		if (!mysql) {
+			return;
+		}
+		if (c == null || c.isClosed()) {
+			connect();
+		}
+		Statement statement = c.createStatement();
+		statement.executeUpdate("UPDATE `" + database + "` SET `Kills`=" + i
+				+ " WHERE UUID = '" + player.getUniqueId().toString() + "'");
+		TBN.debugMsg("UPDATE `" + database + "` SET `Kills`=" + i
+				+ " WHERE UUID = '" + player.getUniqueId().toString() + "'");
+		c.close();
+	}
+
+	public int getKills(Player player) throws SQLException,
+			ClassNotFoundException {
+		int get = 0;
+		if (!mysql) {
+			return 0;
+		}
+		if (c == null || c.isClosed()) {
+			connect();
+		}
+		Statement statement = c.createStatement();
+		ResultSet res = statement.executeQuery("SELECT * FROM " + database
+				+ " WHERE UUID = '" + player.getUniqueId().toString() + "';");
+		res.next();
+		get = res.getInt("Kills");
+		c.close();
+		return get;
+	}
+
+	public void setDeaths(Player player, int i) throws SQLException,
+			ClassNotFoundException {
+		if (!mysql) {
+			return;
+		}
+		if (c == null || c.isClosed()) {
+			connect();
+		}
+		Statement statement = c.createStatement();
+		statement.executeUpdate("UPDATE `" + database + "` SET `Deaths`=" + i
+				+ " WHERE UUID = '" + player.getUniqueId().toString() + "'");
+		TBN.debugMsg("UPDATE `" + database + "` SET `Deaths`=" + i
+				+ " WHERE UUID = '" + player.getUniqueId().toString() + "'");
+		c.close();
+	}
+
+	public int getDeaths(Player player) throws SQLException,
+			ClassNotFoundException {
+		int get = 0;
+		if (!mysql) {
+			return 0;
+		}
+		if (c == null || c.isClosed()) {
+			connect();
+		}
+		Statement statement = c.createStatement();
+		ResultSet res = statement.executeQuery("SELECT * FROM " + database
+				+ " WHERE UUID = '" + player.getUniqueId().toString() + "';");
+		TBN.debugMsg("SELECT * FROM " + database + " WHERE UUID = '"
+				+ player.getUniqueId().toString() + "';");
+		res.next();
+		get = res.getInt("Deaths");
 		c.close();
 		return get;
 	}
@@ -169,6 +226,10 @@ public class MySQLer {
 		}
 		pp.setCoins(getCoins(pp.getPlayer()));
 		c.close();
+	}
+
+	public enum Data {
+		Minigame_Tokens, Minigame_Tokens_Test
 	}
 
 }
