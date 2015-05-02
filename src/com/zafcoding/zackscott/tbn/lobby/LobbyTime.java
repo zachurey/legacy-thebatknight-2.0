@@ -26,8 +26,6 @@ public class LobbyTime {
 		if (info.getActiveWorld() == null) {
 			String worldName = "SamCity";
 			info.setActiveWorld(Bukkit.getWorld("SamCity"));
-			System.out.println("[DEBUG] The world has been set to "
-					+ Bukkit.getWorld("SamCity"));
 			File playerFilesDir = new File(worldName + "/players");
 			if (playerFilesDir.isDirectory()) {
 				String[] playerDats = playerFilesDir.list();
@@ -46,6 +44,7 @@ public class LobbyTime {
 				pp.setCanPickupItems(false);
 				pp.setFoodLevel(20);
 				pp.setFireTicks(0);
+				pp.setLevel(info.getTime());
 			}
 			dotime();
 		}
@@ -80,22 +79,22 @@ public class LobbyTime {
 				info.broadCast("");
 				info.setTime(120);
 				for (final Player player : Bukkit.getOnlinePlayers()) {
-				      final Location l = new Location(player.getWorld(), player
-				        .getLocation().getBlockX(), player.getLocation()
-				        .getBlockY() + 3, player.getLocation().getBlockZ());
-				      new Thread(new Runnable() {
-				        public void run() {
-				          try {
-				            for (int i = 0; i < 4; i++) {
-				              player.playEffect(l, Effect.CLICK1, 1);
-				              Thread.sleep(450L);
-				            }
-				          } catch (Exception e) {
-				            e.printStackTrace();
-				          }
-				        }
-				      }).start();
-				    }
+					final Location l = new Location(player.getWorld(), player
+							.getLocation().getBlockX(), player.getLocation()
+							.getBlockY() + 3, player.getLocation().getBlockZ());
+					new Thread(new Runnable() {
+						public void run() {
+							try {
+								for (int i = 0; i < 4; i++) {
+									player.playEffect(l, Effect.CLICK1, 1);
+									Thread.sleep(450L);
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}).start();
+				}
 				return;
 			}
 		}

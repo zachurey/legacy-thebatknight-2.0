@@ -362,7 +362,6 @@ public class Locations {
 											}
 										}
 									} else {
-										tbn.debugMsg("Skiped 1");
 									}
 								}
 							}
@@ -381,13 +380,11 @@ public class Locations {
 		for (ItemStack it : inv.getContents()) {
 			if (it != null) {
 				if (it.getType() == is) {
-					tbn.debugMsg(is + " is not a thingy!");
 					return false;
 				}
 			} else {
 			}
 		}
-		tbn.debugMsg(is + " is a thingy!");
 		return true;
 	}
 

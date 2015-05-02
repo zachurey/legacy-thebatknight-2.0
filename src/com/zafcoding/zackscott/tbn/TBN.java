@@ -453,6 +453,42 @@ public class TBN extends JavaPlugin {
 						return true;
 					}
 				}
+				if (args[0].equalsIgnoreCase("all")) {
+					if (p.isOp()) {
+						if (args.length != 2) {
+							p.sendMessage(ChatColor.RED
+									+ "Usage: /tbn all <amount>");
+							return true;
+						}
+						int amount = 0;
+						try {
+							amount = Integer.parseInt(args[1]);
+						} catch (Exception e) {
+							p.sendMessage(ChatColor.RED + "" + args[1]
+									+ " is not an integer!");
+							return true;
+						}
+						for (PlayerProfile tp : info.profiles) {
+							tp.setCoins(tp.getCoins() + amount);
+							try {
+								sql.setCoins(tp.getPlayer(),
+										sql.getCoins(tp.getPlayer()) + amount);
+							} catch (ClassNotFoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							tp.getPlayer().sendMessage(
+									ChatColor.AQUA + "+" + amount + " Token");
+						}
+						return true;
+					} else {
+						p.sendMessage("Please ask Zack to use Zach's commands!");
+						return true;
+					}
+				}
 				if (args.length == 1) {
 					if (args[0].equalsIgnoreCase("world")) {
 						p.sendMessage("[" + ChatColor.GOLD + "TBN"

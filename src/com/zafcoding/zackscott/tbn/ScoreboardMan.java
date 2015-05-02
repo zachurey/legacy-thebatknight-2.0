@@ -16,23 +16,36 @@ public class ScoreboardMan {
 	TBN tbn = TBN.tbn;
 	Info info = tbn.info;
 
-	ScoreboardManager manage = Bukkit.getScoreboardManager();
-	Scoreboard board = manage.getNewScoreboard();
-	Objective obj = board.registerNewObjective("test", "dummy");
-
 	public void updateScoreBoard() {
-		obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-		obj.setDisplayName(ChatColor.GOLD + "TBK");
-		if (info.getState() == ServerState.In_Game) {
-			Score score = obj.getScore(ChatColor.GREEN + "Time:");
-			score.setScore(info.getGameTime());
-		}
 		for (Player pp : Bukkit.getOnlinePlayers()) {
-			if (info.getState() == ServerState.Pre_Game) {
-				Score coin = obj.getScore(ChatColor.GREEN + "Tokens:");
-				coin.setScore(info.getPP(pp).getCoins());
+			if (info.getPP(pp).sb == null) {
+				ScoreboardManager manage = Bukkit.getScoreboardManager();
+				Scoreboard board = manage.getNewScoreboard();
+				info.getPP(pp).sb = board;
 			}
-			pp.setScoreboard(board);
+			Scoreboard board = info.getPP(pp).sb;
+			if (board.getObjective("test") == null) {
+				Objective obj = board.registerNewObjective("test", "dummy");
+				obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+				obj.setDisplayName(ChatColor.GOLD + "TBK");
+			}
+			Objective obj = board.getObjective("test");
+			if (info.getState() == ServerState.In_Game) {
+				Score score = obj.getScore(ChatColor.GREEN + "Time:");
+				score.setScore(info.getGameTime());
+			}
+			if (pp.getScoreboard() == board) {
+				if (board.getObjective("test")
+						.getScore(ChatColor.GREEN + "Ⓣ Tokens:").getScore() != info
+						.getPP(pp).getCoins()) {
+						Score coin = obj
+								.getScore(ChatColor.GREEN + "Ⓣ Tokens:");
+						coin.setScore(info.getPP(pp).getCoins());
+				}
+			}
+			if (pp.getScoreboard() != board) {
+				pp.setScoreboard(board);
+			}
 		}
 	}
 

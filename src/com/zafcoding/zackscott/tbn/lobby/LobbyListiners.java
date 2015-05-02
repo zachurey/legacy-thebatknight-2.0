@@ -282,6 +282,12 @@ public class LobbyListiners implements Listener {
 							ChatColor.RED + "Why would you want to damage "
 									+ pp.getType() + "??");
 				}
+				if (pp.getPlayer() == info.batman
+						&& eq.getPlayer() == info.robin
+						|| pp.getPlayer() == info.robin
+						&& eq.getPlayer() == info.batman) {
+					e.setCancelled(true);
+				}
 				if (pp.getType() == PlayType.KittyKat) {
 					Player player = pp.getPlayer();
 					if (e.getCause() == DamageCause.PROJECTILE) {

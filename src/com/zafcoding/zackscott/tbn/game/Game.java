@@ -112,7 +112,7 @@ public class Game {
 							time--;
 						}
 						if (time <= 1) {
-							if(info.pvp){
+							if (info.pvp) {
 								return;
 							}
 							info.pvp = true;
@@ -126,7 +126,7 @@ public class Game {
 	}
 
 	public static void endGame(final int bo) {
-		if(info.getState() == ServerState.Post_Game){
+		if (info.getState() == ServerState.Post_Game) {
 			return;
 		}
 		info.setState(ServerState.Post_Game);
@@ -175,7 +175,6 @@ public class Game {
 			info.broadCast(ChatColor.YELLOW
 					+ "The bad guys collected a total of " + ChatColor.AQUA
 					+ total + "" + ChatColor.YELLOW + " diamonds!");
-			shootFireworks(mostdia.getPlayer(), 30);
 		}
 		if (bo == 0) {
 			PlayerProfile mostkill = null;
@@ -227,7 +226,6 @@ public class Game {
 				info.broadCast(ChatColor.AQUA + "The heros killed "
 						+ ChatColor.DARK_AQUA + totalkill + "" + ChatColor.AQUA
 						+ " players!");
-				shootFireworks(mostkill.getPlayer(), 30);
 			} catch (Exception e) {
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
 			}
@@ -240,16 +238,23 @@ public class Game {
 		TBN.debugMsg("Removed chests: " + removeChest());
 		info.broadCast(ChatColor.RED + "" + ChatColor.BOLD
 				+ "Server reseting in 10 seconds!");
-		i = Bukkit.getScheduler().scheduleSyncDelayedTask(tbn, new Runnable() {
+		try {
+			i = Bukkit.getScheduler().scheduleSyncDelayedTask(tbn,
+					new Runnable() {
 
-			@Override
-			public void run() {
-				for (Player p : Bukkit.getOnlinePlayers()) {
-					p.chat("/hub");
-				}
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
-			}
-		}, 200L);
+						@Override
+						public void run() {
+							for (Player p : Bukkit.getOnlinePlayers()) {
+								p.chat("/hub");
+							}
+							Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+									"restart");
+						}
+					}, 200L);
+		} catch (Exception e) {
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
+
+		}
 	}
 
 	public static int removeEnts() {
@@ -982,48 +987,6 @@ public class Game {
 						}
 					}
 				}, 1200L, 1200L);
-	}
-
-	private static void shootFireworks(final Player entity, final int times) {
-		new Thread(new Runnable() {
-			public void run() {
-				for (int i = 0; i < times; i++) {
-					Firework fw = (Firework) entity.getWorld().spawn(
-							entity.getLocation(), Firework.class);
-					FireworkMeta fm = fw.getFireworkMeta();
-					Random x = new Random();
-					int xf = x.nextInt(4) + 1;
-					FireworkEffect.Type type = FireworkEffect.Type.BALL;
-					if (xf == 1)
-						type = FireworkEffect.Type.BALL;
-					if (xf == 2)
-						type = FireworkEffect.Type.BALL_LARGE;
-					if (xf == 3)
-						type = FireworkEffect.Type.BURST;
-					if (xf == 4)
-						type = FireworkEffect.Type.CREEPER;
-					if (xf == 5)
-						type = FireworkEffect.Type.STAR;
-					int xf1i = x.nextInt(17) + 1;
-					int xf2i = x.nextInt(17) + 1;
-					Color cc = getColor(xf1i);
-					Color cd = getColor(xf2i);
-					FireworkEffect effect = FireworkEffect.builder()
-							.flicker(x.nextBoolean()).withColor(cc)
-							.withFade(cd).with(type).trail(x.nextBoolean())
-							.build();
-					fm.addEffect(effect);
-					int pw = x.nextInt(2) + 1;
-					fm.setPower(pw);
-					fw.setFireworkMeta(fm);
-					try {
-						Thread.sleep(500 + new Random().nextInt(700));
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}).start();
 	}
 
 	public static Color getColor(int x) {

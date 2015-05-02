@@ -46,19 +46,17 @@ public class MySQLer {
 		if (c == null) {
 			connect();
 		}
-		DatabaseMetaData dbm = c.getMetaData();
-		ResultSet tables = dbm.getTables(null, null, "Minigame_Tokens", null);
-		if (tables.next()) {
-			exist = true;
-		} else {
-			Statement statement = c.createStatement();
-			statement
-					.executeUpdate("CREATE TABLE Minigame_Tokens(Table_ID INT NOT NULL AUTO_INCREMENT,UUID VARCHAR(100) NOT NULL,Username VARCHAR(100) NOT NULL,Token INT NOT NULL,PRIMARY KEY ( Table_ID ));");
-			System.out
-					.println("CREATE TABLE Minigame_Tokens(Table_ID INT NOT NULL AUTO_INCREMENT,UUID VARCHAR(100) NOT NULL,Username VARCHAR(100) NOT NULL,Token INT NOT NULL,PRIMARY KEY ( Table_ID ));");
-			exist = true;
-			return;
-		}
+		return;
+		/*
+		 * DatabaseMetaData dbm = c.getMetaData(); ResultSet tables =
+		 * dbm.getTables(null, null, "Minigame_Tokens", null); if
+		 * (tables.next()) { exist = true; } else { Statement statement =
+		 * c.createStatement(); statement .executeUpdate(
+		 * "CREATE TABLE Minigame_Tokens(Table_ID INT NOT NULL AUTO_INCREMENT,UUID VARCHAR(100) NOT NULL,Username VARCHAR(100) NOT NULL,Token INT NOT NULL,PRIMARY KEY ( Table_ID ));"
+		 * ); System.out .println(
+		 * "CREATE TABLE Minigame_Tokens(Table_ID INT NOT NULL AUTO_INCREMENT,UUID VARCHAR(100) NOT NULL,Username VARCHAR(100) NOT NULL,Token INT NOT NULL,PRIMARY KEY ( Table_ID ));"
+		 * ); exist = true; return; }
+		 */
 	}
 
 	public boolean isPlayer(Player player) throws ClassNotFoundException,
@@ -67,7 +65,7 @@ public class MySQLer {
 		if (!mysql) {
 			return false;
 		}
-		if (c == null) {
+		if (c == null || c.isClosed()) {
 			connect();
 		}
 		try {
@@ -90,7 +88,7 @@ public class MySQLer {
 			c = null;
 			return false;
 		}
-
+		c.close();
 		return is;
 	}
 
@@ -99,12 +97,12 @@ public class MySQLer {
 		if (!mysql) {
 			return;
 		}
-		if (c == null) {
+		if (c == null || c.isClosed()) {
 			connect();
 		}
 		String br = "'";
 		TBN.debugMsg("Creating profile for " + player.getDisplayName() + "...");
-		TBN.debugMsg("INSERT INTO `Minigame_Tokens`(`Table_ID`, `UUID`, `Username`, `Token`) VALUES ('1',"
+		TBN.debugMsg("INSERT INTO `Minigame_Tokens`(`UUID`, `Username`, `Token`) VALUES ("
 				+ br
 				+ ""
 				+ player.getUniqueId().toString()
@@ -114,14 +112,14 @@ public class MySQLer {
 				+ player.getDisplayName() + br + ",0)");
 		Statement statement = c.createStatement();
 		statement
-				.executeUpdate("INSERT INTO `Minigame_Tokens`(`Table_ID`, `UUID`, `Username`, `Token`) VALUES ('1',"
+				.executeUpdate("INSERT INTO `Minigame_Tokens`(`UUID`, `Username`, `Token`) VALUES ("
 						+ br
 						+ ""
 						+ player.getUniqueId().toString()
 						+ br
 						+ ","
 						+ br + player.getDisplayName() + br + ",0)");
-
+		c.close();
 	}
 
 	public void setCoins(Player player, int i) throws SQLException,
@@ -129,7 +127,7 @@ public class MySQLer {
 		if (!mysql) {
 			return;
 		}
-		if (c == null) {
+		if (c == null || c.isClosed()) {
 			connect();
 		}
 		Statement statement = c.createStatement();
@@ -137,7 +135,7 @@ public class MySQLer {
 				+ " WHERE UUID = '" + player.getUniqueId().toString() + "'");
 		TBN.debugMsg("UPDATE `Minigame_Tokens` SET `Token`=" + i
 				+ " WHERE UUID = '" + player.getUniqueId().toString() + "'");
-
+		c.close();
 	}
 
 	public int getCoins(Player player) throws SQLException,
@@ -148,7 +146,7 @@ public class MySQLer {
 		if (!mysql) {
 			return 0;
 		}
-		if (c == null) {
+		if (c == null || c.isClosed()) {
 			connect();
 		}
 		Statement statement = c.createStatement();
@@ -157,6 +155,7 @@ public class MySQLer {
 						+ player.getUniqueId().toString() + "';");
 		res.next();
 		get = res.getInt("Token");
+		c.close();
 		return get;
 	}
 
@@ -165,10 +164,11 @@ public class MySQLer {
 		if (!mysql) {
 			return;
 		}
-		if (c == null) {
+		if (c == null || c.isClosed()) {
 			connect();
 		}
 		pp.setCoins(getCoins(pp.getPlayer()));
+		c.close();
 	}
 
 }

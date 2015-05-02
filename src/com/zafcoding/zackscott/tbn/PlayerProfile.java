@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.Scoreboard;
 
 import com.zafcoding.zackscott.tbn.game.Game;
 
@@ -29,6 +30,7 @@ public class PlayerProfile {
 	public boolean shopuse = false;
 	public ShopUse su = ShopUse.inactive;
 	int coins = 0;
+	public Scoreboard sb = null;
 
 	public PlayerProfile(Player player, PlayType pt) {
 		p = player;
