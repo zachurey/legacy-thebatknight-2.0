@@ -48,10 +48,18 @@ public class Game {
 		i = 0;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void start() {
 		info.setState(ServerState.In_Game);
+		Bukkit.getScheduler().scheduleAsyncDelayedTask(tbn, new Runnable() {
+			@Override
+			public void run() {
+				Info.poo = true;
+				return;
+			}
+		}, 80L);
 		info.setGameTime(tbn.getConfig().getInt("MatchLengh") * 60);
-		//setHeroesAndBadGuys(tbn);
+		setHeroesAndBadGuys(tbn);
 		Locations.populateChests(Info.superChest);
 		Info.herofreeze = true;
 		info.getActiveWorld().setTime(14000);
@@ -131,8 +139,8 @@ public class Game {
 		}
 		info.setState(ServerState.Post_Game);
 		PlayerProfile mostdia = null;
-		if(bo == -1){
-			
+		if (bo == -1) {
+
 		}
 		if (bo == 1) {
 			int total = 0;
@@ -391,301 +399,332 @@ public class Game {
 	@SuppressWarnings({ "rawtypes", "unchecked", "static-access", "unused",
 			"deprecation" })
 	private void setHeroesAndBadGuys(TBN tbn2) {
-		ArrayList<Player> pl = info.getPlayers();
-		Random rand = new Random();
-		int batmanIndex = rand.nextInt(pl.size());
-		int robinIndex = rand.nextInt(pl.size());
-		int jockerIndex = rand.nextInt(pl.size());
-		int puffinIndex = rand.nextInt(pl.size());
-		int catIndex = rand.nextInt(pl.size());
+		try {
+			ArrayList<Player> pl = info.getPlayers();
+			Random rand = new Random();
+			int batmanIndex = rand.nextInt(pl.size());
+			int robinIndex = rand.nextInt(pl.size());
+			int jockerIndex = rand.nextInt(pl.size());
+			int puffinIndex = rand.nextInt(pl.size());
+			int catIndex = rand.nextInt(pl.size());
 
-		while (batmanIndex == robinIndex) {
-			robinIndex = rand.nextInt(pl.size());
-		}
-		while ((batmanIndex == jockerIndex || robinIndex == jockerIndex)) {
-			jockerIndex = rand.nextInt(pl.size());
-		}
-		while ((batmanIndex == catIndex || robinIndex == catIndex)
-				|| jockerIndex == catIndex) {
-			catIndex = rand.nextInt(pl.size());
-		}
-		while ((batmanIndex == puffinIndex || robinIndex == puffinIndex)
-				|| jockerIndex == puffinIndex || catIndex == puffinIndex) {
-			puffinIndex = rand.nextInt(pl.size());
-		}
-
-		tbn.debugMsg("Setting batman...");
-		if (info.batman == null) {
-			info.batman = pl.get(batmanIndex);
-			info.getPP(info.batman).setType(PlayType.BatNight);
-		}
-
-		tbn.debugMsg("Setting robin...");
-		if (info.robin == null) {
-			info.robin = pl.get(robinIndex);
-			info.getPP(info.robin).setType(PlayType.BirdBoy);
-		}
-
-		tbn.debugMsg("Setting joker...");
-		if (info.joker == null) {
-			info.joker = pl.get(jockerIndex);
-			info.getPP(info.joker).setType(PlayType.Joker);
-		}
-		tbn.debugMsg("Setting puffin...");
-		if (info.puffin == null) {
-			info.puffin = pl.get(puffinIndex);
-			info.getPP(info.puffin).setType(PlayType.Puffin);
-		}
-		tbn.debugMsg("Setting catlady...");
-		if (info.catwomen == null) {
-			info.catwomen = pl.get(catIndex);
-			info.getPP(info.catwomen).setType(PlayType.KittyKat);
-		}
-
-		tbn.debugMsg("Adding badguys...");
-		for (Player pp : info.getPlayers()) {
-			PlayerProfile ppp = info.getPP(pp);
-			if (ppp.getType() != PlayType.BatNight
-					&& ppp.getType() != PlayType.BirdBoy
-					&& ppp.getType() != PlayType.KittyKat
-					&& ppp.getType() != PlayType.Joker
-					&& ppp.getType() != PlayType.Puffin) {
-				info.badguys.add(pp);
+			while (batmanIndex == robinIndex) {
+				robinIndex = rand.nextInt(pl.size());
 			}
-		}
-
-		tbn.debugMsg("Doing some inv stuffr...");
-		info.clearAllInventories();
-		ItemStack strength = new ItemStack(Material.POTION);
-		Potion p = new Potion(PotionType.STRENGTH);
-		p.apply(strength);
-		ItemStack instantHeal = new ItemStack(Material.POTION);
-		Potion p2 = new Potion(PotionType.INSTANT_HEAL);
-		p2.apply(instantHeal);
-		ItemStack regen = new ItemStack(Material.POTION);
-		Potion p3 = new Potion(PotionType.REGEN);
-		p3.apply(regen);
-		ItemStack posion = new ItemStack(Material.POTION);
-		Potion p4 = new Potion(PotionType.POISON);
-		p4.apply(posion);
-		ItemStack speed = new ItemStack(Material.POTION);
-		Potion p5 = new Potion(PotionType.SPEED);
-		p5.apply(speed);
-		ItemStack sword;
-		sword = new ItemStack(Material.DIAMOND_SWORD);
-		sword.addEnchantment(Enchantment.DAMAGE_ALL, 1);
-
-		List compassLore = new ArrayList();
-		List bowLore = new ArrayList();
-		List swordLore = new ArrayList();
-		List featherLore = new ArrayList();
-
-		compassLore
-				.add(ChatColor.DARK_GRAY + "Use This To Track The Bad Guys!");
-		bowLore.add(ChatColor.DARK_GRAY + "Take em down boyz!");
-		swordLore.add(ChatColor.DARK_GRAY + "Slice and Dice!");
-		featherLore.add(ChatColor.DARK_GRAY
-				+ "Fly like one of your French Girls!");
-
-		if (info.batman != null) {
-			info.batman.getInventory()
-					.addItem(
-							new ItemStack[] {
-									setName(sword, ChatColor.DARK_RED
-											+ "BatSword", swordLore),
-									setName(strength, ChatColor.GRAY
-											+ "Steroids", null),
-									setName(instantHeal, ChatColor.LIGHT_PURPLE
-											+ "Health Serum", null),
-									setName(new ItemStack(Material.COMPASS),
-											ChatColor.GREEN + "Tracker",
-											compassLore),
-									setName(regen, ChatColor.GREEN + "Med Kit",
-											null),
-									setName(posion, ChatColor.DARK_GREEN
-											+ "Gas Bomb", null),
-									setName(speed, ChatColor.BLUE
-											+ "Adrenaline Shot", null),
-									setName(new ItemStack(Material.FEATHER),
-											ChatColor.GRAY
-													+ "Feather o' Flight",
-											featherLore) });
-			info.batman.getInventory().setHelmet(
-					setArmourColour(Material.LEATHER_HELMET, 0, 0, 0));
-			info.batman.getInventory().setChestplate(
-					setArmourColour(Material.LEATHER_CHESTPLATE, 0, 0, 0));
-			info.batman.getInventory().setLeggings(
-					setArmourColour(Material.LEATHER_LEGGINGS, 0, 0, 0));
-			info.batman.getInventory().setBoots(
-					setArmourColour(Material.LEATHER_BOOTS, 0, 0, 0));
-			setListName(info.batman, info.batman.getDisplayName(),
-					ChatColor.GRAY);
-			info.batman.setDisplayName(ChatColor.GRAY + "[BatKnight]");
-			info.batman.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
-					.getName(), -1));
-		}
-		if (info.robin != null) {
-			info.robin.getInventory().addItem(
-					new ItemStack[] {
-							setName(new ItemStack(Material.COMPASS),
-									ChatColor.GREEN + "Tracker", compassLore),
-							setName(sword, ChatColor.RED + "BatSword",
-									swordLore),
-							setName(new ItemStack(Material.FEATHER),
-									ChatColor.GRAY + "Feather o' Flight",
-									featherLore), strength });
-			info.robin.getInventory().setHelmet(
-					setArmourColour(Material.LEATHER_HELMET, 64, 193, 55));
-			info.robin.getInventory().setChestplate(
-					setArmourColour(Material.LEATHER_CHESTPLATE, 64, 193, 55));
-			info.robin.getInventory().setLeggings(
-					setArmourColour(Material.LEATHER_LEGGINGS, 64, 193, 55));
-			info.robin.getInventory().setBoots(
-					setArmourColour(Material.LEATHER_BOOTS, 64, 193, 55));
-			setListName(info.robin, info.robin.getDisplayName(),
-					ChatColor.GREEN);
-			info.robin.setDisplayName(ChatColor.GREEN + "[BirdBoy]");
-			info.robin.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
-					.getName(), -2));
-		}
-		if (info.joker != null) {
-			info.joker.getInventory().setHelmet(
-					setArmourColour(Material.LEATHER_HELMET, 191, 0, 255));
-			info.joker.getInventory().setChestplate(
-					setArmourColour(Material.LEATHER_CHESTPLATE, 191, 0, 255));
-			info.joker.getInventory().setLeggings(
-					setArmourColour(Material.LEATHER_LEGGINGS, 191, 0, 255));
-
-			ItemStack jokerBoots = new ItemStack(Material.IRON_BOOTS);
-			jokerBoots.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 20);
-			List jokerBootsLore = new ArrayList();
-			jokerBootsLore.add(ChatColor.DARK_GRAY
-					+ "Escape In Times Of Need...");
-			info.joker.getInventory().setBoots(
-					setName(jokerBoots, ChatColor.GRAY + "The Iron Imperators",
-							jokerBootsLore));
-
-			ItemStack jSword = new ItemStack(Material.IRON_SWORD);
-			ItemStack jPotion = new ItemStack(Material.POTION);
-			Potion jP = new Potion(PotionType.POISON);
-			jP.setSplash(true);
-			jP.apply(jPotion);
-
-			List jokerSwordLore = new ArrayList();
-			List jokerBombLore = new ArrayList();
-			List tntiabLore = new ArrayList();
-
-			tntiabLore
-					.add(ChatColor.DARK_GRAY
-							+ "Trick the villains into opening these... They'll get a big suprise!");
-			jokerSwordLore.add(ChatColor.DARK_GRAY
-					+ "So Little Time... So Much Pain...");
-			jokerBombLore.add(ChatColor.RED + "Kaboom...");
-
-			jSword.addEnchantment(Enchantment.DAMAGE_ALL, 2);
-			info.joker.getInventory().addItem(
-					new ItemStack[] { setName(jSword, ChatColor.DARK_PURPLE
-							+ "The Fate Changer", jokerSwordLore) });
-			info.joker.getInventory().addItem(
-					new ItemStack[] { setName(new ItemStack(Material.CHEST, 5),
-							ChatColor.RED + "TNT-In-A-Box", new ArrayList()) });
-			int spawn = randInt(1, 20);
-			info.joker.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
-					.getName(), spawn));
-			setListName(info.joker, info.joker.getDisplayName(),
-					ChatColor.DARK_PURPLE);
-			info.joker.setDisplayName(ChatColor.DARK_PURPLE + "[Jester]");
-			if (info.spawnwitch >= 20) {
-				info.spawnwitch = 1;
+			while ((batmanIndex == jockerIndex || robinIndex == jockerIndex)) {
+				jockerIndex = rand.nextInt(pl.size());
 			}
-			info.joker.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
-					.getName(), info.spawnwitch));
-			info.spawnwitch++;
-		}
-		if (info.puffin != null) {
-			List<String> ll = new ArrayList<String>();
-			info.puffin.getInventory().addItem(
-					new ItemStack[] {
-							setName(Material.STONE_HOE, ChatColor.DARK_PURPLE
-									+ "Umbrella", ll),
-							setName(Material.EGG, ChatColor.YELLOW
-									+ "Minion Spawner", ll),
-							setName(Material.RAW_CHICKEN, ChatColor.GRAY
-									+ "The Puffinator", ll) });
-			if (info.spawnwitch >= 20) {
-				info.spawnwitch = 1;
+			while ((batmanIndex == catIndex || robinIndex == catIndex)
+					|| jockerIndex == catIndex) {
+				catIndex = rand.nextInt(pl.size());
 			}
-			info.puffin.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
-					.getName(), info.spawnwitch));
-			info.spawnwitch++;
-		}
-		if (info.catwomen != null) {
-			info.catwomen.getInventory().addItem(
-					new ItemStack[] {
-							setName(new ItemStack(Material.STONE_SWORD),
-									ChatColor.GRAY + "Kitty Claws", null),
-							setName(new ItemStack(Material.MILK_BUCKET),
-									ChatColor.GOLD + "Catsciser", null),
-							setName(new ItemStack(Material.getMaterial(349)),
-									ChatColor.BLUE + "Minion Spawner", null),
-							setName(new ItemStack(Material.FISHING_ROD),
-									ChatColor.RED + "Diamond Stealer", null),
-							setName(Material.COMPASS, ChatColor.GREEN
-									+ "Tracker", compassLore) });
-			info.catwomen.getInventory().setHelmet(
-					setArmourColour(Material.LEATHER_HELMET, 253, 152, 254));
-			info.catwomen.getInventory()
-					.setChestplate(
-							setArmourColour(Material.LEATHER_CHESTPLATE, 253,
-									152, 254));
-			info.catwomen.getInventory().setLeggings(
-					setArmourColour(Material.LEATHER_LEGGINGS, 253, 152, 254));
-			info.catwomen.getInventory().setBoots(
-					setArmourColour(Material.LEATHER_LEGGINGS, 253, 152, 254));
-			info.catwomen.addPotionEffect(new PotionEffect(
-					PotionEffectType.SPEED, -1, 3));
-			setListName(info.catwomen, info.catwomen.getDisplayName(),
-					ChatColor.LIGHT_PURPLE);
-			if (info.spawnwitch >= 20) {
-				info.spawnwitch = 1;
+			while ((batmanIndex == puffinIndex || robinIndex == puffinIndex)
+					|| jockerIndex == puffinIndex || catIndex == puffinIndex) {
+				puffinIndex = rand.nextInt(pl.size());
 			}
-			info.catwomen.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
-					.getName(), info.spawnwitch));
-			info.spawnwitch++;
-		}
 
-		int index = 0;
-		for (Player badGuy : info.badguys) {
-			if ((badGuy != null) && (badGuy.getName() != null)
-					&& info.getPP(badGuy).getType() == PlayType.Villan) {
-				badGuy.getInventory().addItem(
+			tbn.debugMsg("Setting batman...");
+			if (info.batman == null) {
+				info.batman = pl.get(batmanIndex);
+				info.getPP(info.batman).setType(PlayType.BatNight);
+			}
+
+			tbn.debugMsg("Setting robin...");
+			if (info.robin == null) {
+				info.robin = pl.get(robinIndex);
+				info.getPP(info.robin).setType(PlayType.BirdBoy);
+			}
+
+			tbn.debugMsg("Setting joker...");
+			if (info.joker == null) {
+				info.joker = pl.get(jockerIndex);
+				info.getPP(info.joker).setType(PlayType.Joker);
+			}
+			tbn.debugMsg("Setting puffin...");
+			if (info.puffin == null) {
+				info.puffin = pl.get(puffinIndex);
+				info.getPP(info.puffin).setType(PlayType.Puffin);
+			}
+			tbn.debugMsg("Setting catlady...");
+			if (info.catwomen == null) {
+				info.catwomen = pl.get(catIndex);
+				info.getPP(info.catwomen).setType(PlayType.KittyKat);
+			}
+
+			tbn.debugMsg("Adding badguys...");
+			for (Player pp : info.getPlayers()) {
+				PlayerProfile ppp = info.getPP(pp);
+				if (ppp.getType() != PlayType.BatNight
+						&& ppp.getType() != PlayType.BirdBoy
+						&& ppp.getType() != PlayType.KittyKat
+						&& ppp.getType() != PlayType.Joker
+						&& ppp.getType() != PlayType.Puffin) {
+					info.badguys.add(pp);
+				}
+			}
+
+			tbn.debugMsg("Doing some inv stuffr...");
+			info.clearAllInventories();
+			ItemStack strength = new ItemStack(Material.POTION);
+			Potion p = new Potion(PotionType.STRENGTH);
+			p.apply(strength);
+			ItemStack instantHeal = new ItemStack(Material.POTION);
+			Potion p2 = new Potion(PotionType.INSTANT_HEAL);
+			p2.apply(instantHeal);
+			ItemStack regen = new ItemStack(Material.POTION);
+			Potion p3 = new Potion(PotionType.REGEN);
+			p3.apply(regen);
+			ItemStack posion = new ItemStack(Material.POTION);
+			Potion p4 = new Potion(PotionType.POISON);
+			p4.apply(posion);
+			ItemStack speed = new ItemStack(Material.POTION);
+			Potion p5 = new Potion(PotionType.SPEED);
+			p5.apply(speed);
+			ItemStack sword;
+			sword = new ItemStack(Material.DIAMOND_SWORD);
+			sword.addEnchantment(Enchantment.DAMAGE_ALL, 1);
+
+			List compassLore = new ArrayList();
+			List bowLore = new ArrayList();
+			List swordLore = new ArrayList();
+			List featherLore = new ArrayList();
+
+			compassLore.add(ChatColor.DARK_GRAY
+					+ "Use This To Track The Bad Guys!");
+			bowLore.add(ChatColor.DARK_GRAY + "Take em down boyz!");
+			swordLore.add(ChatColor.DARK_GRAY + "Slice and Dice!");
+			featherLore.add(ChatColor.DARK_GRAY
+					+ "Fly like one of your French Girls!");
+
+			if (info.batman != null) {
+				info.batman.getInventory().addItem(
 						new ItemStack[] {
-								new ItemStack(Material.STONE_SWORD),
-								new ItemStack(Material.BOW),
-								new ItemStack(Material.ARROW, new Random()
-										.nextInt(64)) });
-				setListName(badGuy, badGuy.getDisplayName(), ChatColor.YELLOW);
-				/*
-				 * if ((index == randomIndex) && (badGuy != null)) { ItemStack i
-				 * = setName(new ItemStack(Material.STICK), ChatColor.YELLOW +
-				 * "Knockback Stick", null);
-				 * i.addUnsafeEnchantment(Enchantment.KNOCKBACK, 4);
-				 * i.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 2);
-				 * badGuy.getInventory().addItem(new ItemStack[] { i }); } End
-				 * of comment
-				 */
-				index++;
-				badGuy.updateInventory();
+								setName(sword, ChatColor.DARK_RED + "BatSword",
+										swordLore),
+								setName(strength, ChatColor.GRAY + "Steroids",
+										null),
+								setName(instantHeal, ChatColor.LIGHT_PURPLE
+										+ "Health Serum", null),
+								setName(new ItemStack(Material.COMPASS),
+										ChatColor.GREEN + "Tracker",
+										compassLore),
+								setName(regen, ChatColor.GREEN + "Med Kit",
+										null),
+								setName(posion, ChatColor.DARK_GREEN
+										+ "Gas Bomb", null),
+								setName(speed, ChatColor.BLUE
+										+ "Adrenaline Shot", null),
+								setName(new ItemStack(Material.FEATHER),
+										ChatColor.GRAY + "Feather o' Flight",
+										featherLore) });
+				info.batman.getInventory().setHelmet(
+						setArmourColour(Material.LEATHER_HELMET, 0, 0, 0));
+				info.batman.getInventory().setChestplate(
+						setArmourColour(Material.LEATHER_CHESTPLATE, 0, 0, 0));
+				info.batman.getInventory().setLeggings(
+						setArmourColour(Material.LEATHER_LEGGINGS, 0, 0, 0));
+				info.batman.getInventory().setBoots(
+						setArmourColour(Material.LEATHER_BOOTS, 0, 0, 0));
+				setListName(info.batman, info.batman.getDisplayName(),
+						ChatColor.GRAY);
+				info.batman.setDisplayName(ChatColor.GRAY + "[BatKnight]");
+				info.batman.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+						.getName(), -1));
+			}
+			if (info.robin != null) {
+				info.robin.getInventory().addItem(
+						new ItemStack[] {
+								setName(new ItemStack(Material.COMPASS),
+										ChatColor.GREEN + "Tracker",
+										compassLore),
+								setName(sword, ChatColor.RED + "BatSword",
+										swordLore),
+								setName(new ItemStack(Material.FEATHER),
+										ChatColor.GRAY + "Feather o' Flight",
+										featherLore), strength });
+				info.robin.getInventory().setHelmet(
+						setArmourColour(Material.LEATHER_HELMET, 64, 193, 55));
+				info.robin.getInventory().setChestplate(
+						setArmourColour(Material.LEATHER_CHESTPLATE, 64, 193,
+								55));
+				info.robin.getInventory()
+						.setLeggings(
+								setArmourColour(Material.LEATHER_LEGGINGS, 64,
+										193, 55));
+				info.robin.getInventory().setBoots(
+						setArmourColour(Material.LEATHER_BOOTS, 64, 193, 55));
+				setListName(info.robin, info.robin.getDisplayName(),
+						ChatColor.GREEN);
+				info.robin.setDisplayName(ChatColor.GREEN + "[BirdBoy]");
+				info.robin.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+						.getName(), -2));
+			}
+			if (info.joker != null) {
+				info.joker.getInventory().setHelmet(
+						setArmourColour(Material.LEATHER_HELMET, 191, 0, 255));
+				info.joker.getInventory().setChestplate(
+						setArmourColour(Material.LEATHER_CHESTPLATE, 191, 0,
+								255));
+				info.joker.getInventory()
+						.setLeggings(
+								setArmourColour(Material.LEATHER_LEGGINGS, 191,
+										0, 255));
+
+				ItemStack jokerBoots = new ItemStack(Material.IRON_BOOTS);
+				jokerBoots
+						.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 20);
+				List jokerBootsLore = new ArrayList();
+				jokerBootsLore.add(ChatColor.DARK_GRAY
+						+ "Escape In Times Of Need...");
+				info.joker.getInventory().setBoots(
+						setName(jokerBoots, ChatColor.GRAY
+								+ "The Iron Imperators", jokerBootsLore));
+
+				ItemStack jSword = new ItemStack(Material.IRON_SWORD);
+				ItemStack jPotion = new ItemStack(Material.POTION);
+				Potion jP = new Potion(PotionType.POISON);
+				jP.setSplash(true);
+				jP.apply(jPotion);
+
+				List jokerSwordLore = new ArrayList();
+				List jokerBombLore = new ArrayList();
+				List tntiabLore = new ArrayList();
+
+				tntiabLore
+						.add(ChatColor.DARK_GRAY
+								+ "Trick the villains into opening these... They'll get a big suprise!");
+				jokerSwordLore.add(ChatColor.DARK_GRAY
+						+ "So Little Time... So Much Pain...");
+				jokerBombLore.add(ChatColor.RED + "Kaboom...");
+
+				jSword.addEnchantment(Enchantment.DAMAGE_ALL, 2);
+				info.joker.getInventory().addItem(
+						new ItemStack[] { setName(jSword, ChatColor.DARK_PURPLE
+								+ "The Fate Changer", jokerSwordLore) });
+				info.joker.getInventory().addItem(
+						new ItemStack[] { setName(new ItemStack(Material.CHEST,
+								5), ChatColor.RED + "TNT-In-A-Box",
+								new ArrayList()) });
+				int spawn = randInt(1, 20);
+				info.joker.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+						.getName(), spawn));
+				setListName(info.joker, info.joker.getDisplayName(),
+						ChatColor.DARK_PURPLE);
+				info.joker.setDisplayName(ChatColor.DARK_PURPLE + "[Jester]");
 				if (info.spawnwitch >= 20) {
 					info.spawnwitch = 1;
 				}
-				badGuy.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+				info.joker.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
 						.getName(), info.spawnwitch));
 				info.spawnwitch++;
 			}
+			if (info.puffin != null) {
+				List<String> ll = new ArrayList<String>();
+				info.puffin
+						.getInventory()
+						.addItem(
+								new ItemStack[] {
+										setName(Material.STONE_HOE,
+												ChatColor.DARK_PURPLE
+														+ "Umbrella", ll),
+										setName(Material.EGG, ChatColor.YELLOW
+												+ "Minion Spawner", ll),
+										setName(Material.RAW_CHICKEN,
+												ChatColor.GRAY
+														+ "The Puffinator", ll) });
+				if (info.spawnwitch >= 20) {
+					info.spawnwitch = 1;
+				}
+				info.puffin.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+						.getName(), info.spawnwitch));
+				info.spawnwitch++;
+			}
+			if (info.catwomen != null) {
+				info.catwomen.getInventory()
+						.addItem(
+								new ItemStack[] {
+										setName(new ItemStack(
+												Material.STONE_SWORD),
+												ChatColor.GRAY + "Kitty Claws",
+												null),
+										setName(new ItemStack(
+												Material.MILK_BUCKET),
+												ChatColor.GOLD + "Catsciser",
+												null),
+										setName(new ItemStack(Material
+												.getMaterial(349)),
+												ChatColor.BLUE
+														+ "Minion Spawner",
+												null),
+										setName(new ItemStack(
+												Material.FISHING_ROD),
+												ChatColor.RED
+														+ "Diamond Stealer",
+												null),
+										setName(Material.COMPASS,
+												ChatColor.GREEN + "Tracker",
+												compassLore) });
+				info.catwomen.getInventory()
+						.setHelmet(
+								setArmourColour(Material.LEATHER_HELMET, 253,
+										152, 254));
+				info.catwomen.getInventory().setChestplate(
+						setArmourColour(Material.LEATHER_CHESTPLATE, 253, 152,
+								254));
+				info.catwomen.getInventory().setLeggings(
+						setArmourColour(Material.LEATHER_LEGGINGS, 253, 152,
+								254));
+				info.catwomen.getInventory().setBoots(
+						setArmourColour(Material.LEATHER_LEGGINGS, 253, 152,
+								254));
+				info.catwomen.addPotionEffect(new PotionEffect(
+						PotionEffectType.SPEED, -1, 3));
+				setListName(info.catwomen, info.catwomen.getDisplayName(),
+						ChatColor.LIGHT_PURPLE);
+				if (info.spawnwitch >= 20) {
+					info.spawnwitch = 1;
+				}
+				info.catwomen.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+						.getName(), info.spawnwitch));
+				info.spawnwitch++;
+			}
+
+			int index = 0;
+			for (Player badGuy : info.badguys) {
+				if ((badGuy != null) && (badGuy.getName() != null)
+						&& info.getPP(badGuy).getType() == PlayType.Villan) {
+					badGuy.getInventory().addItem(
+							new ItemStack[] {
+									new ItemStack(Material.STONE_SWORD),
+									new ItemStack(Material.BOW),
+									new ItemStack(Material.ARROW, new Random()
+											.nextInt(64)) });
+					setListName(badGuy, badGuy.getDisplayName(),
+							ChatColor.YELLOW);
+					/*
+					 * if ((index == randomIndex) && (badGuy != null)) {
+					 * ItemStack i = setName(new ItemStack(Material.STICK),
+					 * ChatColor.YELLOW + "Knockback Stick", null);
+					 * i.addUnsafeEnchantment(Enchantment.KNOCKBACK, 4);
+					 * i.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 2);
+					 * badGuy.getInventory().addItem(new ItemStack[] { i }); }
+					 * End of comment
+					 */
+					index++;
+					badGuy.updateInventory();
+					if (info.spawnwitch >= 20) {
+						info.spawnwitch = 1;
+					}
+					badGuy.teleport(tbn.getPlayerSpawn(info.getActiveWorld()
+							.getName(), info.spawnwitch));
+					info.spawnwitch++;
+				}
+			}
+			info.updateAllInventories();
+			sendHowToPlayInfo();
+		} catch (Exception e) {
+
 		}
-		info.updateAllInventories();
-		sendHowToPlayInfo();
 	}
 
 	public ItemStack setName(Material ma, String name, List<String> lore) {

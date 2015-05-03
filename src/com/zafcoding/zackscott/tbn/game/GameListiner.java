@@ -361,7 +361,6 @@ public class GameListiner implements Listener {
 		try {
 			if (event.getItem() != null
 					&& event.getItem().getType() == Material.IRON_HOE) {
-				TBN.debugMsg(event.getAction() + "");
 			}
 			if ((event.getItem().getType() == Material.IRON_HOE)
 					&& ((event.getAction() == Action.RIGHT_CLICK_AIR) || (event
