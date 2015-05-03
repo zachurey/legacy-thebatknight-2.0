@@ -51,7 +51,7 @@ public class Game {
 	public void start() {
 		info.setState(ServerState.In_Game);
 		info.setGameTime(tbn.getConfig().getInt("MatchLengh") * 60);
-		setHeroesAndBadGuys(tbn);
+		//setHeroesAndBadGuys(tbn);
 		Locations.populateChests(Info.superChest);
 		Info.herofreeze = true;
 		info.getActiveWorld().setTime(14000);
@@ -99,7 +99,7 @@ public class Game {
 
 	int time = 10;
 
-	private void startGraceStop() {
+	public void startGraceStop() {
 		info.pvp = false;
 		info.broadCast(ChatColor.RED
 				+ "You have been given a grace period for 10 seconds!");
@@ -131,6 +131,9 @@ public class Game {
 		}
 		info.setState(ServerState.Post_Game);
 		PlayerProfile mostdia = null;
+		if(bo == -1){
+			
+		}
 		if (bo == 1) {
 			int total = 0;
 			for (Player pa : info.getPlayers()) {

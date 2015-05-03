@@ -203,9 +203,9 @@ public class Info {
 			p.setGameMode(GameMode.SPECTATOR);
 			p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD
 					+ "Left click to teleport to a random player!");
-			/*for (Player pl : Bukkit.getOnlinePlayers()) {
-				p.hidePlayer(pl);
-			}*/
+			/*
+			 * for (Player pl : Bukkit.getOnlinePlayers()) { p.hidePlayer(pl); }
+			 */
 			spects.add(p);
 		}
 	}
@@ -219,9 +219,9 @@ public class Info {
 		p.setGameMode(GameMode.SPECTATOR);
 		p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD
 				+ "Left click to teleport to a random player!");
-		/*for (Player pl : Bukkit.getOnlinePlayers()) {
-			p.hidePlayer(pl);
-		}*/
+		/*
+		 * for (Player pl : Bukkit.getOnlinePlayers()) { p.hidePlayer(pl); }
+		 */
 		spects.add(p);
 		p.teleport(p.getWorld().getSpawnLocation());
 		return;

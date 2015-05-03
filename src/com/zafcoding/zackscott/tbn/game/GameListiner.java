@@ -61,11 +61,15 @@ public class GameListiner implements Listener {
 	@EventHandler
 	public void PlayerFall(EntityDamageEvent e) {
 		if (e.getEntity().getType() == EntityType.PLAYER) {
-			if (info.getGameTime() >= ((tbn.getConfig().getInt("MatchLengh") * 60) - 3)) {
-				e.setCancelled(true);
-			}
 			if (!(info.getState() == ServerState.In_Game)) {
 				e.setCancelled(true);
+			}
+			if (e.getCause() == DamageCause.BLOCK_EXPLOSION) {
+				Vector unitVector = e.getEntity().getLocation().toVector()
+						.subtract(e.getEntity().getLocation().toVector())
+						.normalize();
+				// Set speed and push entity:
+				e.getEntity().setVelocity(unitVector.multiply(3));
 			}
 			if (e.getCause() == DamageCause.FALL) {
 				if (e.getEntity() instanceof Player) {
@@ -355,10 +359,13 @@ public class GameListiner implements Listener {
 	@EventHandler
 	public void a1308a(PlayerInteractEvent event) {
 		try {
+			if (event.getItem() != null
+					&& event.getItem().getType() == Material.IRON_HOE) {
+				TBN.debugMsg(event.getAction() + "");
+			}
 			if ((event.getItem().getType() == Material.IRON_HOE)
 					&& ((event.getAction() == Action.RIGHT_CLICK_AIR) || (event
 							.getAction() == Action.RIGHT_CLICK_BLOCK))) {
-				event.setCancelled(false);
 				if (info.h == 1) {
 					event.getPlayer().sendMessage(
 							ChatColor.DARK_AQUA + "" + ChatColor.BOLD
@@ -383,11 +390,11 @@ public class GameListiner implements Listener {
 								info.h = 0;
 							}
 						}, 40L);
+				return;
 			}
 			if ((event.getItem().getType() == Material.IRON_HOE)
 					&& ((event.getAction() == Action.LEFT_CLICK_AIR) || (event
 							.getAction() == Action.LEFT_CLICK_BLOCK))) {
-				event.setCancelled(false);
 				if (info.h == 1) {
 					event.getPlayer().sendMessage(
 							ChatColor.DARK_AQUA + "" + ChatColor.BOLD
@@ -436,10 +443,6 @@ public class GameListiner implements Listener {
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void handleExplosion(EntityExplodeEvent e) {
-		if (e.getEntity().getType() != EntityType.PLAYER) {
-			e.setCancelled(true);
-		}
-
 		double x = 0;
 		double y = 0;
 		double z = 0;
@@ -497,16 +500,16 @@ public class GameListiner implements Listener {
 					e.setCancelled(true);
 				}
 				if (info.batman == pp && info.robin == ep) {
+					ep.getPlayer().sendMessage(
+							ChatColor.RED
+									+ "Why would you want to hurt Robin!?");
+					e.setCancelled(true);
+				}
+				if (info.batman == ep && info.robin == pp) {
 					ep.getPlayer()
 							.sendMessage(
 									ChatColor.RED
 											+ "Why would you want to hurt TheBatKnight!?");
-					e.setCancelled(true);
-				}
-				if (info.batman == ep && info.robin == pp) {
-					ep.getPlayer().sendMessage(
-							ChatColor.RED
-									+ "Why would you want to hurt Robin!?");
 					e.setCancelled(true);
 				}
 			}

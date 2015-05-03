@@ -139,6 +139,7 @@ public class TBN extends JavaPlugin {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		gt.end();
 		System.out.print("[TBN] The Bat Night v." + version + " disabled!");
 	}
 

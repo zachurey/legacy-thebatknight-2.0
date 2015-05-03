@@ -1,14 +1,14 @@
 package com.zafcoding.zackscott.tbn;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import org.bukkit.entity.Player;
-
-import com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException;
 
 public class MySQLer {
 
@@ -216,6 +216,12 @@ public class MySQLer {
 		return get;
 	}
 
+	public void logChat(Player pl, String message){
+		DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+		Calendar cal = Calendar.getInstance();
+		System.out.println(df.format(cal));
+	}
+	
 	public void synceToken(PlayerProfile pp) throws ClassNotFoundException,
 			SQLException {
 		if (!mysql) {
