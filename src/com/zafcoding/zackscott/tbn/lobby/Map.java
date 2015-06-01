@@ -50,6 +50,32 @@ public class Map {
 		}
 	}
 	
+	public void setupMap(int re){
+		if(re == 1){
+			String worldName = "SamCity";
+			TBN.info.setActiveWorld(Bukkit.getWorld("SamCity"));
+			File playerFilesDir = new File(worldName + "/players");
+			if (playerFilesDir.isDirectory()) {
+				String[] playerDats = playerFilesDir.list();
+				for (int i = 0; i < playerDats.length; i++) {
+					File datFile = new File(playerFilesDir, playerDats[i]);
+					datFile.delete();
+				}
+			}
+		}if(re == 2){
+			String worldName = "MallMap";
+			TBN.info.setActiveWorld(Bukkit.getWorld("MallMap"));
+			File playerFilesDir = new File(worldName + "/players");
+			if (playerFilesDir.isDirectory()) {
+				String[] playerDats = playerFilesDir.list();
+				for (int i = 0; i < playerDats.length; i++) {
+					File datFile = new File(playerFilesDir, playerDats[i]);
+					datFile.delete();
+				}
+			}
+		}
+	}
+	
 	public ArrayList<MapInt> getMaps(){
 		return maps;
 	}

@@ -102,6 +102,10 @@ public class LobbyTime {
 	}
 
 	private void broadcastTime(int t) {
+		if(info.getActiveWorld() == null){
+			Map map = new Map();
+			map.setupMap(2);
+		}
 		if (t == 120) {
 			info.broadCast(ChatColor.RED + "2 minutes " + ChatColor.GOLD
 					+ "till the game starts!");
