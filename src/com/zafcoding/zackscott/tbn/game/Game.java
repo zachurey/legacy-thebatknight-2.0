@@ -58,7 +58,10 @@ public class Game {
 				return;
 			}
 		}, 80L);
-		info.setGameTime(tbn.getConfig().getInt("MatchLengh") * 60);
+		if (info.getPlayerCount() < (tbn.getMaxPlayer() / 2)) {
+			info.setGameTime((tbn.getConfig().getInt("MatchLengh") * 60) / 2);
+		} else
+			info.setGameTime(tbn.getConfig().getInt("MatchLengh") * 60);
 		setHeroesAndBadGuys(tbn);
 		Locations.populateChests(Info.superChest);
 		Info.herofreeze = true;
@@ -477,9 +480,11 @@ public class Game {
 			ItemStack posion = new ItemStack(Material.POTION);
 			Potion p4 = new Potion(PotionType.POISON);
 			p4.apply(posion);
+			p4.setSplash(true);
 			ItemStack speed = new ItemStack(Material.POTION);
 			Potion p5 = new Potion(PotionType.SPEED);
 			p5.apply(speed);
+			p5.setSplash(true);
 			ItemStack sword;
 			sword = new ItemStack(Material.DIAMOND_SWORD);
 			sword.addEnchantment(Enchantment.DAMAGE_ALL, 1);

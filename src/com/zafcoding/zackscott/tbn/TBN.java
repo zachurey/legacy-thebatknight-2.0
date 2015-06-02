@@ -716,53 +716,38 @@ public class TBN extends JavaPlugin {
 						if (p.isOp()) {
 							if (debugMode) {
 								if (info.batman != null && info.batman == p) {
-									ItemStack strength = new ItemStack(
-											Material.POTION);
-									Potion pp = new Potion(PotionType.STRENGTH);
-									pp.setSplash(true);
-									pp.apply(strength);
-									ItemStack instantHeal = new ItemStack(
-											Material.POTION);
-									Potion p2 = new Potion(
-											PotionType.INSTANT_HEAL);
-									p2.setSplash(true);
+									ItemStack strength = new ItemStack(Material.POTION);
+									Potion p1 = new Potion(PotionType.STRENGTH);
+									p1.apply(strength);
+									ItemStack instantHeal = new ItemStack(Material.POTION);
+									Potion p2 = new Potion(PotionType.INSTANT_HEAL);
 									p2.apply(instantHeal);
-									ItemStack regen = new ItemStack(
-											Material.POTION);
+									ItemStack regen = new ItemStack(Material.POTION);
 									Potion p3 = new Potion(PotionType.REGEN);
-									p3.setSplash(true);
 									p3.apply(regen);
-									ItemStack posion = new ItemStack(
-											Material.POTION);
+									ItemStack posion = new ItemStack(Material.POTION);
 									Potion p4 = new Potion(PotionType.POISON);
-									p4.setSplash(true);
 									p4.apply(posion);
-									ItemStack speed = new ItemStack(
-											Material.POTION);
+									p4.setSplash(true);
+									ItemStack speed = new ItemStack(Material.POTION);
 									Potion p5 = new Potion(PotionType.SPEED);
-									p5.setSplash(true);
 									p5.apply(speed);
+									p5.setSplash(true);
 									ItemStack sword;
-									sword = new ItemStack(
-											Material.DIAMOND_SWORD);
-									sword.addEnchantment(
-											Enchantment.DAMAGE_ALL, 1);
+									sword = new ItemStack(Material.DIAMOND_SWORD);
+									sword.addEnchantment(Enchantment.DAMAGE_ALL, 1);
 
 									List compassLore = new ArrayList();
 									List bowLore = new ArrayList();
 									List swordLore = new ArrayList();
 									List featherLore = new ArrayList();
 
-									compassLore
-											.add(ChatColor.DARK_GRAY
-													+ "Use This To Track The Bad Guys!");
-									bowLore.add(ChatColor.DARK_GRAY
-											+ "Take em down boyz!");
-									swordLore.add(ChatColor.DARK_GRAY
-											+ "Slice and Dice!");
-									featherLore
-											.add(ChatColor.DARK_GRAY
-													+ "Fly like one of your French Girls!");
+									compassLore.add(ChatColor.DARK_GRAY
+											+ "Use This To Track The Bad Guys!");
+									bowLore.add(ChatColor.DARK_GRAY + "Take em down boyz!");
+									swordLore.add(ChatColor.DARK_GRAY + "Slice and Dice!");
+									featherLore.add(ChatColor.DARK_GRAY
+											+ "Fly like one of your French Girls!");
 
 									info.batman
 											.getInventory()

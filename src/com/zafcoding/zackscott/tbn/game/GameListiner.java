@@ -296,6 +296,10 @@ public class GameListiner implements Listener {
 			try {
 				if (e.getItem().getType() != null
 						&& e.getItem().getType() == Material.RAW_FISH) {
+					if(!(info.getPP(e.getPlayer()).getType() == PlayType.KittyKat)){
+						e.setCancelled(true);
+						return;
+					}
 					e.setCancelled(true);
 					Location loc = e.getClickedBlock().getLocation();
 					loc.setY(e.getClickedBlock().getLocation().getY() + 2);
@@ -325,6 +329,10 @@ public class GameListiner implements Listener {
 			try {
 				if (e.getItem().getType() != null
 						&& e.getItem().getType() == Material.EGG) {
+					if(!(info.getPP(e.getPlayer()).getType() == PlayType.Puffin)){
+						e.setCancelled(true);
+						return;
+					}
 					Location loc = e.getClickedBlock().getLocation();
 					loc.setY(e.getClickedBlock().getLocation().getY() + 2);
 					final Entity ee = e.getClickedBlock().getWorld()
